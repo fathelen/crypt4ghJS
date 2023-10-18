@@ -23,6 +23,9 @@ const testDataEncMultiEdit = fs.readFileSync('testData\\encMultiEdit.crypt4gh')
 const testDataEncEditOdd = fs.readFileSync('testData\\encEditOdd.crypt4gh')
 const testDataBlock = fs.readFileSync('testData\\encBlock.crypt4gh')
 const testDataReenc = fs.readFileSync('testData\\ReEnc.crypt4gh')
+const testDataRearrNoEdit = fs.readFileSync('testData\\Rearr_noEdit.crypt4gh')
+const testDataRearrEdit = fs.readFileSync('testData\\Rearr_Edit.crypt4gh')
+const testDataRearrMultiEdit = fs.readFileSync('testData\\Rearr_MultiEdit.crypt4gh')
 const seckeyFileKey = new Uint8Array([20, 185, 204, 26, 245, 237, 159, 85, 129, 196, 166, 241, 27, 160, 54, 218, 89, 96, 153, 190, 9, 141, 139, 109, 142, 182, 83, 62, 107, 180, 10, 203])
 const seckey = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAEbm9uZQAEbm9uZQAg4BW6LpwKHBQN0MCZgjPtDafcGbN5wRmUSrIwEcN4te0=\n-----END CRYPT4GH PRIVATE KEY-----\n'
 const pubkey = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nGER04WfJXzPHiCWe94CHlMY6sp6zwWpAehA0MMHjdVQ=\n-----END CRYPT4GH PUBLIC KEY-----\n'
@@ -215,7 +218,6 @@ test('decryption with block', async () => {
   blocks = null
   const decryptedText = await index.decryption.decryption(Uint8Array.from(testDataBlock), encSeckey, blocks)
   const textdecoder = new TextDecoder()
-  console.log(mergedArray(decryptedText))
   expect(decryptedText).toBeInstanceOf(Array)
   expect(decryptedText[0]).toBeInstanceOf(Uint8Array)
   expect(textdecoder.decode(mergedArray(decryptedText))).toMatch(/faaa/)
@@ -249,4 +251,65 @@ test('decryption of reeencrypted', async () => {
   expect(decryptedText[0]).toBeInstanceOf(Uint8Array)
   expect(textdecoder.decode(mergedArray(decryptedText))).toMatch(/faaa/)
   expect(textdecoder.decode(mergedArray(decryptedText))).toMatch(/dddd/)
+})
+
+// rearrangment ohne edit vorher
+test('rearrangment without edit', async () => {
+  const editlist = [0, 9]
+  const rearrangedText = await index.rearrangment.rearrange(Uint8Array.from(testDataEncrypted), seckeyFileKey, [encPubkeyPass], editlist)
+  expect(rearrangedText).toBeInstanceOf(Array)
+  expect(rearrangedText[0]).toBeInstanceOf(Uint8Array)
+  // fs.writeFileSync('testData\\Rearr_noEdit.crypt4gh', mergedArray(rearrangedText))
+})
+
+test('decryption of rearrangment without edit', async () => {
+  blocks = null
+  const decryptedText = await index.decryption.decryption(Uint8Array.from(testDataRearrNoEdit), encSeckeyPass, blocks)
+  const textdecoder = new TextDecoder()
+  expect(decryptedText).toBeInstanceOf(Array)
+  expect(decryptedText[0]).toBeInstanceOf(Uint8Array)
+  expect(textdecoder.decode(mergedArray(decryptedText))).toBe('faaaaaaaa')
+})
+
+// rearrangment with edit
+test('rearrangment with edit', async () => {
+  const editlist = [0, 9]
+  const rearrangedText = await index.rearrangment.rearrange(Uint8Array.from(testDataEncryptedEdit), encSeckey, [encPubkeyPass], editlist)
+  expect(rearrangedText).toBeInstanceOf(Array)
+  expect(rearrangedText[0]).toBeInstanceOf(Uint8Array)
+  // fs.writeFileSync('testData\\Rearr_Edit.crypt4gh', mergedArray(rearrangedText))
+})
+
+test('decryption of rearrangment with edit', async () => {
+  blocks = null
+  const decryptedText = await index.decryption.decryption(Uint8Array.from(testDataRearrEdit), encSeckeyPass, blocks)
+  const textdecoder = new TextDecoder()
+  expect(decryptedText).toBeInstanceOf(Array)
+  expect(decryptedText[0]).toBeInstanceOf(Uint8Array)
+  expect(textdecoder.decode(mergedArray(decryptedText))).toBe('abcdefghi')
+})
+
+// rearrangment with multi edit
+test('rearrangment with multi edit', async () => {
+  const editlist = [0, 4]
+  const rearrangedText = await index.rearrangment.rearrange(Uint8Array.from(testDataEncMultiEdit), encSeckey, [encPubkeyPass], editlist)
+  expect(rearrangedText).toBeInstanceOf(Array)
+  expect(rearrangedText[0]).toBeInstanceOf(Uint8Array)
+  // fs.writeFileSync('testData\\Rearr_MultiEdit.crypt4gh', mergedArray(rearrangedText))
+})
+
+test('decryption of rearrangment with edit', async () => {
+  blocks = null
+  const decryptedText = await index.decryption.decryption(Uint8Array.from(testDataRearrMultiEdit), encSeckeyPass, blocks)
+  const textdecoder = new TextDecoder()
+  expect(decryptedText).toBeInstanceOf(Array)
+  expect(decryptedText[0]).toBeInstanceOf(Uint8Array)
+  expect(textdecoder.decode(mergedArray(decryptedText))).toBe('abcd')
+})
+
+// rearrangment with edit out of range
+test('rearrangment with edit out of range', async () => {
+  const editlist = [0, 12]
+  const rearrangedText = await index.rearrangment.rearrange(Uint8Array.from(testDataEncryptedEdit), encSeckey, [encPubkeyPass], editlist)
+  expect(rearrangedText).toBe(undefined)
 })

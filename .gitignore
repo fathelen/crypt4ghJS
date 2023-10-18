@@ -6,3 +6,6 @@ testData/encBlock.crypt4gh
 testData/abcdEncrypted.crypt4gh
 testData/abcd.txt
 testData/ReEnc.crypt4gh
+testData/Rearr_noEdit.crypt4gh
+testData/Rearr_MultiEdit.crypt4gh
+testData/Rearr_Edit.crypt4gh
