@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fathelen/crypt4gh_js.git"
+    "url": "git+https://github.com/fathelen/crypt4ghJS.git"
   },
   "keywords": [
     "crypt4gh",

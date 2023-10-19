@@ -32,13 +32,13 @@ exports.encryption = async function (unencryptedData, secretkey, publicKeys, blo
     // body encryption
     const nonce = helperfunction.randomBytes(12)
     const chacha20poly1305 = new ChaCha20Poly1305.ChaCha20Poly1305(sessionKey)
-    if (blocks) {
+    if (blocks && !editlist) {
       const encryptedBlock = await encryptBlock(headerPackets, blocks, chacha20poly1305, unencryptedData, nonce)
       fullEnc = encryptedBlock
-    } else if (editlist) {
+    } else if (editlist && !blocks) {
       const encryptedEdit = await encryptEditlist(editlist, encryptionMethod, sessionKey, publicKeys, secretkey, unencryptedData, chacha20poly1305, nonce)
       fullEnc = encryptedEdit
-    } else {
+    } else if (!blocks && !editlist) {
       serializedData = enc.serialize(headerPackets[0], headerPackets[1], headerPackets[2], headerPackets[3])
       fullEnc.push(serializedData)
       const chunksize = SEGMENT_SIZE

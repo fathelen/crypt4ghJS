@@ -313,3 +313,11 @@ test('rearrangment with edit out of range', async () => {
   const rearrangedText = await index.rearrangment.rearrange(Uint8Array.from(testDataEncryptedEdit), encSeckey, [encPubkeyPass], editlist)
   expect(rearrangedText).toBe(undefined)
 })
+
+// edit and block (not compatible)
+test('encryption with edit and block', async () => {
+  edit = [0, 5]
+  block = [1]
+  const encryptedText = await index.encryption.encryption(Buffer.from(testDataUnencrypted), encSeckey, [encPubkey], block, edit)
+  expect(encryptedText).not.toBe([])
+})
