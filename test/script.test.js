@@ -321,3 +321,10 @@ test('encryption with edit and block', async () => {
   const encryptedText = await index.encryption.encryption(Buffer.from(testDataUnencrypted), encSeckey, [encPubkey], block, edit)
   expect(encryptedText).not.toBe([])
 })
+
+// edit and decblock
+test('edit and decblock', async () => {
+  blocks = [1]
+  const decryptedText = await index.decryption.decryption(Uint8Array.from(testDataEncryptedEdit), encSeckey, blocks)
+  expect(decryptedText).toBe(undefined)
+})
