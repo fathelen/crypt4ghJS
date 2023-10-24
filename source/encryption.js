@@ -18,13 +18,12 @@ const magicBytestring = helperfunction.string2byte('crypt4gh')
  * @param {*} editlist => optional parameter, list of bytes which a decrypting person is allowed to decrypt.
  * @returns => Arraylist of encrypted data
  */
-exports.encryption = async function (unencryptedData, secretkey, publicKeys, blocks, editlist) {
+exports.encryption = async function * (unencryptedData, secretkey, publicKeys, blocks, editlist) {
   try {
     // header part
     const encryptionMethod = new Uint32Array([0])
     const sessionKey = helperfunction.randomBytes(32)
     const typeArray = []
-    let fullEnc = []
     const encPacketDataContent = enc.make_packet_data_enc(encryptionMethod, sessionKey)
     typeArray.push(encPacketDataContent)
     const headerPackets = enc.header_encrypt(typeArray, secretkey, publicKeys)
@@ -33,27 +32,36 @@ exports.encryption = async function (unencryptedData, secretkey, publicKeys, blo
     const nonce = helperfunction.randomBytes(12)
     const chacha20poly1305 = new ChaCha20Poly1305.ChaCha20Poly1305(sessionKey)
     if (blocks && !editlist) {
-      const encryptedBlock = await encryptBlock(headerPackets, blocks, chacha20poly1305, unencryptedData, nonce)
-      fullEnc = encryptedBlock
+      for await (const val of encryptBlock(headerPackets, blocks, chacha20poly1305, unencryptedData, nonce)) {
+        yield await Promise.resolve(val)
+      }
     } else if (editlist && !blocks) {
-      const encryptedEdit = await encryptEditlist(editlist, encryptionMethod, sessionKey, publicKeys, secretkey, unencryptedData, chacha20poly1305, nonce)
-      fullEnc = encryptedEdit
+      for await (const val of encryptEditlist(editlist, encryptionMethod, sessionKey, publicKeys, secretkey, unencryptedData, chacha20poly1305, nonce)) {
+        yield await Promise.resolve(val)
+      }
     } else if (!blocks && !editlist) {
       serializedData = enc.serialize(headerPackets[0], headerPackets[1], headerPackets[2], headerPackets[3])
-      fullEnc.push(serializedData)
       const chunksize = SEGMENT_SIZE
       let offset = 0
       while (offset < unencryptedData.length) {
         const chunkfile = await unencryptedData.subarray(offset, offset + chunksize)
         const encChunk = chacha20poly1305.seal(nonce, chunkfile)
-        const nonceEnc = new Uint8Array(nonce.length + encChunk.length)
-        nonceEnc.set(nonce)
-        nonceEnc.set(encChunk, nonce.length)
-        fullEnc.push(nonceEnc)
-        offset += chunksize
+        if (offset === 0) {
+          const nonceEnc = new Uint8Array(serializedData.length + nonce.length + encChunk.length)
+          nonceEnc.set(serializedData)
+          nonceEnc.set(nonce, serializedData.length)
+          nonceEnc.set(encChunk, nonce.length + serializedData.length)
+          offset += chunksize
+          yield await Promise.resolve(nonceEnc)
+        } else {
+          const nonceEnc = new Uint8Array(nonce.length + encChunk.length)
+          nonceEnc.set(nonce)
+          nonceEnc.set(encChunk, nonce.length)
+          offset += chunksize
+          yield await Promise.resolve(nonceEnc)
+        }
       }
     }
-    return fullEnc
   } catch (e) {
     console.trace('Encryption not possible.')
   }
@@ -323,22 +331,27 @@ exports.header_encrypt_multi_edit = function (editLists, encryptionPaket, seckey
  * @param {*} nonce => nonce for encryption (12byte)
  * @returns => List of Uint8Arrays containing the crypt4gh encrypted data
  */
-async function encryptBlock (headerPackets, blocks, chacha20poly1305, unencryptedData, nonce) {
+async function * encryptBlock (headerPackets, blocks, chacha20poly1305, unencryptedData, nonce) {
   try {
-    const fullEnc = []
     const serializedData = enc.serialize(headerPackets[0], headerPackets[1], headerPackets[2], headerPackets[3])
-    fullEnc.push(serializedData)
     for (let i = 0; i < blocks.length; i++) {
       const offset = (blocks[i] - 1) * SEGMENT_SIZE
       const chunksize = SEGMENT_SIZE
       const chunkfile = await unencryptedData.subarray(offset, offset + chunksize)
       const encChunk = chacha20poly1305.seal(nonce, chunkfile)
-      const nonceEnc = new Uint8Array(nonce.length + encChunk.length)
-      nonceEnc.set(nonce)
-      nonceEnc.set(encChunk, nonce.length)
-      fullEnc.push(nonceEnc)
+      if (i === 0) {
+        const nonceEnc = new Uint8Array(nonce.length + encChunk.length + serializedData.length)
+        nonceEnc.set(serializedData)
+        nonceEnc.set(nonce, serializedData.length)
+        nonceEnc.set(encChunk, nonce.length + serializedData.length)
+        yield await Promise.resolve(nonceEnc)
+      } else {
+        const nonceEnc = new Uint8Array(nonce.length + encChunk.length)
+        nonceEnc.set(nonce)
+        nonceEnc.set(encChunk, nonce.length)
+        yield await Promise.resolve(nonceEnc)
+      }
     }
-    return fullEnc
   } catch (e) {
     console.trace('Encryption with Blocks was not possible.')
   }
@@ -356,23 +369,31 @@ async function encryptBlock (headerPackets, blocks, chacha20poly1305, unencrypte
  * @param {*} nonce => => nonce for encryption (12byte)
  * @returns => List of Uint8Arrays containing the crypt4gh encrypted data
  */
-async function encryptEditlist (editlist, encryptionMethod, sessionKey, publicKeys, secretkey, unencryptedData, chacha20poly1305, nonce) {
+async function * encryptEditlist (editlist, encryptionMethod, sessionKey, publicKeys, secretkey, unencryptedData, chacha20poly1305, nonce) {
   try {
-    const fullEnc = []
     const serializedData = await enc.encryption_edit(editlist, encryptionMethod, sessionKey, publicKeys, secretkey)
-    fullEnc.push(serializedData[0])
     const chunksize = SEGMENT_SIZE
     let offset = 0
     while (offset < unencryptedData.length) {
-      const chunkfile = await unencryptedData.subarray(offset, offset + chunksize)
-      const encChunk = chacha20poly1305.seal(nonce, chunkfile)
-      const nonceEnc = new Uint8Array(nonce.length + encChunk.length)
-      nonceEnc.set(nonce)
-      nonceEnc.set(encChunk, nonce.length)
-      fullEnc.push(nonceEnc)
-      offset += chunksize
+      if (offset === 0) {
+        const chunkfile = await unencryptedData.subarray(offset, offset + chunksize)
+        const encChunk = chacha20poly1305.seal(nonce, chunkfile)
+        const nonceEnc = new Uint8Array(nonce.length + encChunk.length + serializedData[0].length)
+        nonceEnc.set(serializedData[0])
+        nonceEnc.set(nonce, serializedData[0].length)
+        nonceEnc.set(encChunk, nonce.length, serializedData.length)
+        offset += chunksize
+        yield await Promise.resolve(nonceEnc)
+      } else {
+        const chunkfile = await unencryptedData.subarray(offset, offset + chunksize)
+        const encChunk = chacha20poly1305.seal(nonce, chunkfile)
+        const nonceEnc = new Uint8Array(nonce.length + encChunk.length)
+        nonceEnc.set(nonce)
+        nonceEnc.set(encChunk, nonce.length)
+        offset += chunksize
+        yield await Promise.resolve(nonceEnc)
+      }
     }
-    return fullEnc
   } catch (e) {
     console.trace('Encryption with Editlist was not possible.')
   }

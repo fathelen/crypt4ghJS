@@ -1,4 +1,6 @@
 const index = require('crypt4gh_js')
+const fs = require('fs')
+const testDataUnencrypted = fs.readFileSync('C:\\Users\\fabie\\crypt4gh_js\\testData\\abcd.txt', 'utf8')
 
 // Keyfiles
 // keyfiles without password
@@ -6,8 +8,8 @@ const pubkey = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nGER04WfJXzPHiCWe94CHlMY6sp6
 const seckey = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAEbm9uZQAEbm9uZQAg4BW6LpwKHBQN0MCZgjPtDafcGbN5wRmUSrIwEcN4te0=\n-----END CRYPT4GH PRIVATE KEY-----\n'
 
 // kefiles with password (example password = password)
-const pubkeyPass = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nvHrVpBpFLpX/OquK2Ze4Mfzb8aVrn05XmTgT4ymVwzE=\n-----END CRYPT4GH PUBLIC KEY-----\n'
-const seckeyPass = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAGc2NyeXB0ABQAAAAAMHZyZm0wb3JrM2E5d2QyeQARY2hhY2hhMjBfcG9seTEzMDUAPHUyY2lhbDQ1dWZydxzqFWikrPHQc6dKqWySS59BoMAe1L0FRmBXnwPd80N4fJBJS5f+vnmlA+JZ8qCpow==\n-----END CRYPT4GH PRIVATE KEY-----\n'
+// const pubkeyPass = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nvHrVpBpFLpX/OquK2Ze4Mfzb8aVrn05XmTgT4ymVwzE=\n-----END CRYPT4GH PUBLIC KEY-----\n'
+// const seckeyPass = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAGc2NyeXB0ABQAAAAAMHZyZm0wb3JrM2E5d2QyeQARY2hhY2hhMjBfcG9seTEzMDUAPHUyY2lhbDQ1dWZydxzqFWikrPHQc6dKqWySS59BoMAe1L0FRmBXnwPd80N4fJBJS5f+vnmlA+JZ8qCpow==\n-----END CRYPT4GH PRIVATE KEY-----\n'
 // Example text for encryption
 const unencryptedText = Buffer.from('abcdefghijklmnopqrstuvwxyz');
 
@@ -36,12 +38,19 @@ const unencryptedText = Buffer.from('abcdefghijklmnopqrstuvwxyz');
     // const keys2 = await index.keyfiles.encryption_keyfiles([seckeyPass, pubkeyPass], 'gunpass')
     /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Example Encryption
-    let edit = null
-    let block = null
+    const edit = null
+    const block = null
     // simple Encryption without editlist or blocks
     try {
-      const encryptedText = await index.encryption.encryption(unencryptedText, keys[0], [keys[1]], block, edit)
-      console.log(encryptedText)
+      // const encryptedText = await index.encryption.encryption(unencryptedText, keys[0], [keys[1]], block, edit)
+      async function generate () {
+        for await (const val of index.encryption.encryption(Buffer.from(testDataUnencrypted), keys[0], [keys[1]], block, edit)) {
+          console.log(val)
+        }
+      }
+
+      generate()
+      /*
       // check file format and encryptability
       /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
       try {
@@ -133,7 +142,7 @@ const unencryptedText = Buffer.from('abcdefghijklmnopqrstuvwxyz');
           console.log(textdecoder.decode(mergedArray(plaintext)))
         } catch (e) {
           console.trace('Decryption impossible!!')
-        } */
+        }
         /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       } catch (e) {
         console.trace('Could not be rearranged')
@@ -165,15 +174,16 @@ const unencryptedText = Buffer.from('abcdefghijklmnopqrstuvwxyz');
           console.log(textdecoder.decode(mergedArray(plaintext)))
         } catch (e) {
           console.trace('Decryption impossible!') // here error!
-        } */
+        }
         /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       } catch (e) {
         console.trace('Could not be rearranged')
-      }
+      } */
       /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     } catch (e) {
       console.trace('Data could not be encrypted!')
     }
+    /*
     // Encryption with single editlist
     edit = [0, 10]
     try {
@@ -209,7 +219,7 @@ const unencryptedText = Buffer.from('abcdefghijklmnopqrstuvwxyz');
         console.log(textdecoder.decode(mergedArray(plaintext)))
       } catch (e) {
         console.trace('Decryption impossible!')
-      } */
+      }
       /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // Reeencryption
       try {
@@ -236,7 +246,7 @@ const unencryptedText = Buffer.from('abcdefghijklmnopqrstuvwxyz');
           console.log(textdecoder.decode(mergedArray(plaintext)))
         } catch (e) {
           console.trace('Decryption impossible!')
-        } */
+        }
         /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       } catch (e) {
         console.trace('Coud not be reeencrypted')
@@ -271,7 +281,7 @@ const unencryptedText = Buffer.from('abcdefghijklmnopqrstuvwxyz');
           console.log(textdecoder.decode(mergedArray(plaintext)))
         } catch (e) {
           console.trace('Decryption impossible!') // here error!
-        } */
+        }
         /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       } catch (e) {
         console.trace('Could not be rearranged')
@@ -303,7 +313,7 @@ const unencryptedText = Buffer.from('abcdefghijklmnopqrstuvwxyz');
           console.log(textdecoder.decode(mergedArray(plaintext)))
         } catch (e) {
           console.trace('Decryption impossible!') // here error!
-        } */
+        }
         /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       } catch (e) {
         console.trace('Could not be rearranged')
@@ -347,7 +357,7 @@ const unencryptedText = Buffer.from('abcdefghijklmnopqrstuvwxyz');
         console.log(textdecoder.decode(mergedArray(plaintext)))
       } catch (e) {
         console.trace('Decryption impossible!')
-      } */
+      }
       /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // Reeencryption
       try {
@@ -374,7 +384,7 @@ const unencryptedText = Buffer.from('abcdefghijklmnopqrstuvwxyz');
           console.log(textdecoder.decode(mergedArray(plaintext)))
         } catch (e) {
           console.trace('Decryption impossible!')
-        } */
+        }
         /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       } catch (e) {
         console.trace('Coud not be reeencrypted')
@@ -409,7 +419,7 @@ const unencryptedText = Buffer.from('abcdefghijklmnopqrstuvwxyz');
           console.log(textdecoder.decode(mergedArray(plaintext)))
         } catch (e) {
           console.trace('Decryption impossible!') // here error!
-        } */
+        }
         /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       } catch (e) {
         console.trace('Could not be rearranged')
@@ -441,7 +451,7 @@ const unencryptedText = Buffer.from('abcdefghijklmnopqrstuvwxyz');
           console.log(textdecoder.decode(mergedArray(plaintext)))
         } catch (e) {
           console.trace('Decryption impossible!') // here error!
-        } */
+        }
         /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       } catch (e) {
         console.trace('Could not be rearranged')
@@ -546,7 +556,7 @@ const unencryptedText = Buffer.from('abcdefghijklmnopqrstuvwxyz');
           console.log(textdecoder.decode(mergedArray(plaintext)))
         } catch (e) {
           console.trace('Decryption impossible!') // here error!
-        } */
+        }
         /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       } catch (e) {
         console.trace('Could not be rearranged')
@@ -578,7 +588,7 @@ const unencryptedText = Buffer.from('abcdefghijklmnopqrstuvwxyz');
           console.log(textdecoder.decode(mergedArray(plaintext)))
         } catch (e) {
           console.trace('Decryption impossible!') // here error!
-        } */
+        }
         /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       } catch (e) {
         console.trace('Could not be rearranged')
@@ -586,11 +596,12 @@ const unencryptedText = Buffer.from('abcdefghijklmnopqrstuvwxyz');
       /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     } catch (e) {
       console.trace('Data could not be encrypted!')
-    }
+    } */
     /// ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   } catch (e) {
     console.trace('There is a problem with the key data!')
   }
+  /*
   // with password
   try {
     const keysPassword = await index.keyfiles.encryption_keyfiles([seckeyPass, pubkeyPass], 'gunpass')
@@ -693,7 +704,7 @@ const unencryptedText = Buffer.from('abcdefghijklmnopqrstuvwxyz');
           console.log(textdecoder.decode(mergedArray(plaintext)))
         } catch (e) {
           console.trace('Decryption impossible!') // here error!
-        } */
+        }
         /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       } catch (e) {
         console.trace('Could not be rearranged')
@@ -725,7 +736,7 @@ const unencryptedText = Buffer.from('abcdefghijklmnopqrstuvwxyz');
           console.log(textdecoder.decode(mergedArray(plaintext)))
         } catch (e) {
           console.trace('Decryption impossible!') // here error!
-        } */
+        }
         /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       } catch (e) {
         console.trace('Could not be rearranged')
@@ -769,7 +780,7 @@ const unencryptedText = Buffer.from('abcdefghijklmnopqrstuvwxyz');
         console.log(textdecoder.decode(mergedArray(plaintext)))
       } catch (e) {
         console.trace('Decryption impossible!')// Hier richtig
-      } */
+      }
       /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // Reeencryption
       /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -796,7 +807,7 @@ const unencryptedText = Buffer.from('abcdefghijklmnopqrstuvwxyz');
           console.log(textdecoder.decode(mergedArray(plaintext)))
         } catch (e) {
           console.trace('Decryption impossible!')
-        } */
+        }
         /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       } catch (e) {
         console.trace('Coud not be reeencrypted')
@@ -831,7 +842,7 @@ const unencryptedText = Buffer.from('abcdefghijklmnopqrstuvwxyz');
           console.log(textdecoder.decode(mergedArray(plaintext)))
         } catch (e) {
           console.trace('Decryption impossible!') // here error!
-        } */
+        }
         /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       } catch (e) {
         console.trace('Could not be rearranged')
@@ -863,7 +874,7 @@ const unencryptedText = Buffer.from('abcdefghijklmnopqrstuvwxyz');
           console.log(textdecoder.decode(mergedArray(plaintext)))
         } catch (e) {
           console.trace('Decryption impossible!') // here error!
-        } */
+        }
         /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       } catch (e) {
         console.trace("Couldn't be rearranged")
@@ -907,7 +918,7 @@ const unencryptedText = Buffer.from('abcdefghijklmnopqrstuvwxyz');
         console.log(textdecoder.decode(mergedArray(plaintext)))
       } catch (e) {
         console.trace('Decryption impossible!') // Hier richtig
-      } */
+      }
       /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // Reeencryption
       /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -934,7 +945,7 @@ const unencryptedText = Buffer.from('abcdefghijklmnopqrstuvwxyz');
           console.log(textdecoder.decode(mergedArray(plaintext)))
         } catch (e) {
           console.trace('Decryption impossible!')
-        } */
+        }
         /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       } catch (e) {
         console.trace('Coud not be reeencrypted')
@@ -969,7 +980,7 @@ const unencryptedText = Buffer.from('abcdefghijklmnopqrstuvwxyz');
           console.log(textdecoder.decode(mergedArray(plaintext)))
         } catch (e) {
           console.trace('Decryption impossible!') // here error!
-        } */
+        }
         /// /////////////////////////////////////////////////////////////////////////////////////////////////////////////
       } catch (e) {
         console.trace('Could not be rearranged')
@@ -1001,7 +1012,7 @@ const unencryptedText = Buffer.from('abcdefghijklmnopqrstuvwxyz');
           console.log(textdecoder.decode(mergedArray(plaintext)))
         } catch (e) {
           console.trace('Decryption impossible!') // here error!
-        } */
+        }
         /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       } catch (e) {
         console.trace('Could not be rearranged')
@@ -1106,7 +1117,7 @@ const unencryptedText = Buffer.from('abcdefghijklmnopqrstuvwxyz');
           console.log(textdecoder.decode(mergedArray(plaintext)))
         } catch (e) {
           console.trace('Decryption impossible!') // here error!
-        } */
+        }
         /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       } catch (e) {
         console.trace('Could not be rearranged')
@@ -1138,7 +1149,7 @@ const unencryptedText = Buffer.from('abcdefghijklmnopqrstuvwxyz');
           console.log(textdecoder.decode(mergedArray(plaintext)))
         } catch (e) {
           console.trace('Decryption impossible!') // here error!
-        } */
+        }
         /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////
       } catch (e) {
         console.trace('Could not be rearranged')
@@ -1149,9 +1160,10 @@ const unencryptedText = Buffer.from('abcdefghijklmnopqrstuvwxyz');
     }
   } catch (e) {
     console.trace('Could not decrypt keyfiles')
-  }
+  } */
 })()
 
+/*
 const mergedArray = function (ArrayList) {
   let length = 0
   ArrayList.forEach(item => {
@@ -1164,4 +1176,4 @@ const mergedArray = function (ArrayList) {
     offset += item.length
   })
   return mergedArray
-}
+} */

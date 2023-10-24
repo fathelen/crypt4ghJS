@@ -31,10 +31,10 @@ async function headerRearrange (decPackets, editlist, inputlänge, pubkeys, seck
       const oldEdit = partitionPacket[1][0]
       const big64Oldedit = new BigUint64Array(oldEdit.buffer)
       let b
-      const wrongarray = []
+      const outOfRange = []
       // new header with multiple editlists
       if (Array.isArray(editlist[0]) === true) {
-        const multiEdit = await rearrHeaderMultiEdits(editlist, big64Oldedit, inputlänge, b, wrongarray, encryptionMethod, key, pubkeys, seckey)
+        const multiEdit = await rearrHeaderMultiEdits(editlist, big64Oldedit, inputlänge, b, outOfRange, encryptionMethod, key, pubkeys, seckey)
         return multiEdit
       } else {
         // new header with single edit list
@@ -173,7 +173,7 @@ async function rearrangement (decryptedPackets, editlist, headerPackets, pubkey,
   }
 }
 
-async function rearrHeaderMultiEdits (editlist, big64Oldedit, inputlänge, b, wrongarray, encryptionMethod, key, pubkeys, seckey) {
+async function rearrHeaderMultiEdits (editlist, big64Oldedit, inputlänge, b, outOfRange, encryptionMethod, key, pubkeys, seckey) {
   for (let i = 0; i < editlist.length; i++) {
     if ((big64Oldedit.length - 1) % 2 !== 0) {
       const lastEdit = calculateLastEditOld(inputlänge, big64Oldedit, b)
@@ -190,19 +190,18 @@ async function rearrHeaderMultiEdits (editlist, big64Oldedit, inputlänge, b, wr
     const newEdit = parts(editlist[i])
     // Berechne, ob Bereiche ineinander passen
     const checked = checkParts(allowed, newEdit)
-    // let wrong = [];
     if (checked.length === newEdit.length) {
       for (let i = 0; i < checked.length; i++) {
         if (i === 0) {
-          wrongarray.push(0)
+          outOfRange.push(0)
         }
         if (checked[i][0] !== newEdit[i][0] || checked[i][1] !== newEdit[i][1]) {
-          wrongarray.push(1)
+          outOfRange.push(1)
         }
       }
     }
   }
-  if (!wrongarray.includes(1)) {
+  if (!outOfRange.includes(1)) {
     const s = await enc.encryption_edit(editlist, encryptionMethod, key, pubkeys, seckey)
     return s
   }
@@ -225,17 +224,17 @@ async function rearrHeaderEdit (big64Oldedit, inputlänge, b, editlist, decPacke
   const newEdit = parts(editlist)
   // Berechne, ob Bereiche ineinander passen
   const checked = checkParts(allowed, newEdit)
-  let wrong
+  let unallowedEdit
   if (checked.length === newEdit.length) {
     for (let i = 0; i < checked.length; i++) {
       if (i === 0) {
-        wrong = 0
+        unallowedEdit = 0
       }
       if (checked[i][0] !== newEdit[i][0] || checked[i][1] !== newEdit[i][1]) {
-        wrong = 1
+        unallowedEdit = 1
       }
     }
-    if (wrong === 0) {
+    if (unallowedEdit === 0) {
       const newEditPacket = enc.make_packet_edit_list(editlist)
       const encr = enc.header_encrypt([decPackets[0], newEditPacket], seckey, pubkeys)
       const serializedData = enc.serialize(encr[0], encr[1], encr[2], encr[3])
