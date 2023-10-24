@@ -20,19 +20,28 @@ const magicBytestring = helperfunction.string2byte('crypt4gh')
  * @returns => decrypted data in an ArrayList, each value is a 64kb block of the
  *             data
  */
-exports.decryption = async function (encryptedData, seckey, blocks = []) {
+exports.decryption = async function * (encryptedData, seckey, blocks = []) {
   const header = await encryptedData.subarray(0, 1000)
   const headerInformation = dec.header_deconstruction(header, seckey)
-  const ArrayList = []
+  // const ArrayList = []
   const chacha20poly1305 = new ChaCha20Poly1305.ChaCha20Poly1305(headerInformation[0])
   try {
     if (blocks && !headerInformation[3].length > 0) {
-      const decryptionBlock = await decryptionBlocks(encryptedData, blocks, headerInformation, chacha20poly1305)
-      // ArrayList.push(decryptionBlock)
-      return decryptionBlock
+      for await (const val of decryptionBlocks(encryptedData, blocks, headerInformation, chacha20poly1305)) {
+        yield await Promise.resolve(val)
+      }
     } else if (headerInformation[3].length > 0 && blocks == null) {
-      const decryptionEdit = await decryptionEditlist(encryptedData, headerInformation, chacha20poly1305, ArrayList)
-      return decryptionEdit
+      let i = 0
+      for await (const val of decryptionEditlist(encryptedData, headerInformation, chacha20poly1305)) {
+        yield await Promise.resolve([val, i])
+        i++
+        /*
+        const edit64 = new BigInt64Array(headerInformation[3][0].buffer)
+        const editlist = edit64.subarray(1)
+        const result = applyEditlist(editlist, val) */
+      }
+      // const decryptionEdit = decryptionEditlist(encryptedData, headerInformation, chacha20poly1305)
+      // return decryptionEdit
     } else if (headerInformation[3].length > 0 && blocks != null) {
       console.trace('Combination of blocks and edit list is not possible')
     } else {
@@ -40,9 +49,10 @@ exports.decryption = async function (encryptedData, seckey, blocks = []) {
         const nonce = await encryptedData.subarray(i, i + 12)
         const enc = await encryptedData.subarray(i + 12, i + 12 + dec.SEGMENT_SIZE + 16)
         const plaintext = chacha20poly1305.open(nonce, enc)
-        ArrayList.push(plaintext)
+        yield await Promise.resolve(plaintext)
+      // ArrayList.push(plaintext)
       }
-      return ArrayList
+    // return ArrayList
     }
   } catch (e) {
     console.trace('Decryption was not possible')
@@ -250,16 +260,14 @@ function applyEditlist (edlist, decryptedText) {
  * @param {*} chacha20poly1305 => encryption method
  * @returns => decrypted data
  */
-async function decryptionBlocks (encryptedData, blocks, headerInformation, chacha20poly1305) {
-  const text = []
+async function * decryptionBlocks (encryptedData, blocks, headerInformation, chacha20poly1305) {
   try {
     for (let i = 0; i < blocks.length; i++) {
       const nonce = await encryptedData.subarray((blocks[i] - 1) * fullSegment + headerInformation[4], (blocks[i] - 1) * fullSegment + headerInformation[4] + 12)
       const enc = await encryptedData.subarray((blocks[i] - 1) * fullSegment + headerInformation[4] + 12, (blocks[i] - 1) * fullSegment + headerInformation[4] + 12 + dec.SEGMENT_SIZE + 16)
       const plaintext = chacha20poly1305.open(nonce, enc)
-      text.push(plaintext)
+      yield await Promise.resolve(plaintext)
     }
-    return text
   } catch (e) {
     console.trace('Decryption with blocks not possible.')
   }
@@ -273,29 +281,14 @@ async function decryptionBlocks (encryptedData, blocks, headerInformation, chach
  * @param {*} ArrayList => Array to concat Uint8AArrays for editlist application
  * @returns => decrypted data
  */
-async function decryptionEditlist (encryptedData, headerInformation, chacha20poly1305, ArrayList) {
+async function * decryptionEditlist (encryptedData, headerInformation, chacha20poly1305) {
   try {
     for (let i = headerInformation[4]; i < encryptedData.length; i = i + 65564) {
       const nonce = await encryptedData.subarray(i, i + 12)
       const enc = await encryptedData.subarray(i + 12, i + 12 + dec.SEGMENT_SIZE + 16)
       const plaintext = chacha20poly1305.open(nonce, enc)
-      ArrayList.push(plaintext)
+      yield await Promise.resolve(plaintext)
     }
-    let length = 0
-    ArrayList.forEach(item => {
-      length += item.length
-    })
-    // Create a new array with total length and merge all source arrays.
-    const mergedArray = new Uint8Array(length)
-    let offset = 0
-    ArrayList.forEach(item => {
-      mergedArray.set(item, offset)
-      offset += item.length
-    })
-    const edit64 = new BigInt64Array(headerInformation[3][0].buffer)
-    const editlist = edit64.subarray(1)
-    const result = applyEditlist(editlist, mergedArray)
-    return result
   } catch (e) {
     console.trace('Decryption wit editlist not possible.')
   }

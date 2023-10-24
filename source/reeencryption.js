@@ -12,10 +12,9 @@ const newKey = x25519.generateKeyPair()
  * @param {*} keySec => uploaders secret key (Uint8array)
  * @returns => Array of Uint8arrays containing new crypt4gh file
  */
-exports.reencrypt = async function (encryptedData, keysPub, keySec) {
+exports.reencrypt = async function * (encryptedData, keysPub, keySec) {
   try {
     // Decrypt and Reencrypt header of infile
-    const fullEnc = []
     const header = await encryptedData.subarray(0, 10000)
     const headerPackets = dec.parse(header)
     const decryptedPackets = dec.decrypt_header(headerPackets[0], keySec)
@@ -24,16 +23,22 @@ exports.reencrypt = async function (encryptedData, keysPub, keySec) {
     keysPub.unshift(newKey.publicKey)
     const encr = enc.header_encrypt(headers, newKey.secretKey, keysPub)
     const serializedData = enc.serialize(encr[0], keysPub[0], encr[2], encr[3])
-    fullEnc.push(serializedData)
     const chunksize = SEGMENTSIZE
     let offset = headerPackets[2]
     while (offset < encryptedData.length) {
-      const chunkfile = await encryptedData.subarray(offset, offset + chunksize)
-      // Blob.arrayBuffer() can be polyfilled with a FileReader
-      fullEnc.push(chunkfile)
-      offset += chunksize
+      if (offset === 0) {
+        const chunkfile = await encryptedData.subarray(offset, offset + chunksize)
+        const nonceEnc = new Uint8Array(serializedData.length + chunkfile.length)
+        nonceEnc.set(serializedData)
+        nonceEnc.set(chunkfile, serializedData.length)
+        yield await Promise.resolve(nonceEnc)
+        offset += chunksize
+      } else {
+        const chunkfile = await encryptedData.subarray(offset, offset + chunksize)
+        yield await Promise.resolve(chunkfile)
+        offset += chunksize
+      }
     }
-    return fullEnc
   } catch (e) {
     console.trace('Reeencryption not possible.')
   }
