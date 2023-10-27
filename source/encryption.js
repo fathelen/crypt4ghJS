@@ -381,7 +381,7 @@ async function * encryptEditlist (editlist, encryptionMethod, sessionKey, public
         const nonceEnc = new Uint8Array(nonce.length + encChunk.length + serializedData[0].length)
         nonceEnc.set(serializedData[0])
         nonceEnc.set(nonce, serializedData[0].length)
-        nonceEnc.set(encChunk, nonce.length, serializedData.length)
+        nonceEnc.set(encChunk, nonce.length + serializedData[0].length)
         offset += chunksize
         yield await Promise.resolve(nonceEnc)
       } else {

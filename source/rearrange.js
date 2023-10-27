@@ -1,5 +1,6 @@
 const enc = require('./encryption')
 const dec = require('./decryption')
+const rea = require('./rearrange')
 
 const SEGMENT_SIZE = 65536
 // let encryptionMethod= new Uint32Array([0])
@@ -90,7 +91,7 @@ function calculaLastEditNew (inputlänge, editlist) {
   }
 }
 
-function parts (edits) {
+exports.parts = function (edits) {
   try {
     let position = BigInt(0)
     const allowed = []
@@ -186,8 +187,8 @@ async function rearrHeaderMultiEdits (editlist, big64Oldedit, inputlänge, b, ou
       editlist[i] = calculaLastEditNew(inputlänge, editlist[i])
     }
     // Berechnung, bereiche der beiden editlisten
-    const allowed = parts(b)
-    const newEdit = parts(editlist[i])
+    const allowed = rea.parts(b)
+    const newEdit = rea.parts(editlist[i])
     // Berechne, ob Bereiche ineinander passen
     const checked = checkParts(allowed, newEdit)
     if (checked.length === newEdit.length) {
@@ -220,8 +221,8 @@ async function rearrHeaderEdit (big64Oldedit, inputlänge, b, editlist, decPacke
     editlist = calculaLastEditNew(inputlänge, editlist)
   }
   // Berechnung, bereiche der beiden editlisten
-  const allowed = parts(b)
-  const newEdit = parts(editlist)
+  const allowed = rea.parts(b)
+  const newEdit = rea.parts(editlist)
   // Berechne, ob Bereiche ineinander passen
   const checked = checkParts(allowed, newEdit)
   let unallowedEdit

@@ -31,15 +31,34 @@ exports.decryption = async function * (encryptedData, seckey, blocks = []) {
         yield await Promise.resolve(val)
       }
     } else if (headerInformation[3].length > 0 && blocks == null) {
-      let i = 0
+      // 1.Step: Welche Blöcke müssen entschlüsselt werden
+      const edit64 = new BigInt64Array(headerInformation[3][0].buffer)
+      const editlist = edit64.subarray(1)
+      const addedEdit = []
+      let j = 0n
+      for (let i = 0; i < editlist.length; i++) {
+        j = j + editlist[i]
+        addedEdit.push(j)
+      }
+      const blocks = []
+      for (let i = 0; i < addedEdit.length; i++) {
+        blocks.push((addedEdit[i] / 65536n) + 1n)
+      }
+      const uniqueblocks = [...new Set(blocks)]
+      // 2.Step entschlüssle nur die gebrauchten blöcke
+      for await (const val of decryptionBlocks(encryptedData, uniqueblocks, headerInformation, chacha20poly1305)) {
+        applyEditlist(edit, val)
+        // yield await Promise.resolve(val)
+      }
+      /*
+      let i=0
       for await (const val of decryptionEditlist(encryptedData, headerInformation, chacha20poly1305)) {
         yield await Promise.resolve([val, i])
         i++
-        /*
         const edit64 = new BigInt64Array(headerInformation[3][0].buffer)
         const editlist = edit64.subarray(1)
-        const result = applyEditlist(editlist, val) */
-      }
+        const result = applyEditlist(editlist, val)
+      } */
       // const decryptionEdit = decryptionEditlist(encryptedData, headerInformation, chacha20poly1305)
       // return decryptionEdit
     } else if (headerInformation[3].length > 0 && blocks != null) {
@@ -290,6 +309,6 @@ async function * decryptionEditlist (encryptedData, headerInformation, chacha20p
       yield await Promise.resolve(plaintext)
     }
   } catch (e) {
-    console.trace('Decryption wit editlist not possible.')
+    console.trace('Decryption with editlist not possible.')
   }
 }
