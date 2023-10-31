@@ -21,6 +21,8 @@ const testDataUnencrypted = fs.readFileSync('testData\\abcd.txt', 'utf8')
 const testDataEncrypted = fs.readFileSync('testData\\abcdEncrypted.crypt4gh')
 const testDataPlain = fs.readFileSync('testData\\editplain.crypt4gh')
 const test4edit = fs.readFileSync('testData\\edit4values.crypt4gh')
+const test6edit = fs.readFileSync('testData\\edit6values.crypt4gh')
+const test8edit = fs.readFileSync('testData\\edit8values.crypt4gh')
 const testDataEncryptedEdit = fs.readFileSync('testData\\encEdit.crypt4gh')
 const testDataEncMultiEdit = fs.readFileSync('testData\\encMultiEdit.crypt4gh')
 const testDataEncEditOdd = fs.readFileSync('testData\\encEditOdd.crypt4gh')
@@ -102,10 +104,10 @@ test('encryption with password,without editlist or block', async () => {
 
 // encryption without password and blocks with editlist
 test('encryption without password and blocks with editlist', async () => {
-  edit = [0, 10, 70000, 20]
+  edit = [0, 10, 30, 20, 70000, 20, 30, 5]
   block = null
   for await (const val of index.encryption.encryption(Buffer.from(testDataUnencrypted), encSeckey, [encPubkey], block, edit)) {
-    fs.appendFileSync('testData\\edit4values.crypt4gh', val)
+    fs.appendFileSync('testData\\edit8values.crypt4gh', val)
     expect(val).toBeInstanceOf(Uint8Array)
   }
 })
@@ -176,9 +178,9 @@ test('decryption without password, editlist, encblocks or decblocks', async () =
 // decryption without password, encblocks or decblocks, with editlist
 test('decryption without password, encblocks or decblocks, with editlist', async () => {
   blocks = null
-  for await (const val of encryptedText = index.decryption.decryption(Uint8Array.from(test4edit), encSeckey, blocks)) {
+  for await (const val of encryptedText = index.decryption.decryption(Uint8Array.from(test8edit), encSeckey, blocks)) {
     console.log(val)
-    // expect(val).toBeInstanceOf(Uint8Array)
+    expect(val).toBeInstanceOf(Array)
   }
   /*
   const decryptedText = await index.decryption.decryption(Uint8Array.from(testDataEncryptedEdit), encSeckey, blocks)

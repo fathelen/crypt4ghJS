@@ -28,7 +28,7 @@ exports.decryption = async function * (encryptedData, seckey, blocks = []) {
   try {
     if (blocks && !headerInformation[3].length > 0) {
       for await (const val of decryptionBlocks(encryptedData, blocks, headerInformation, chacha20poly1305)) {
-        yield await Promise.resolve(val)
+        yield await Promise.resolve(val[0])
       }
     } else if (headerInformation[3].length > 0 && blocks == null) {
       // 1.Step: Welche Blöcke müssen entschlüsselt werden
@@ -40,15 +40,21 @@ exports.decryption = async function * (encryptedData, seckey, blocks = []) {
         j = j + editlist[i]
         addedEdit.push(j)
       }
-      const blocks = []
+      // 2.Map erstellen
+      const blocks = new Map()
       for (let i = 0; i < addedEdit.length; i++) {
-        blocks.push((addedEdit[i] / 65536n) + 1n)
+        if (blocks.has(Number((addedEdit[i] / 65536n) + 1n))) {
+          blocks.set(Number((addedEdit[i] / 65536n) + 1n), [...blocks.get(Number((addedEdit[i] / 65536n) + 1n)), editlist[i]])
+        } else {
+          blocks.set(Number((addedEdit[i] / 65536n) + 1n), [addedEdit[i] - 65536n * (addedEdit[i] / 65536n)])
+        }
       }
-      const uniqueblocks = [...new Set(blocks)]
-      // 2.Step entschlüssle nur die gebrauchten blöcke
-      for await (const val of decryptionBlocks(encryptedData, uniqueblocks, headerInformation, chacha20poly1305)) {
-        applyEditlist(edit, val)
-        // yield await Promise.resolve(val)
+      // 3.Step entschlüssle nur die gebrauchten blöcke
+      for await (const val of decryptionBlocks(encryptedData, Array.from(blocks.keys()), headerInformation, chacha20poly1305)) {
+        // 4. verschiedene Fälle der edit list berechnen
+        const edit = applyEditlist(blocks.get(val[1] + 1), val[0])
+        // const edit = applyEditlist([blocks.get(val[1] + 1)[0] - 65336n * BigInt(val[1]), (blocks.get(val[1] + 1)[1] - 65336n * BigInt(val[1])) - (blocks.get(val[1] + 1)[0] - 65336n * BigInt(val[1]))], val[0])
+        yield await Promise.resolve(edit)
       }
       /*
       let i=0
@@ -285,7 +291,7 @@ async function * decryptionBlocks (encryptedData, blocks, headerInformation, cha
       const nonce = await encryptedData.subarray((blocks[i] - 1) * fullSegment + headerInformation[4], (blocks[i] - 1) * fullSegment + headerInformation[4] + 12)
       const enc = await encryptedData.subarray((blocks[i] - 1) * fullSegment + headerInformation[4] + 12, (blocks[i] - 1) * fullSegment + headerInformation[4] + 12 + dec.SEGMENT_SIZE + 16)
       const plaintext = chacha20poly1305.open(nonce, enc)
-      yield await Promise.resolve(plaintext)
+      yield await Promise.resolve([plaintext, i])
     }
   } catch (e) {
     console.trace('Decryption with blocks not possible.')
