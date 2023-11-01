@@ -42,6 +42,36 @@ exports.decryption = async function * (encryptedData, seckey, blocks = []) {
       }
       // 2.Map erstellen
       const blocks = new Map()
+      let bEven = 0
+      for (let i = 0; i < addedEdit.length; i++) {
+        if (i % 2 === 0) {
+          bEven = Number((addedEdit[i] / 65536n) + 1n)
+        } else {
+          const bOdd = Number((addedEdit[i] / 65536n) + 1n)
+          if (bEven !== bOdd) {
+            if (blocks.has(bEven)) {
+              blocks.set(bEven, [...blocks.get(bEven), editlist[i - 1]])
+              blocks.set(bEven, [...blocks.get(bEven), (65536n - editlist[i - 1])])
+              blocks.set(bOdd, [...blocks.get(bOdd), 0n])
+              blocks.set(bOdd, [...blocks.get(bOdd), editlist[i] - (65536n - editlist[i - 1])])
+            } else {
+              console.log([editlist[i - 1]])
+              blocks.set(bEven, [editlist[i - 1]])
+              blocks.set(bEven, [...blocks.get(bEven), (65536n - editlist[i - 1])])
+              blocks.set(bOdd, [0n])
+              blocks.set(bOdd, [...blocks.get(bOdd), editlist[i] - (65536n - editlist[i - 1])])
+            }
+          } else {
+            if (blocks.has(bEven)) {
+              blocks.set(bEven, [...blocks.get(bEven), editlist[i - 1]])
+              blocks.set(bEven, [...blocks.get(bEven), editlist[i]])
+            } else {
+              blocks.set(bEven, [addedEdit[i - 1] - 65536n * (addedEdit[i - 1] / 65536n)])
+              blocks.set(bEven, [...blocks.get(bEven), editlist[i]])
+            }
+          }
+        }
+      } /*
       for (let i = 0; i < addedEdit.length; i++) {
         if (blocks.has(Number((addedEdit[i] / 65536n) + 1n))) {
           blocks.set(Number((addedEdit[i] / 65536n) + 1n), [...blocks.get(Number((addedEdit[i] / 65536n) + 1n)), editlist[i]])
@@ -49,6 +79,7 @@ exports.decryption = async function * (encryptedData, seckey, blocks = []) {
           blocks.set(Number((addedEdit[i] / 65536n) + 1n), [addedEdit[i] - 65536n * (addedEdit[i] / 65536n)])
         }
       }
+      console.log(blocks) */
       // 3.Step entschlüssle nur die gebrauchten blöcke
       for await (const val of decryptionBlocks(encryptedData, Array.from(blocks.keys()), headerInformation, chacha20poly1305)) {
         // 4. verschiedene Fälle der edit list berechnen
