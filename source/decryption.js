@@ -49,17 +49,36 @@ exports.decryption = async function * (encryptedData, seckey, blocks = []) {
         } else {
           const bOdd = Number((addedEdit[i] / 65536n) + 1n)
           if (bEven !== bOdd) {
-            if (blocks.has(bEven)) {
-              blocks.set(bEven, [...blocks.get(bEven), editlist[i - 1]])
-              blocks.set(bEven, [...blocks.get(bEven), (65536n - editlist[i - 1])])
-              blocks.set(bOdd, [...blocks.get(bOdd), 0n])
-              blocks.set(bOdd, [...blocks.get(bOdd), editlist[i] - (65536n - editlist[i - 1])])
+            if (bEven + 1 === bOdd) {
+              if (blocks.has(bEven)) {
+                blocks.set(bEven, [...blocks.get(bEven), editlist[i - 1]])
+                blocks.set(bEven, [...blocks.get(bEven), (65536n - editlist[i - 1])])
+                blocks.set(bOdd, [...blocks.get(bOdd), 0n])
+                blocks.set(bOdd, [...blocks.get(bOdd), editlist[i] - (65536n - editlist[i - 1])])
+              } else {
+                blocks.set(bEven, [editlist[i - 1]])
+                blocks.set(bEven, [...blocks.get(bEven), (65536n - editlist[i - 1])])
+                blocks.set(bOdd, [0n])
+                blocks.set(bOdd, [...blocks.get(bOdd), editlist[i] - (65536n - editlist[i - 1])])
+              }
             } else {
-              console.log([editlist[i - 1]])
-              blocks.set(bEven, [editlist[i - 1]])
-              blocks.set(bEven, [...blocks.get(bEven), (65536n - editlist[i - 1])])
-              blocks.set(bOdd, [0n])
-              blocks.set(bOdd, [...blocks.get(bOdd), editlist[i] - (65536n - editlist[i - 1])])
+              for (let j = bEven; j <= bOdd; j++) {
+                if (j === bEven) {
+                  if (blocks.has(bEven)) {
+                    blocks.set(bEven, [...blocks.get(bEven), editlist[i - 1]])
+                    blocks.set(bEven, [...blocks.get(bEven), 65536n])
+                  } else {
+                    blocks.set(bEven, [editlist[i - 1]])
+                    blocks.set(bEven, [...blocks.get(bEven), 65536n])
+                  }
+                } else if (j === bOdd) {
+                  blocks.set(j, [0n])
+                  blocks.set(j, [...blocks.get(j), editlist[i] - ((BigInt(j) - 1n) * 65536n)])
+                } else {
+                  blocks.set(j, [0n])
+                  blocks.set(j, [...blocks.get(j), 65536n])
+                }
+              }
             }
           } else {
             if (blocks.has(bEven)) {
@@ -71,33 +90,12 @@ exports.decryption = async function * (encryptedData, seckey, blocks = []) {
             }
           }
         }
-      } /*
-      for (let i = 0; i < addedEdit.length; i++) {
-        if (blocks.has(Number((addedEdit[i] / 65536n) + 1n))) {
-          blocks.set(Number((addedEdit[i] / 65536n) + 1n), [...blocks.get(Number((addedEdit[i] / 65536n) + 1n)), editlist[i]])
-        } else {
-          blocks.set(Number((addedEdit[i] / 65536n) + 1n), [addedEdit[i] - 65536n * (addedEdit[i] / 65536n)])
-        }
       }
-      console.log(blocks) */
       // 3.Step entschlüssle nur die gebrauchten blöcke
       for await (const val of decryptionBlocks(encryptedData, Array.from(blocks.keys()), headerInformation, chacha20poly1305)) {
-        // 4. verschiedene Fälle der edit list berechnen
         const edit = applyEditlist(blocks.get(val[1] + 1), val[0])
-        // const edit = applyEditlist([blocks.get(val[1] + 1)[0] - 65336n * BigInt(val[1]), (blocks.get(val[1] + 1)[1] - 65336n * BigInt(val[1])) - (blocks.get(val[1] + 1)[0] - 65336n * BigInt(val[1]))], val[0])
         yield await Promise.resolve(edit)
       }
-      /*
-      let i=0
-      for await (const val of decryptionEditlist(encryptedData, headerInformation, chacha20poly1305)) {
-        yield await Promise.resolve([val, i])
-        i++
-        const edit64 = new BigInt64Array(headerInformation[3][0].buffer)
-        const editlist = edit64.subarray(1)
-        const result = applyEditlist(editlist, val)
-      } */
-      // const decryptionEdit = decryptionEditlist(encryptedData, headerInformation, chacha20poly1305)
-      // return decryptionEdit
     } else if (headerInformation[3].length > 0 && blocks != null) {
       console.trace('Combination of blocks and edit list is not possible')
     } else {
