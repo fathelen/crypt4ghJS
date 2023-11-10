@@ -17,3 +17,8 @@ testData/edit8values.crypt4gh
 testData/edit6values.crypt4gh
 testData/editCase3values.crypt4gh
 source/decryption.js
+testData/editOdd3.crypt4gh
+testData/editOdd2.crypt4gh
+testData/editOdd1.crypt4gh
+testData/editOdd1_1.crypt4gh
+testData/editCase4.crypt4gh
