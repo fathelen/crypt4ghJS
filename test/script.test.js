@@ -182,9 +182,11 @@ test('decryption without password, editlist, encblocks or decblocks', async () =
 // decryption without password, encblocks or decblocks, with editlist
 test('decryption without password, encblocks or decblocks, with editlist', async () => {
   blocks = null
-  for await (const val of encryptedText = index.decryption.decryption(Uint8Array.from(testCase3), encSeckey, blocks)) {
+  for await (const val of encryptedText = index.decryption.decryption(Uint8Array.from(test8edit), encSeckey, blocks)) {
     // console.log(val)
-    // expect(val).toBeInstanceOf(Array)
+    expect(val).toBeInstanceOf(Array)
+    const textdecoder = new TextDecoder()
+    // console.log(textdecoder.decode(val[0]))
   }
   /*
   const decryptedText = await index.decryption.decryption(Uint8Array.from(testDataEncryptedEdit), encSeckey, blocks)

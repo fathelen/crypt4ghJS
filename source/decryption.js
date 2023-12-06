@@ -34,6 +34,7 @@ exports.decryption = async function * (encryptedData, seckey, blocks = []) {
       // 1.Step: Welche Blöcke müssen entschlüsselt werden
       const edit64 = new BigInt64Array(headerInformation[3][0].buffer)
       let editlist = edit64.subarray(1)
+      console.log(editlist)
       let addedEdit = []
       let j = 0n
       for (let i = 0; i < editlist.length; i++) {
@@ -59,8 +60,6 @@ exports.decryption = async function * (encryptedData, seckey, blocks = []) {
           addedEdit.push(j)
         }
       }
-      console.log(editlist)
-      console.log(addedEdit)
       for (let i = 0; i < addedEdit.length; i++) {
         if (i % 2 === 0) {
           bEven = Number(((addedEdit[i] - 1n) / 65536n) + 1n)
@@ -98,68 +97,20 @@ exports.decryption = async function * (encryptedData, seckey, blocks = []) {
               }
             }
             blocks.set(bOdd, [0n])
-            blocks.set(bOdd, [...blocks.get(bOdd), editlist[i] - ((65536n * x) - editlist[i - 1])])
+            if (Number(x) > 0) {
+              blocks.set(bOdd, [...blocks.get(bOdd), editlist[i] - (65536n * x - editlist[i - 1])])
+            } else {
+              blocks.set(bOdd, [...blocks.get(bOdd), editlist[i] - (65536n * (x + 1n) - editlist[i - 1])])
+            }
           }
         }
       }
       console.log(blocks)
-      /*
-      for (let i = 0; i < addedEdit.length; i++) {
-        if (i % 2 === 0) {
-          bEven = Number((addedEdit[i] / 65536n) + 1n)
-        } else {
-          const bOdd = Number((addedEdit[i] / 65536n) + 1n)
-          if (bEven !== bOdd) {
-            if (bEven + 1 === bOdd) {
-              if (blocks.has(bEven)) {
-                blocks.set(bEven, [...blocks.get(bEven), editlist[i - 1]])
-                blocks.set(bEven, [...blocks.get(bEven), (65536n - editlist[i - 1])])
-                blocks.set(bOdd, [...blocks.get(bOdd), 0n])
-                blocks.set(bOdd, [...blocks.get(bOdd), editlist[i] - (65536n - editlist[i - 1])])
-              } else {
-                blocks.set(bEven, [editlist[i - 1]])
-                blocks.set(bEven, [...blocks.get(bEven), (65536n - editlist[i - 1])])
-                blocks.set(bOdd, [0n])
-                blocks.set(bOdd, [...blocks.get(bOdd), editlist[i] - (65536n - editlist[i - 1])])
-              }
-            } else {
-              for (let j = bEven; j <= bOdd; j++) {
-                if (j === bEven) {
-                  if (blocks.has(bEven)) {
-                    blocks.set(bEven, [...blocks.get(bEven), editlist[i - 1]])
-                    blocks.set(bEven, [...blocks.get(bEven), 65536n])
-                  } else {
-                    blocks.set(bEven, [editlist[i - 1]])
-                    blocks.set(bEven, [...blocks.get(bEven), 65536n])
-                  }
-                } else if (j === bOdd) {
-                  blocks.set(j, [0n])
-                  blocks.set(j, [...blocks.get(j), editlist[i] - ((BigInt(j) - 1n) * 65536n)])
-                } else {
-                  blocks.set(j, [0n])
-                  blocks.set(j, [...blocks.get(j), 65536n])
-                }
-              }
-            }
-          } else {
-            if (blocks.has(bEven)) {
-              blocks.set(bEven, [...blocks.get(bEven), editlist[i - 1]])
-              blocks.set(bEven, [...blocks.get(bEven), editlist[i]])
-            } else {
-              console.log('Hier: ', bEven, '   ', [addedEdit[i - 1] - 65536n * (addedEdit[i - 1] / 65536n)])
-              blocks.set(bEven, [addedEdit[i - 1] - 65536n * (addedEdit[i - 1] / 65536n)])
-              blocks.set(bEven, [...blocks.get(bEven), editlist[i]])
-            }
-          }
-        }
-      }
-      */
-      /*
       // 3.Step entschlüssle nur die gebrauchten blöcke
       for await (const val of decryptionBlocks(encryptedData, Array.from(blocks.keys()), headerInformation, chacha20poly1305)) {
-        const edit = applyEditlist(blocks.get(val[1] + 1), val[0])
+        const edit = applyEditlist(blocks.get(val[2]), val[0])
         yield await Promise.resolve(edit)
-      } */
+      }
     } else if (headerInformation[3].length > 0 && blocks != null) {
       console.trace('Combination of blocks and edit list is not possible')
     } else {
@@ -168,7 +119,6 @@ exports.decryption = async function * (encryptedData, seckey, blocks = []) {
         const enc = await encryptedData.subarray(i + 12, i + 12 + dec.SEGMENT_SIZE + 16)
         const plaintext = chacha20poly1305.open(nonce, enc)
         yield await Promise.resolve(plaintext)
-      // ArrayList.push(plaintext)
       }
     // return ArrayList
     }
@@ -384,30 +334,9 @@ async function * decryptionBlocks (encryptedData, blocks, headerInformation, cha
       const nonce = await encryptedData.subarray((blocks[i] - 1) * fullSegment + headerInformation[4], (blocks[i] - 1) * fullSegment + headerInformation[4] + 12)
       const enc = await encryptedData.subarray((blocks[i] - 1) * fullSegment + headerInformation[4] + 12, (blocks[i] - 1) * fullSegment + headerInformation[4] + 12 + dec.SEGMENT_SIZE + 16)
       const plaintext = chacha20poly1305.open(nonce, enc)
-      yield await Promise.resolve([plaintext, i])
+      yield await Promise.resolve([plaintext, i, blocks[i]])
     }
   } catch (e) {
     console.trace('Decryption with blocks not possible.')
-  }
-}
-
-/**
- * Function to decrypt data including an editlist
- * @param {*} encryptedData => crypt4gh encrypted data in Uint8Array format
- * @param {*} headerInformation => Information contained in decrypted header package
- * @param {*} chacha20poly1305 => encryption method
- * @param {*} ArrayList => Array to concat Uint8AArrays for editlist application
- * @returns => decrypted data
- */
-async function * decryptionEditlist (encryptedData, headerInformation, chacha20poly1305) {
-  try {
-    for (let i = headerInformation[4]; i < encryptedData.length; i = i + 65564) {
-      const nonce = await encryptedData.subarray(i, i + 12)
-      const enc = await encryptedData.subarray(i + 12, i + 12 + dec.SEGMENT_SIZE + 16)
-      const plaintext = chacha20poly1305.open(nonce, enc)
-      yield await Promise.resolve(plaintext)
-    }
-  } catch (e) {
-    console.trace('Decryption with editlist not possible.')
   }
 }
