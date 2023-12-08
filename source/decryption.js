@@ -42,8 +42,10 @@ exports.decryption = async function * (encryptedData, seckey, blocks = []) {
         addedEdit.push(j)
       }
       // ungerade editlist anpassen
+      let unEven = false
       const editOdd = new BigInt64Array(editlist.length + 1)
       if (editlist.length % 2 !== 0) {
+        unEven = true
         const sum = (editlist.reduce((partialSum, a) => partialSum + a, 0n))
         editOdd.set(editlist)
         editOdd[editOdd.length - 1] = 65536n * ((sum / 65536n) + 1n) - sum
@@ -77,18 +79,38 @@ exports.decryption = async function * (encryptedData, seckey, blocks = []) {
             }
           } else if (bEven === bOdd && i < 2) {
             if (blocks.has(bEven)) {
-              blocks.set(bEven, [...blocks.get(bEven), editlist[i - 1]])
+              if (editlist[i - 1] > 65536n) {
+                blocks.set(bEven, [...blocks.get(bEven), editlist[i - 1] - (BigInt(bEven - 1) * 65536n)])
+              } else {
+                blocks.set(bEven, [...blocks.get(bEven), editlist[i - 1]])
+              }
             } else {
-              blocks.set(bEven, [editlist[i - 1]])
+              if (editlist[i - 1] > 65536n) {
+                blocks.set(bEven, [editlist[i - 1] - (BigInt(bEven - 1) * 65536n)])
+              } else {
+                blocks.set(bEven, [editlist[i - 1]])
+              }
             }
             blocks.set(bEven, [...blocks.get(bEven), editlist[i]])
           } else if (bEven !== bOdd) {
             if (blocks.has(bEven)) {
-              blocks.set(bEven, [editlist[i - 1]])
+              if (editlist[i - 1] > 65536n) {
+                blocks.set(bEven, [...blocks.get(bEven), editlist[i - 1] - (BigInt(bEven - 1) * 65536n)])
+              } else {
+                blocks.set(bEven, [...blocks.get(bEven), editlist[i - 1]])
+              }
             } else {
-              blocks.set(bEven, [editlist[i - 1]])
+              if (editlist[i - 1] > 65536n) {
+                blocks.set(bEven, [editlist[i - 1] - (BigInt(bEven - 1) * 65536n)])
+              } else {
+                blocks.set(bEven, [editlist[i - 1]])
+              }
             }
-            blocks.set(bEven, [...blocks.get(bEven), 65536n - editlist[i - 1]])
+            if (editlist[i - 1] > 65536) {
+              blocks.set(bEven, [...blocks.get(bEven), 65536n * BigInt(bEven) - editlist[i - 1]])
+            } else {
+              blocks.set(bEven, [...blocks.get(bEven), 65536n - editlist[i - 1]])
+            }
             const lastKey = [...blocks.keys()].pop()
             const x = (editlist[i] / 65536n)
             if (editlist[i] > 65536n) {
@@ -98,9 +120,17 @@ exports.decryption = async function * (encryptedData, seckey, blocks = []) {
             }
             blocks.set(bOdd, [0n])
             if (Number(x) > 0) {
-              blocks.set(bOdd, [...blocks.get(bOdd), editlist[i] - (65536n * x - editlist[i - 1])])
+              if (editlist[i - 1] > 65536) {
+                blocks.set(bOdd, [...blocks.get(bOdd), editlist[i] - (65536n * BigInt(bEven) - editlist[i - 1])])
+              } else {
+                blocks.set(bOdd, [...blocks.get(bOdd), editlist[i] - (65536n * x - editlist[i - 1])])
+              }
             } else {
-              blocks.set(bOdd, [...blocks.get(bOdd), editlist[i] - (65536n * (x + 1n) - editlist[i - 1])])
+              if (editlist[i - 1] > 65536) {
+                blocks.set(bOdd, [...blocks.get(bOdd), editlist[i] - (65536n * BigInt(bEven) - editlist[i - 1])])
+              } else {
+                blocks.set(bOdd, [...blocks.get(bOdd), editlist[i] - (65536n * (x + 1n) - editlist[i - 1])])
+              }
             }
           }
         }
@@ -110,6 +140,14 @@ exports.decryption = async function * (encryptedData, seckey, blocks = []) {
       for await (const val of decryptionBlocks(encryptedData, Array.from(blocks.keys()), headerInformation, chacha20poly1305)) {
         const edit = applyEditlist(blocks.get(val[2]), val[0])
         yield await Promise.resolve(edit)
+      }
+      if (unEven === true) {
+        for (let i = headerInformation[4] + 65564 * Math.max(...blocks.keys()); i < encryptedData.length; i = i + 65564) {
+          const nonce = await encryptedData.subarray(i, i + 12)
+          const enc = await encryptedData.subarray(i + 12, i + 12 + dec.SEGMENT_SIZE + 16)
+          const plaintext = chacha20poly1305.open(nonce, enc)
+          yield await Promise.resolve(plaintext)
+        }
       }
     } else if (headerInformation[3].length > 0 && blocks != null) {
       console.trace('Combination of blocks and edit list is not possible')
@@ -314,7 +352,18 @@ function applyEditlist (edlist, decryptedText) {
         pos = pos + keep
       }
     }
-    return editedData
+    let length = 0
+    editedData.forEach(item => {
+      length += item.length
+    })
+    // Create a new array with total length and merge all source arrays.
+    const mergedArray = new Uint8Array(length)
+    let offset = 0
+    editedData.forEach(item => {
+      mergedArray.set(item, offset)
+      offset += item.length
+    })
+    return mergedArray
   } catch (e) {
     console.trace('edit list could not be applied.')
   }

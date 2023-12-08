@@ -1,7 +1,6 @@
 /* eslint no-undef: */
 const index = require('crypt4gh_js')
 
-/*
 const mergedArray = function (ArrayList) {
   let length = 0
   ArrayList.forEach(item => {
@@ -14,17 +13,20 @@ const mergedArray = function (ArrayList) {
     offset += item.length
   })
   return mergedArray
-} */
+}
 
 const fs = require('fs')
 const testDataUnencrypted = fs.readFileSync('testData\\abcd.txt', 'utf8')
 const testDataEncrypted = fs.readFileSync('testData\\abcdEncrypted.crypt4gh')
-const testDataPlain = fs.readFileSync('testData\\editplain.crypt4gh')
+const testDataPlain = fs.readFileSync('testData\\edit.crypt4gh')
 const test4edit = fs.readFileSync('testData\\edit4values.crypt4gh')
 const test6edit = fs.readFileSync('testData\\edit6values.crypt4gh')
 const test8edit = fs.readFileSync('testData\\edit8values.crypt4gh')
 const testCase3 = fs.readFileSync('testData\\editCase3values.crypt4gh')
 const testCase4 = fs.readFileSync('testData\\editCase4values.crypt4gh')
+const testCase5 = fs.readFileSync('testData\\editCase5.crypt4gh')
+const testCase6 = fs.readFileSync('testData\\editCase6.crypt4gh')
+const testCase7 = fs.readFileSync('testData\\editCase7.crypt4gh')
 const testOdd1 = fs.readFileSync('testData\\editOdd1.crypt4gh')
 const testOdd11 = fs.readFileSync('testData\\editOdd1_1.crypt4gh')
 const testOdd2 = fs.readFileSync('testData\\editOdd2.crypt4gh')
@@ -47,7 +49,7 @@ const encSeckey = new Uint8Array([224, 21, 186, 46, 156, 10, 28, 20, 13, 208, 19
 const encPubkey = new Uint8Array([24, 68, 116, 225, 103, 201, 95, 51, 199, 136, 37, 158, 247, 128, 135, 148, 198, 58, 178, 158, 179, 193, 106, 64, 122, 16, 52, 48, 193, 227, 117, 84])
 const encSeckeyPass = new Uint8Array([0, 78, 220, 95, 54, 181, 47, 52, 219, 136, 71, 191, 133, 251, 22, 200, 52, 195, 145, 195, 151, 193, 84, 12, 220, 215, 72, 117, 163, 211, 226, 189])
 const encPubkeyPass = new Uint8Array([188, 122, 213, 164, 26, 69, 46, 149, 255, 58, 171, 138, 217, 151, 184, 49, 252, 219, 241, 165, 107, 159, 78, 87, 153, 56, 19, 227, 41, 149, 195, 49])
-/*
+
 // test key generation without password
 test('generate secret/ public key pair without password', async () => {
   const encKeys = await index.keygen.keygen('')
@@ -96,9 +98,10 @@ test('encryption without password, editlist or block', async () => {
   const edit = null
   for await (const val of index.encryption.encryption(Buffer.from(testDataUnencrypted), encSeckey, [encPubkey], block, edit)) {
     expect(val).toBeInstanceOf(Uint8Array)
-    fs.appendFileSync('testData\\editplain.crypt4gh', val)
+    // fs.appendFileSync('testData\\edit1.crypt4gh', val)
   }
 })
+
 // encryption with password, without editlist or blocks
 test('encryption with password,without editlist or block', async () => {
   edit = null
@@ -107,15 +110,17 @@ test('encryption with password,without editlist or block', async () => {
     expect(val).toBeInstanceOf(Uint8Array)
   }
 })
+
 // encryption without password and blocks with editlist
 test('encryption without password and blocks with editlist', async () => {
-  edit = [0, 140000, 10, 20]
+  edit = [0, 70000, 5]
   block = null
   for await (const val of index.encryption.encryption(Buffer.from(testDataUnencrypted), encSeckey, [encPubkey], block, edit)) {
-    fs.appendFileSync('testData\\editCase4.crypt4gh', val)
+    // fs.appendFileSync('testData\\editOdd1_1.crypt4gh', val)
     expect(val).toBeInstanceOf(Uint8Array)
   }
 })
+
 // encryption without password and blocks with editlist (odd)
 test('encryption without password and blocks with editlist(odd)', async () => {
   edit = [0, 10, 10]
@@ -169,6 +174,7 @@ test('encryption with password and block, without editlist', async () => {
     expect(val).toBeInstanceOf(Uint8Array)
   }
 })
+
 // decryption without password, editlist, encblocks or decblocks
 test('decryption without password, editlist, encblocks or decblocks', async () => {
   blocks = null
@@ -178,63 +184,165 @@ test('decryption without password, editlist, encblocks or decblocks', async () =
     // console.log(textdecoder.decode(val))
   }
 })
-*/
+
 // decryption without password, encblocks or decblocks, with editlist
 test('decryption without password, encblocks or decblocks, with editlist', async () => {
   blocks = null
-  for await (const val of encryptedText = index.decryption.decryption(Uint8Array.from(test8edit), encSeckey, blocks)) {
-    // console.log(val)
-    expect(val).toBeInstanceOf(Array)
-    const textdecoder = new TextDecoder()
-    // console.log(textdecoder.decode(val[0]))
+  for await (const val of encryptedText = index.decryption.decryption(Uint8Array.from(test4edit), encSeckey, blocks)) {
+    expect(val).toBeInstanceOf(Uint8Array)
+    // const textdecoder = new TextDecoder()
+    // console.log(textdecoder.decode(val))
   }
-  /*
-  const decryptedText = await index.decryption.decryption(Uint8Array.from(testDataEncryptedEdit), encSeckey, blocks)
-  expect(decryptedText).toBeInstanceOf(Array)
-  expect(decryptedText[0]).toBeInstanceOf(Uint8Array)
-  const textdecoder = new TextDecoder()
-  expect(textdecoder.decode(mergedArray(decryptedText))).toMatch('abcdefghij') */
 })
-/*
+
+// decryption without password, encblocks or decblocks, with editlist (6)
+test('decryption without password, encblocks or decblocks, with editlist', async () => {
+  blocks = null
+  for await (const val of encryptedText = index.decryption.decryption(Uint8Array.from(test6edit), encSeckey, blocks)) {
+    expect(val).toBeInstanceOf(Uint8Array)
+    // const textdecoder = new TextDecoder()
+    // console.log(textdecoder.decode(val))
+  }
+})
+
+// decryption without password, encblocks or decblocks, with editlist (8)
+test('decryption without password, encblocks or decblocks, with editlist', async () => {
+  blocks = null
+  for await (const val of encryptedText = index.decryption.decryption(Uint8Array.from(test8edit), encSeckey, blocks)) {
+    expect(val).toBeInstanceOf(Uint8Array)
+    // const textdecoder = new TextDecoder()
+    // console.log(textdecoder.decode(val))
+  }
+})
+
+// decryption without password, encblocks or decblocks, with odd editlist (1)
+test('decryption without password, encblocks or decblocks, with editlist', async () => {
+  blocks = null
+  for await (const val of encryptedText = index.decryption.decryption(Uint8Array.from(testOdd1), encSeckey, blocks)) {
+    expect(val).toBeInstanceOf(Uint8Array)
+    // const textdecoder = new TextDecoder()
+    // console.log(textdecoder.decode(val))
+  }
+})
+
+// decryption without password, encblocks or decblocks, with odd editlist (11)
+test('decryption without password, encblocks or decblocks, with editlist', async () => {
+  blocks = null
+  for await (const val of encryptedText = index.decryption.decryption(Uint8Array.from(testOdd11), encSeckey, blocks)) {
+    expect(val).toBeInstanceOf(Uint8Array)
+    // const textdecoder = new TextDecoder()
+    // console.log(textdecoder.decode(val))
+  }
+})
+
+// decryption without password, encblocks or decblocks, with odd editlist (2)
+test('decryption without password, encblocks or decblocks, with editlist', async () => {
+  blocks = null
+  for await (const val of encryptedText = index.decryption.decryption(Uint8Array.from(testOdd2), encSeckey, blocks)) {
+    expect(val).toBeInstanceOf(Uint8Array)
+    // const textdecoder = new TextDecoder()
+    // console.log(textdecoder.decode(val))
+  }
+})
+
+// decryption without password, encblocks or decblocks, with odd editlist (3)
+test('decryption without password, encblocks or decblocks, with editlist', async () => {
+  blocks = null
+  for await (const val of encryptedText = index.decryption.decryption(Uint8Array.from(testOdd3), encSeckey, blocks)) {
+    expect(val).toBeInstanceOf(Uint8Array)
+    // const textdecoder = new TextDecoder()
+    // console.log(textdecoder.decode(val))
+  }
+})
+
+// decryption without password, encblocks or decblocks, with editlist testcase 3
+test('decryption without password, encblocks or decblocks, with editlist', async () => {
+  blocks = null
+  for await (const val of encryptedText = index.decryption.decryption(Uint8Array.from(testCase3), encSeckey, blocks)) {
+    expect(val).toBeInstanceOf(Uint8Array)
+    // const textdecoder = new TextDecoder()
+    // console.log(textdecoder.decode(val))
+  }
+})
+
+// decryption without password, encblocks or decblocks, with editlist testcase 4
+test('decryption without password, encblocks or decblocks, with editlist', async () => {
+  blocks = null
+  for await (const val of encryptedText = index.decryption.decryption(Uint8Array.from(testCase4), encSeckey, blocks)) {
+    expect(val).toBeInstanceOf(Uint8Array)
+    // const textdecoder = new TextDecoder()
+    // console.log(textdecoder.decode(val))
+  }
+})
+
+// decryption without password, encblocks or decblocks, with editlist testcase 5
+test('decryption without password, encblocks or decblocks, with editlist', async () => {
+  blocks = null
+  for await (const val of encryptedText = index.decryption.decryption(Uint8Array.from(testCase5), encSeckey, blocks)) {
+    expect(val).toBeInstanceOf(Uint8Array)
+    // const textdecoder = new TextDecoder()
+    // console.log(textdecoder.decode(val))
+  }
+})
+
+// decryption without password, encblocks or decblocks, with editlist testcase 6
+test('decryption without password, encblocks or decblocks, with editlist', async () => {
+  blocks = null
+  for await (const val of encryptedText = index.decryption.decryption(Uint8Array.from(testCase6), encSeckey, blocks)) {
+    expect(val).toBeInstanceOf(Uint8Array)
+    // const textdecoder = new TextDecoder()
+    // console.log(textdecoder.decode(val))
+  }
+})
+
+// decryption without password, encblocks or decblocks, with editlist testcase 7
+test('decryption without password, encblocks or decblocks, with editlist', async () => {
+  blocks = null
+  for await (const val of encryptedText = index.decryption.decryption(Uint8Array.from(testCase7), encSeckey, blocks)) {
+    expect(val).toBeInstanceOf(Uint8Array)
+    // const textdecoder = new TextDecoder()
+    // console.log(textdecoder.decode(val))
+  }
+})
+
 // decryption without password, encblocks or decblocks, with multiple editlist
 test('decryption without password, encblocks or decblocks, with multiple editlist (Person 1)', async () => {
   blocks = null
-  const decryptedText = await index.decryption.decryption(Uint8Array.from(testDataEncMultiEdit), encSeckey, blocks)
-  expect(decryptedText).toBeInstanceOf(Array)
-  expect(decryptedText[0]).toBeInstanceOf(Uint8Array)
-  const textdecoder = new TextDecoder()
-  expect(textdecoder.decode(mergedArray(decryptedText))).toMatch('abcdefghij')
+  for await (const val of decryptedText = await index.decryption.decryption(Uint8Array.from(testDataEncMultiEdit), encSeckey, blocks)) {
+    expect(val).toBeInstanceOf(Uint8Array)
+    const textdecoder = new TextDecoder()
+    expect(textdecoder.decode(val)).toMatch('abcdefghij')
+  }
 })
 
 // decryption without password, encblocks or decblocks, with multiple editlist
 test('decryption without password, encblocks or decblocks, with multiple editlist (Person 2)', async () => {
   blocks = null
-  const decryptedText = await index.decryption.decryption(Uint8Array.from(testDataEncMultiEdit), encSeckeyPass, blocks)
-  expect(decryptedText).toBeInstanceOf(Array)
-  expect(decryptedText[0]).toBeInstanceOf(Uint8Array)
-  const textdecoder = new TextDecoder()
-  expect(textdecoder.decode(mergedArray(decryptedText))).toMatch('abcd')
+  for await (const val of decryptedText = await index.decryption.decryption(Uint8Array.from(testDataEncMultiEdit), encSeckeyPass, blocks)) {
+    expect(val).toBeInstanceOf(Uint8Array)
+    const textdecoder = new TextDecoder()
+    expect(textdecoder.decode(val)).toMatch('abcd')
+  }
 })
 
 // decryption without password, encblocks or decblocks, with editlist odd
 test('decryption without password, encblocks or decblocks, with editlist odd', async () => {
   blocks = null
-  const decryptedText = await index.decryption.decryption(Uint8Array.from(testDataEncEditOdd), encSeckey, blocks)
-  expect(decryptedText).toBeInstanceOf(Array)
-  expect(decryptedText[0]).toBeInstanceOf(Uint8Array)
-  const textdecoder = new TextDecoder()
-  expect(textdecoder.decode(mergedArray(decryptedText))).toMatch('abcdefghijuvwxyz')
+  for await (const val of decryptedText = await index.decryption.decryption(Uint8Array.from(testDataEncEditOdd), encSeckey, blocks)) {
+    expect(val).toBeInstanceOf(Uint8Array)
+    const textdecoder = new TextDecoder()
+    expect(textdecoder.decode(val)).toMatch('abcdefghijuvwxyz')
+  }
 })
 
 // decryption with block
 test('decryption with block', async () => {
   blocks = null
-  const decryptedText = await index.decryption.decryption(Uint8Array.from(testDataBlock), encSeckey, blocks)
-  const textdecoder = new TextDecoder()
-  expect(decryptedText).toBeInstanceOf(Array)
-  expect(decryptedText[0]).toBeInstanceOf(Uint8Array)
-  expect(textdecoder.decode(mergedArray(decryptedText))).toMatch(/faaa/)
-  expect(textdecoder.decode(mergedArray(decryptedText))).toMatch(/dddd/)
+  for await (const val of decryptedText = await index.decryption.decryption(Uint8Array.from(testDataBlock), encSeckey, blocks)) {
+    expect(val).toBeInstanceOf(Uint8Array)
+    // const textdecoder = new TextDecoder()
+    // console.log(textdecoder.decode(val))
+  }
 })
 
 // decryption with decblock
@@ -245,13 +353,6 @@ test('decryption with decblock', async () => {
     // const textdecoder = new TextDecoder()
     // console.log(textdecoder.decode(val))
   }
-  /*
-  const decryptedText = await index.decryption.decryption(Uint8Array.from(testDataBlock), encSeckey, blocks)
-  const textdecoder = new TextDecoder()
-  expect(decryptedText).toBeInstanceOf(Array)
-  expect(decryptedText[0]).toBeInstanceOf(Uint8Array)
-  expect(textdecoder.decode(mergedArray(decryptedText))).toMatch(/faaa/)
-  expect(textdecoder.decode(mergedArray(decryptedText))).not.toMatch(/dddd/)
 })
 
 // reencryption
@@ -261,15 +362,11 @@ test('reeencryption', async () => {
   }
 })
 
-/*
 test('decryption of reeencrypted', async () => {
   blocks = null
-  const decryptedText = await index.decryption.decryption(Uint8Array.from(testDataReenc), encSeckey, blocks)
-  const textdecoder = new TextDecoder()
-  expect(decryptedText).toBeInstanceOf(Array)
-  expect(decryptedText[0]).toBeInstanceOf(Uint8Array)
-  expect(textdecoder.decode(mergedArray(decryptedText))).toMatch(/faaa/)
-  expect(textdecoder.decode(mergedArray(decryptedText))).toMatch(/dddd/)
+  for await (const val of decryptedText = await index.decryption.decryption(Uint8Array.from(testDataReenc), encSeckey, blocks)) {
+    expect(val).toBeInstanceOf(Uint8Array)
+  }
 })
 
 // rearrangment ohne edit vorher
@@ -278,16 +375,16 @@ test('rearrangment without edit', async () => {
   const rearrangedText = await index.rearrangment.rearrange(Uint8Array.from(testDataEncrypted), seckeyFileKey, [encPubkeyPass], editlist)
   expect(rearrangedText).toBeInstanceOf(Array)
   expect(rearrangedText[0]).toBeInstanceOf(Uint8Array)
-  // fs.writeFileSync('testData\\Rearr_noEdit.crypt4gh', mergedArray(rearrangedText))
+  fs.writeFileSync('testData\\Rearr_noEdit.crypt4gh', mergedArray(rearrangedText))
 })
 
 test('decryption of rearrangment without edit', async () => {
   blocks = null
-  const decryptedText = await index.decryption.decryption(Uint8Array.from(testDataRearrNoEdit), encSeckeyPass, blocks)
-  const textdecoder = new TextDecoder()
-  expect(decryptedText).toBeInstanceOf(Array)
-  expect(decryptedText[0]).toBeInstanceOf(Uint8Array)
-  expect(textdecoder.decode(mergedArray(decryptedText))).toBe('faaaaaaaa')
+  for await (const val of decryptedText = await index.decryption.decryption(Uint8Array.from(testDataRearrNoEdit), encSeckeyPass, blocks)) {
+    expect(val).toBeInstanceOf(Uint8Array)
+    const textdecoder = new TextDecoder()
+    expect(textdecoder.decode(val)).toBe('faaaaaaaa')
+  }
 })
 
 // rearrangment with edit
@@ -296,16 +393,16 @@ test('rearrangment with edit', async () => {
   const rearrangedText = await index.rearrangment.rearrange(Uint8Array.from(testDataEncryptedEdit), encSeckey, [encPubkeyPass], editlist)
   expect(rearrangedText).toBeInstanceOf(Array)
   expect(rearrangedText[0]).toBeInstanceOf(Uint8Array)
-  // fs.writeFileSync('testData\\Rearr_Edit.crypt4gh', mergedArray(rearrangedText))
+  fs.writeFileSync('testData\\Rearr_Edit.crypt4gh', mergedArray(rearrangedText))
 })
 
 test('decryption of rearrangment with edit', async () => {
   blocks = null
-  const decryptedText = await index.decryption.decryption(Uint8Array.from(testDataRearrEdit), encSeckeyPass, blocks)
-  const textdecoder = new TextDecoder()
-  expect(decryptedText).toBeInstanceOf(Array)
-  expect(decryptedText[0]).toBeInstanceOf(Uint8Array)
-  expect(textdecoder.decode(mergedArray(decryptedText))).toBe('abcdefghi')
+  for await (const val of decryptedText = await index.decryption.decryption(Uint8Array.from(testDataRearrEdit), encSeckeyPass, blocks)) {
+    expect(val).toBeInstanceOf(Uint8Array)
+    const textdecoder = new TextDecoder()
+    expect(textdecoder.decode(val)).toBe('abcdefghi')
+  }
 })
 
 // rearrangment with multi edit
@@ -314,16 +411,16 @@ test('rearrangment with multi edit', async () => {
   const rearrangedText = await index.rearrangment.rearrange(Uint8Array.from(testDataEncMultiEdit), encSeckey, [encPubkeyPass], editlist)
   expect(rearrangedText).toBeInstanceOf(Array)
   expect(rearrangedText[0]).toBeInstanceOf(Uint8Array)
-  // fs.writeFileSync('testData\\Rearr_MultiEdit.crypt4gh', mergedArray(rearrangedText))
+  fs.writeFileSync('testData\\Rearr_MultiEdit.crypt4gh', mergedArray(rearrangedText))
 })
 
 test('decryption of rearrangment with edit', async () => {
   blocks = null
-  const decryptedText = await index.decryption.decryption(Uint8Array.from(testDataRearrMultiEdit), encSeckeyPass, blocks)
-  const textdecoder = new TextDecoder()
-  expect(decryptedText).toBeInstanceOf(Array)
-  expect(decryptedText[0]).toBeInstanceOf(Uint8Array)
-  expect(textdecoder.decode(mergedArray(decryptedText))).toBe('abcd')
+  for await (const val of decryptedText = await index.decryption.decryption(Uint8Array.from(testDataRearrMultiEdit), encSeckeyPass, blocks)) {
+    expect(val).toBeInstanceOf(Uint8Array)
+    const textdecoder = new TextDecoder()
+    expect(textdecoder.decode(val)).toBe('abcd')
+  }
 })
 
 // rearrangment with edit out of range
@@ -340,10 +437,3 @@ test('encryption with edit and block', async () => {
   const encryptedText = await index.encryption.encryption(Buffer.from(testDataUnencrypted), encSeckey, [encPubkey], block, edit)
   expect(encryptedText).not.toBe([])
 })
-
-// edit and decblock
-test('edit and decblock', async () => {
-  blocks = [1]
-  const decryptedText = await index.decryption.decryption(Uint8Array.from(testDataEncryptedEdit), encSeckey, blocks)
-  expect(decryptedText).toBe(undefined)
-}) */
