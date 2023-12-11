@@ -371,6 +371,7 @@ async function * encryptBlock (headerPackets, blocks, chacha20poly1305, unencryp
  */
 async function * encryptEditlist (editlist, encryptionMethod, sessionKey, publicKeys, secretkey, unencryptedData, chacha20poly1305, nonce) {
   try {
+    console.log(editlist)
     const serializedData = await enc.encryption_edit(editlist, encryptionMethod, sessionKey, publicKeys, secretkey)
     const chunksize = SEGMENT_SIZE
     let offset = 0

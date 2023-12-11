@@ -29,3 +29,9 @@ testData/editCase71.crypt4gh
 testData/editCase5.crypt4gh
 testData/edit1.crypt4gh
 testData/edit.crypt4gh
+test/script.test.js
+testData/bigData.crypt4gh
+testData/ncbi_dataset.zip
+testData/editCase11.crypt4gh
+testData/editCase13.crypt4gh
+testData/editCase12.crypt4gh

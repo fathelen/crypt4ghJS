@@ -16,7 +16,14 @@ const mergedArray = function (ArrayList) {
 }
 
 const fs = require('fs')
+const testCase13 = fs.readFileSync('testData\\editCase13.crypt4gh')
+const testCase12 = fs.readFileSync('testData\\editCase12.crypt4gh')
+const testCase11 = fs.readFileSync('testData\\editCase11.crypt4gh')
 const testDataUnencrypted = fs.readFileSync('testData\\abcd.txt', 'utf8')
+/*
+const bigTest = fs.readFileSync('testData\\ncbi_dataset.zip')
+const bigcrypt4gh = fs.readFileSync('testData\\bigData.crypt4gh')
+*/
 const testDataEncrypted = fs.readFileSync('testData\\abcdEncrypted.crypt4gh')
 const testDataPlain = fs.readFileSync('testData\\edit.crypt4gh')
 const test4edit = fs.readFileSync('testData\\edit4values.crypt4gh')
@@ -91,17 +98,17 @@ test('decrpt secret key and public key with password', async () => {
   expect(keys[0].length).toEqual(new Uint8Array(32).length)
   expect(keys[1].length).toEqual(new Uint8Array(32).length)
 })
-
+/*
 // encryption without password, editlist or blocks
 test('encryption without password, editlist or block', async () => {
   const block = null
   const edit = null
-  for await (const val of index.encryption.encryption(Buffer.from(testDataUnencrypted), encSeckey, [encPubkey], block, edit)) {
-    expect(val).toBeInstanceOf(Uint8Array)
-    // fs.appendFileSync('testData\\edit1.crypt4gh', val)
+  for await (const val of index.encryption.encryption(Buffer.from(bigTest), encSeckey, [encPubkey], block, edit)) {
+    // expect(val).toBeInstanceOf(Uint8Array)
+    // fs.appendFileSync('testData\\bigData.crypt4gh', val)
   }
 })
-
+*/
 // encryption with password, without editlist or blocks
 test('encryption with password,without editlist or block', async () => {
   edit = null
@@ -113,10 +120,10 @@ test('encryption with password,without editlist or block', async () => {
 
 // encryption without password and blocks with editlist
 test('encryption without password and blocks with editlist', async () => {
-  edit = [0, 70000, 5]
+  edit = [3000000, 5]
   block = null
   for await (const val of index.encryption.encryption(Buffer.from(testDataUnencrypted), encSeckey, [encPubkey], block, edit)) {
-    // fs.appendFileSync('testData\\editOdd1_1.crypt4gh', val)
+    // fs.appendFileSync('testData\\editCase13.crypt4gh', val)
     expect(val).toBeInstanceOf(Uint8Array)
   }
 })
@@ -185,7 +192,35 @@ test('decryption without password, editlist, encblocks or decblocks', async () =
   }
 })
 
-// decryption without password, encblocks or decblocks, with editlist
+// decryption without password, encblocks or decblocks, with editlist (case 11)
+test('decryption without password, encblocks or decblocks, with editlist', async () => {
+  blocks = null
+  for await (const val of encryptedText = index.decryption.decryption(Uint8Array.from(testCase11), encSeckey, blocks)) {
+    expect(val).toBeInstanceOf(Uint8Array)
+    // const textdecoder = new TextDecoder()
+    // console.log(textdecoder.decode(val))
+  }
+})
+
+// decryption without password, encblocks or decblocks, with editlist (case 12)
+test('decryption without password, encblocks or decblocks, with editlist', async () => {
+  blocks = null
+  for await (const val of encryptedText = index.decryption.decryption(Uint8Array.from(testCase12), encSeckey, blocks)) {
+    expect(val).toBeInstanceOf(Uint8Array)
+    // const textdecoder = new TextDecoder()
+    // console.log(textdecoder.decode(val))
+  }
+})
+
+// decryption without password, encblocks or decblocks, with editlist (case 13)
+test('decryption without password, encblocks or decblocks, with editlist', async () => {
+  blocks = null
+  for await (const val of encryptedText = index.decryption.decryption(Uint8Array.from(testCase13), encSeckey, blocks)) {
+    expect(val).toBe(undefined)
+  }
+})
+
+// decryption without password, encblocks or decblocks, with editlist (4)
 test('decryption without password, encblocks or decblocks, with editlist', async () => {
   blocks = null
   for await (const val of encryptedText = index.decryption.decryption(Uint8Array.from(test4edit), encSeckey, blocks)) {
