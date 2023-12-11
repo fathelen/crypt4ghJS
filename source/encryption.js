@@ -67,7 +67,7 @@ exports.encryption = async function * (unencryptedData, secretkey, publicKeys, b
   }
 }
 
-exports.encHeader = function (secretkey, publicKeys, blocks, editlist) {
+exports.encHeader = function (secretkey, publicKeys) {
   try {
     // header part
     const encryptionMethod = new Uint32Array([0])
@@ -77,6 +77,18 @@ exports.encHeader = function (secretkey, publicKeys, blocks, editlist) {
     typeArray.push(encPacketDataContent)
     const headerPackets = enc.header_encrypt(typeArray, secretkey, publicKeys)
     const serializedData = enc.serialize(headerPackets[0], headerPackets[1], headerPackets[2], headerPackets[3])
+    return serializedData
+  } catch (e) {
+    console.trace('Header Encryption not possible.')
+  }
+}
+
+exports.encHeaderEdit = async function (secretkey, publicKeys, editlist) {
+  try {
+    // header part
+    const encryptionMethod = new Uint32Array([0])
+    const sessionKey = helperfunction.randomBytes(32)
+    const serializedData = await enc.encryption_edit(editlist, encryptionMethod, sessionKey, publicKeys, secretkey)
     return serializedData
   } catch (e) {
     console.trace('Header Encryption not possible.')

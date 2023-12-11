@@ -36,3 +36,5 @@ testData/editCase11.crypt4gh
 testData/editCase13.crypt4gh
 testData/editCase12.crypt4gh
 testData/readChunks.crypt4gh
+testData/readChunksEdit.crypt4gh
+testData/readChunksBlocks.crypt4gh
