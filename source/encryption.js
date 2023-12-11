@@ -67,6 +67,34 @@ exports.encryption = async function * (unencryptedData, secretkey, publicKeys, b
   }
 }
 
+exports.encHeader = function (secretkey, publicKeys, blocks, editlist) {
+  try {
+    // header part
+    const encryptionMethod = new Uint32Array([0])
+    const sessionKey = helperfunction.randomBytes(32)
+    const typeArray = []
+    const encPacketDataContent = enc.make_packet_data_enc(encryptionMethod, sessionKey)
+    typeArray.push(encPacketDataContent)
+    const headerPackets = enc.header_encrypt(typeArray, secretkey, publicKeys)
+    const serializedData = enc.serialize(headerPackets[0], headerPackets[1], headerPackets[2], headerPackets[3])
+    return serializedData
+  } catch (e) {
+    console.trace('Header Encryption not possible.')
+  }
+}
+
+exports.pureEncryption = async function (chunk) {
+  const sessionKey = helperfunction.randomBytes(32)
+  const nonce = helperfunction.randomBytes(12)
+  const chacha20poly1305 = new ChaCha20Poly1305.ChaCha20Poly1305(sessionKey)
+  const encChunk = chacha20poly1305.seal(nonce, chunk)
+  const nonceEnc = new Uint8Array(nonce.length + encChunk.length)
+  nonceEnc.set(nonce)
+  nonceEnc.set(encChunk, nonce.length)
+  // console.log(nonceEnc)
+  return await Promise.resolve(nonceEnc)
+}
+
 /**
  * Function to create the encryption package
  * @param {*} encryptionMethode => which method is used for encryption (only chacha20poly1305 implemented)
@@ -371,7 +399,6 @@ async function * encryptBlock (headerPackets, blocks, chacha20poly1305, unencryp
  */
 async function * encryptEditlist (editlist, encryptionMethod, sessionKey, publicKeys, secretkey, unencryptedData, chacha20poly1305, nonce) {
   try {
-    console.log(editlist)
     const serializedData = await enc.encryption_edit(editlist, encryptionMethod, sessionKey, publicKeys, secretkey)
     const chunksize = SEGMENT_SIZE
     let offset = 0

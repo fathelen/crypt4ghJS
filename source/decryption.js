@@ -31,7 +31,6 @@ exports.decryption = async function * (encryptedData, seckey, blocks = []) {
         yield await Promise.resolve(val[0])
       }
     } else if (headerInformation[3].length > 0 && blocks == null) {
-      console.log('aaa')
       for await (const val of decryptEdit(headerInformation, encryptedData, chacha20poly1305)) {
         yield await Promise.resolve(val)
       }
@@ -281,7 +280,6 @@ async function * decryptionBlocks (encryptedData, blocks, headerInformation, cha
  * @returns an Array containing the addeded editlist (summed values of editlist), the editlist and a boolean if the og editlist was even or odd.
  */
 function blocks2encrypt (headerInformation) {
-  console.log('drin')
   // 1.Step: Welche Blöcke müssen entschlüsselt werden
   const edit64 = new BigInt64Array(headerInformation[3][0].buffer)
   let editlist = edit64.subarray(1)
@@ -310,7 +308,6 @@ function blocks2encrypt (headerInformation) {
       addedEdit.push(j)
     }
   }
-  console.log(editlist)
   return [addedEdit, editlist, unEven]
 }
 
@@ -322,7 +319,6 @@ function blocks2encrypt (headerInformation) {
  * @returns Array containing a map with the edits for each block and a boolean if the og editlist was even or odd.
  */
 function calculateEditlist (headerInformation) {
-  console.log('hier')
   const preEdit = blocks2encrypt(headerInformation)
   let bEven = 0
   const blocks = new Map()
@@ -411,7 +407,6 @@ function calculateEditlist (headerInformation) {
 async function * decryptEdit (headerInformation, encryptedData, chacha20poly1305) {
   // 3.Step entschlüssle nur die gebrauchten blöcke
   const blocks = await calculateEditlist(headerInformation)
-  console.log('blocks: ', blocks)
   for await (const val of decryptionBlocks(encryptedData, Array.from(blocks[0].keys()), headerInformation, chacha20poly1305)) {
     const edit = applyEditlist(blocks[0].get(val[2]), val[0])
     yield await Promise.resolve(edit)

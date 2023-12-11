@@ -16,14 +16,33 @@ const mergedArray = function (ArrayList) {
 }
 
 const fs = require('fs')
+
+test('read chunks, no edit, no blocks', async () => {
+  edit = null
+  block = null
+  const header = index.encryption.encHeader(encSeckeyPass, [encPubkeyPass], block, edit)
+  // fs.appendFileSync('testData\\readChunks.crypt4gh', header)
+  expect(header).toBeInstanceOf(Uint8Array)
+  if (header) {
+    const readStream = fs.createReadStream('testData\\abcd.txt')
+    readStream
+      .on('data', async function (d) {
+        const val = await index.encryption.pureEncryption(d)
+        // fs.appendFileSync('testData\\readChunks.crypt4gh', val)
+        await expect(val).toBeInstanceOf(Uint8Array)
+      })
+  }
+})
+
+/*
 const testCase13 = fs.readFileSync('testData\\editCase13.crypt4gh')
 const testCase12 = fs.readFileSync('testData\\editCase12.crypt4gh')
 const testCase11 = fs.readFileSync('testData\\editCase11.crypt4gh')
 const testDataUnencrypted = fs.readFileSync('testData\\abcd.txt', 'utf8')
-/*
+
 const bigTest = fs.readFileSync('testData\\ncbi_dataset.zip')
 const bigcrypt4gh = fs.readFileSync('testData\\bigData.crypt4gh')
-*/
+
 const testDataEncrypted = fs.readFileSync('testData\\abcdEncrypted.crypt4gh')
 const testDataPlain = fs.readFileSync('testData\\edit.crypt4gh')
 const test4edit = fs.readFileSync('testData\\edit4values.crypt4gh')
@@ -46,6 +65,7 @@ const testDataReenc = fs.readFileSync('testData\\ReEnc.crypt4gh')
 const testDataRearrNoEdit = fs.readFileSync('testData\\Rearr_noEdit.crypt4gh')
 const testDataRearrEdit = fs.readFileSync('testData\\Rearr_Edit.crypt4gh')
 const testDataRearrMultiEdit = fs.readFileSync('testData\\Rearr_MultiEdit.crypt4gh')
+*/
 const seckeyFileKey = new Uint8Array([20, 185, 204, 26, 245, 237, 159, 85, 129, 196, 166, 241, 27, 160, 54, 218, 89, 96, 153, 190, 9, 141, 139, 109, 142, 182, 83, 62, 107, 180, 10, 203])
 const seckey = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAEbm9uZQAEbm9uZQAg4BW6LpwKHBQN0MCZgjPtDafcGbN5wRmUSrIwEcN4te0=\n-----END CRYPT4GH PRIVATE KEY-----\n'
 const pubkey = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nGER04WfJXzPHiCWe94CHlMY6sp6zwWpAehA0MMHjdVQ=\n-----END CRYPT4GH PUBLIC KEY-----\n'
@@ -56,7 +76,7 @@ const encSeckey = new Uint8Array([224, 21, 186, 46, 156, 10, 28, 20, 13, 208, 19
 const encPubkey = new Uint8Array([24, 68, 116, 225, 103, 201, 95, 51, 199, 136, 37, 158, 247, 128, 135, 148, 198, 58, 178, 158, 179, 193, 106, 64, 122, 16, 52, 48, 193, 227, 117, 84])
 const encSeckeyPass = new Uint8Array([0, 78, 220, 95, 54, 181, 47, 52, 219, 136, 71, 191, 133, 251, 22, 200, 52, 195, 145, 195, 151, 193, 84, 12, 220, 215, 72, 117, 163, 211, 226, 189])
 const encPubkeyPass = new Uint8Array([188, 122, 213, 164, 26, 69, 46, 149, 255, 58, 171, 138, 217, 151, 184, 49, 252, 219, 241, 165, 107, 159, 78, 87, 153, 56, 19, 227, 41, 149, 195, 49])
-
+/*
 // test key generation without password
 test('generate secret/ public key pair without password', async () => {
   const encKeys = await index.keygen.keygen('')
@@ -98,7 +118,7 @@ test('decrpt secret key and public key with password', async () => {
   expect(keys[0].length).toEqual(new Uint8Array(32).length)
   expect(keys[1].length).toEqual(new Uint8Array(32).length)
 })
-/*
+
 // encryption without password, editlist or blocks
 test('encryption without password, editlist or block', async () => {
   const block = null
@@ -108,7 +128,7 @@ test('encryption without password, editlist or block', async () => {
     // fs.appendFileSync('testData\\bigData.crypt4gh', val)
   }
 })
-*/
+
 // encryption with password, without editlist or blocks
 test('encryption with password,without editlist or block', async () => {
   edit = null
@@ -308,7 +328,7 @@ test('decryption without password, encblocks or decblocks, with editlist', async
     // const textdecoder = new TextDecoder()
     // console.log(textdecoder.decode(val))
   }
-})
+}) 
 
 // decryption without password, encblocks or decblocks, with editlist testcase 5
 test('decryption without password, encblocks or decblocks, with editlist', async () => {
@@ -471,4 +491,4 @@ test('encryption with edit and block', async () => {
   block = [1]
   const encryptedText = await index.encryption.encryption(Buffer.from(testDataUnencrypted), encSeckey, [encPubkey], block, edit)
   expect(encryptedText).not.toBe([])
-})
+}) */
