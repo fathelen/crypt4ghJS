@@ -23,7 +23,6 @@ const magicBytestring = helperfunction.string2byte('crypt4gh')
 exports.decryption = async function * (encryptedData, seckey, blocks = []) {
   const header = await encryptedData.subarray(0, 1000)
   const headerInformation = dec.header_deconstruction(header, seckey)
-  // const ArrayList = []
   const chacha20poly1305 = new ChaCha20Poly1305.ChaCha20Poly1305(headerInformation[0])
   try {
     if (blocks && !headerInformation[3].length > 0) {
@@ -49,6 +48,18 @@ exports.decryption = async function * (encryptedData, seckey, blocks = []) {
   }
 }
 
+exports.pureDecryption = async function (d, key) {
+  const chacha20poly1305 = new ChaCha20Poly1305.ChaCha20Poly1305(key)
+  const nonce = await d.subarray(0, 12)
+  const enc = await d.subarray(12)
+  const plaintext = chacha20poly1305.open(nonce, enc)
+  return await Promise.resolve(plaintext)
+}
+
+exports.pureEdit = function (d) {
+  const edits = calculateEditlist(d)
+  return edits
+}
 /**
  * Function checks if a decryption is possible, by checking if the given seckey is able to decode a header packet.
  * @param {*} header => header part of the encrypted data
@@ -218,7 +229,7 @@ function parseEncPacket (packet) {
  * @param {*} decryptedText => already decrypted input data
  * @returns => decrypted data edited according to the editlist
  */
-function applyEditlist (edlist, decryptedText) {
+exports.applyEditlist = function (edlist, decryptedText) {
   try {
     const editedData = []
     let pos = BigInt(0)
@@ -408,7 +419,7 @@ async function * decryptEdit (headerInformation, encryptedData, chacha20poly1305
   // 3.Step entschlüssle nur die gebrauchten blöcke
   const blocks = await calculateEditlist(headerInformation)
   for await (const val of decryptionBlocks(encryptedData, Array.from(blocks[0].keys()), headerInformation, chacha20poly1305)) {
-    const edit = applyEditlist(blocks[0].get(val[2]), val[0])
+    const edit = dec.applyEditlist(blocks[0].get(val[2]), val[0])
     yield await Promise.resolve(edit)
   }
   if (blocks[1] === true) {
