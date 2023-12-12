@@ -150,3 +150,36 @@ test('decryption, read chunks, no edit, blocks, but only wants to decrypt x bloc
       readStream.destroy()
     })
 })
+
+test('reeencryption', async () => {
+  const readStream = fs.createReadStream('testData\\readChunks.crypt4gh', { end: 1000 })
+  readStream
+    .on('data', async function (d) {
+      const reencryptHeader = index.reeencryption.streamReencryptHeader(Uint8Array.from(d), [encPubkey, encPubkeyPass], encSeckeyPass)
+      await expect(reencryptHeader).toBeInstanceOf(Array)
+      // fs.appendFileSync('testData\\chunkReencryption.crypt4gh', reencryptHeader[0])
+      const readStream2 = fs.createReadStream('testData\\readChunks.crypt4gh', { start: reencryptHeader[1], highWaterMark: 65564 })
+      readStream2
+        .on('data', async function (d2) {
+          // fs.appendFileSync('testData\\chunkReencryption.crypt4gh', d2)
+        })
+      readStream.destroy()
+    })
+})
+
+test('decryption of reencryption', async () => {
+  const readStream = fs.createReadStream('testData\\chunkReencryption.crypt4gh', { end: 1000 })
+  readStream
+    .on('data', async function (d) {
+      const val = await index.decryption.header_deconstruction(Uint8Array.from(d), encSeckeyPass)
+      await expect(val).toBeInstanceOf(Array)
+      const readStream2 = fs.createReadStream('testData\\chunkReencryption.crypt4gh', { start: val[4], highWaterMark: 65564 })
+      readStream2
+        .on('data', async function (d2) {
+          const plaintext = await index.decryption.pureDecryption(Uint8Array.from(d2), val[0])
+          // fs.appendFileSync('testData\\chunkDecReencryption.txt', plaintext)
+          expect(plaintext).toBeInstanceOf(Uint8Array)
+        })
+      readStream.destroy()
+    })
+})
