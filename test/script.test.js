@@ -183,3 +183,83 @@ test('decryption of reencryption', async () => {
       readStream.destroy()
     })
 })
+
+test('rearrangement', async () => {
+  const editlist = [0, 5]
+  const readStream = fs.createReadStream('testData\\readChunks.crypt4gh', { end: 1000 })
+  readStream
+    .on('data', async function (d) {
+      const rearrangeHeader = await index.rearrangment.streamRearrange(Uint8Array.from(d), encSeckeyPass, [encPubkey, encPubkeyPass], editlist)
+      await expect(rearrangeHeader[0]).toBeInstanceOf(Uint8Array)
+      // fs.appendFileSync('testData\\chunkRearrangement.crypt4gh', rearrangeHeader[0])
+      const readStream2 = fs.createReadStream('testData\\readChunks.crypt4gh', { start: rearrangeHeader[1], highWaterMark: 65564 })
+      readStream2
+        .on('data', async function (d2) {
+          // fs.appendFileSync('testData\\chunkRearrangement.crypt4gh', d2)
+        })
+      readStream.destroy()
+    })
+})
+
+test('decryption, rearrangement', async () => {
+  let counter = 0
+  const readStream = fs.createReadStream('testData\\chunkRearrangement.crypt4gh', { end: 1000 })
+  readStream
+    .on('data', async function (d) {
+      const val = await index.decryption.header_deconstruction(Uint8Array.from(d), encSeckey)
+      const edits = index.decryption.pureEdit(val)
+      await expect(val).toBeInstanceOf(Array)
+      const readStream2 = fs.createReadStream('testData\\chunkRearrangement.crypt4gh', { start: val[4], highWaterMark: 65564 })
+      readStream2
+        .on('data', async function (d2) {
+          counter++
+          if (Array.from(edits[0].keys()).includes(counter)) {
+            const plaintext = await index.decryption.pureDecryption(Uint8Array.from(d2), val[0])
+            const aplliedEdit = index.decryption.applyEditlist(edits[0].get(counter), plaintext)
+            fs.appendFileSync('testData\\chunkDecRearrangement.txt', aplliedEdit)
+            expect(aplliedEdit).toBeInstanceOf(Uint8Array)
+          }
+        })
+      readStream.destroy()
+    })
+})
+
+test('rearrangement with edit before', async () => {
+  const editlist = [0, 10]
+  const readStream = fs.createReadStream('testData\\readChunksEdit.crypt4gh', { end: 1000 })
+  readStream
+    .on('data', async function (d) {
+      const rearrangeHeader = await index.rearrangment.streamRearrange(Uint8Array.from(d), encSeckeyPass, [encPubkey, encPubkeyPass], editlist)
+      await expect(rearrangeHeader[0]).toBeInstanceOf(Uint8Array)
+      // fs.appendFileSync('testData\\chunkRearrangementEdit.crypt4gh', rearrangeHeader[0])
+      const readStream2 = fs.createReadStream('testData\\readChunksEdit.crypt4gh', { start: rearrangeHeader[1], highWaterMark: 65564 })
+      readStream2
+        .on('data', async function (d2) {
+          // fs.appendFileSync('testData\\chunkRearrangementEdit.crypt4gh', d2)
+        })
+      readStream.destroy()
+    })
+})
+
+test('decryption, rearrangement', async () => {
+  let counter = 0
+  const readStream = fs.createReadStream('testData\\chunkRearrangementEdit.crypt4gh', { end: 1000 })
+  readStream
+    .on('data', async function (d) {
+      const val = await index.decryption.header_deconstruction(Uint8Array.from(d), encSeckey)
+      const edits = index.decryption.pureEdit(val)
+      await expect(val).toBeInstanceOf(Array)
+      const readStream2 = fs.createReadStream('testData\\chunkRearrangementEdit.crypt4gh', { start: val[4], highWaterMark: 65564 })
+      readStream2
+        .on('data', async function (d2) {
+          counter++
+          if (Array.from(edits[0].keys()).includes(counter)) {
+            const plaintext = await index.decryption.pureDecryption(Uint8Array.from(d2), val[0])
+            const aplliedEdit = index.decryption.applyEditlist(edits[0].get(counter), plaintext)
+            fs.appendFileSync('testData\\chunkDecRearrangementEdit.txt', aplliedEdit)
+            expect(aplliedEdit).toBeInstanceOf(Uint8Array)
+          }
+        })
+      readStream.destroy()
+    })
+})

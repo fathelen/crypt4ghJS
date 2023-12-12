@@ -44,3 +44,7 @@ testData/chunkDecBlocks.txt
 testData/chunkDec.txt
 testData/chunkReencryption.crypt4gh
 testData/chunkDecReencryption.txt
+testData/chunkRearrangementEdit.crypt4gh
+testData/chunkRearrangement.crypt4gh
+testData/chunkDecRearrangementEdit.txt
+testData/chunkDecRearrangement.txt
