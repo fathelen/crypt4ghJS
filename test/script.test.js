@@ -7,7 +7,11 @@ const encSeckey = new Uint8Array([224, 21, 186, 46, 156, 10, 28, 20, 13, 208, 19
 const encPubkey = new Uint8Array([24, 68, 116, 225, 103, 201, 95, 51, 199, 136, 37, 158, 247, 128, 135, 148, 198, 58, 178, 158, 179, 193, 106, 64, 122, 16, 52, 48, 193, 227, 117, 84])
 const encSeckeyPass = new Uint8Array([0, 78, 220, 95, 54, 181, 47, 52, 219, 136, 71, 191, 133, 251, 22, 200, 52, 195, 145, 195, 151, 193, 84, 12, 220, 215, 72, 117, 163, 211, 226, 189])
 const encPubkeyPass = new Uint8Array([188, 122, 213, 164, 26, 69, 46, 149, 255, 58, 171, 138, 217, 151, 184, 49, 252, 219, 241, 165, 107, 159, 78, 87, 153, 56, 19, 227, 41, 149, 195, 49])
-
+const pythonPub = '-----BEGIN CRYPT4GH PUBLIC KEY-----\n1tacjs2fhSkst4/5A12SRqX9+9HmpOxh3ZQCHPKjWBc=\n-----END CRYPT4GH PUBLIC KEY-----\n'
+const pythonSec = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAGc2NyeXB0ABQAAAAAkxl9BuOnD7BRIOmBGzxgbAARY2hhY2hhMjBfcG9seTEzMDUAPHBfA3Kly8cX99Zx+VyXEGdgnY7rDKUSdNc2Ml9adhXePri5ZrKfJsWkje4dXSkoTnQjQZbf+iF1U+OdqA==\n-----END CRYPT4GH PRIVATE KEY-----\n'
+const pythonKeySec = new Uint8Array([21, 185, 104, 245, 109, 142, 250, 85, 143, 50, 170, 223, 133, 77, 90, 68, 55, 163, 31, 214, 210, 50, 193, 127, 9, 85, 151, 167, 239, 103, 170, 221])
+const pythonKeyPub = new Uint8Array([214, 214, 156, 142, 205, 159, 133, 41, 44, 183, 143, 249, 3, 93, 146, 70, 165, 253, 251, 209, 230, 164, 236, 97, 221, 148, 2, 28, 242, 163, 88, 23])
+/*
 test('encryption, read chunks, no edit, no blocks', async () => {
   edit = null
   block = null
@@ -262,4 +266,27 @@ test('decryption, rearrangement', async () => {
         })
       readStream.destroy()
     })
+})
+*/
+// test kompatibilität python
+test('decryption of reencryption', async () => {
+  const readStream = fs.createReadStream('testData\\kompatibel.c4gh', { end: 1000 })
+  readStream
+    .on('data', async function (d) {
+      const val = await index.decryption.header_deconstruction(Uint8Array.from(d), pythonKeySec)
+      const readStream2 = fs.createReadStream('testData\\kompatibel.c4gh', { start: val[4], highWaterMark: 65564 })
+      readStream2
+        .on('data', async function (d2) {
+          const plaintext = await index.decryption.pureDecryption(Uint8Array.from(d2), val[0])
+          // fs.appendFileSync('testData\\pythonkompatibel.txt', plaintext)
+          expect(plaintext).toBeInstanceOf(Uint8Array)
+        })
+      readStream.destroy()
+    })
+})
+
+// test decrypt keyfiles with password
+test('decrpt secret key and public key with password', async () => {
+  const keys = await index.keyfiles.encryption_keyfiles([pythonSec, pythonPub], 'gunpass')
+  expect(keys[0]).toBeInstanceOf(Uint8Array)
 })

@@ -48,3 +48,5 @@ testData/chunkRearrangementEdit.crypt4gh
 testData/chunkRearrangement.crypt4gh
 testData/chunkDecRearrangementEdit.txt
 testData/chunkDecRearrangement.txt
+testData/pythonkompatibel.txt
+testData/kompatibel.c4gh
