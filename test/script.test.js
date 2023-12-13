@@ -11,7 +11,7 @@ const pythonPub = '-----BEGIN CRYPT4GH PUBLIC KEY-----\n1tacjs2fhSkst4/5A12SRqX9
 const pythonSec = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAGc2NyeXB0ABQAAAAAkxl9BuOnD7BRIOmBGzxgbAARY2hhY2hhMjBfcG9seTEzMDUAPHBfA3Kly8cX99Zx+VyXEGdgnY7rDKUSdNc2Ml9adhXePri5ZrKfJsWkje4dXSkoTnQjQZbf+iF1U+OdqA==\n-----END CRYPT4GH PRIVATE KEY-----\n'
 const pythonKeySec = new Uint8Array([21, 185, 104, 245, 109, 142, 250, 85, 143, 50, 170, 223, 133, 77, 90, 68, 55, 163, 31, 214, 210, 50, 193, 127, 9, 85, 151, 167, 239, 103, 170, 221])
 const pythonKeyPub = new Uint8Array([214, 214, 156, 142, 205, 159, 133, 41, 44, 183, 143, 249, 3, 93, 146, 70, 165, 253, 251, 209, 230, 164, 236, 97, 221, 148, 2, 28, 242, 163, 88, 23])
-/*
+
 test('encryption, read chunks, no edit, no blocks', async () => {
   edit = null
   block = null
@@ -260,16 +260,16 @@ test('decryption, rearrangement', async () => {
           if (Array.from(edits[0].keys()).includes(counter)) {
             const plaintext = await index.decryption.pureDecryption(Uint8Array.from(d2), val[0])
             const aplliedEdit = index.decryption.applyEditlist(edits[0].get(counter), plaintext)
-            fs.appendFileSync('testData\\chunkDecRearrangementEdit.txt', aplliedEdit)
+            // fs.appendFileSync('testData\\chunkDecRearrangementEdit.txt', aplliedEdit)
             expect(aplliedEdit).toBeInstanceOf(Uint8Array)
           }
         })
       readStream.destroy()
     })
 })
-*/
+
 // test kompatibilität python
-test('decryption of reencryption', async () => {
+test('decryption pythonfile', async () => {
   const readStream = fs.createReadStream('testData\\kompatibel.c4gh', { end: 1000 })
   readStream
     .on('data', async function (d) {
@@ -285,8 +285,58 @@ test('decryption of reencryption', async () => {
     })
 })
 
-// test decrypt keyfiles with password
+// test kompatibilität python
+test('decryption pythonfile', async () => {
+  const readStream = fs.createReadStream('testData\\kompatibelRange.c4gh', { end: 1000 })
+  readStream
+    .on('data', async function (d) {
+      const val = await index.decryption.header_deconstruction(Uint8Array.from(d), pythonKeySec)
+      const readStream2 = fs.createReadStream('testData\\kompatibelRange.c4gh', { start: val[4], highWaterMark: 65564 })
+      readStream2
+        .on('data', async function (d2) {
+          const plaintext = await index.decryption.pureDecryption(Uint8Array.from(d2), val[0])
+          fs.appendFileSync('testData\\pythonkompatibelRange.txt', plaintext)
+          expect(plaintext).toBeInstanceOf(Uint8Array)
+        })
+      readStream.destroy()
+    })
+})
+
+// find python keys
 test('decrpt secret key and public key with password', async () => {
   const keys = await index.keyfiles.encryption_keyfiles([pythonSec, pythonPub], 'gunpass')
   expect(keys[0]).toBeInstanceOf(Uint8Array)
+})
+
+test('encryption, read chunks, no edit, no blocks for python', async () => {
+  edit = null
+  block = null
+  const header = index.encryption.encHeader(pythonKeySec, [pythonKeyPub], block, edit)
+  // fs.appendFileSync('testData\\pythonTest.crypt4gh', header[0])
+  expect(header[0]).toBeInstanceOf(Uint8Array)
+  if (header[1]) {
+    const readStream = fs.createReadStream('testData\\abcd.txt')
+    readStream
+      .on('data', async function (d) {
+        const val = await index.encryption.pureEncryption(d, header[1])
+        // fs.appendFileSync('testData\\pythonTest.crypt4gh', val)
+        await expect(val).toBeInstanceOf(Uint8Array)
+      })
+  }
+})
+
+test('python compitbility Edit', async () => {
+  edit = [10000, 10, 2000, 5]
+  const header = await index.encryption.encHeaderEdit(pythonKeySec, [pythonKeyPub], edit)
+  // fs.appendFileSync('testData\\pythonTestEdit.crypt4gh', header[0][0])
+  expect(header[0][0]).toBeInstanceOf(Uint8Array)
+  if (header) {
+    const readStream = fs.createReadStream('testData\\abcd.txt')
+    readStream
+      .on('data', async function (d) {
+        const val = await index.encryption.pureEncryption(d, header[1])
+        // fs.appendFileSync('testData\\pythonTestEdit.crypt4gh', val)
+        await expect(val).toBeInstanceOf(Uint8Array)
+      })
+  }
 })

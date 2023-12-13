@@ -50,3 +50,7 @@ testData/chunkDecRearrangementEdit.txt
 testData/chunkDecRearrangement.txt
 testData/pythonkompatibel.txt
 testData/kompatibel.c4gh
+testData/pythonTestEdit.crypt4gh
+testData/pythonTest.crypt4gh
+testData/pythonkompatibelRange.txt
+testData/kompatibelRange.c4gh
