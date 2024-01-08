@@ -3,6 +3,7 @@ const ChaCha20Poly1305 = require('@stablelib/chacha20poly1305')
 const x25519 = require('@stablelib/x25519')
 const Blake2b = require('@stablelib/blake2b')
 const enc = require('./encryption')
+const crypto = require('crypto')
 
 const SEGMENT_SIZE = 65536
 const PacketTypeDataEnc = new Uint32Array([0])
@@ -71,7 +72,7 @@ exports.encHeader = function (secretkey, publicKeys) {
   try {
     // header part
     const encryptionMethod = new Uint32Array([0])
-    const sessionKey = helperfunction.randomBytes(32)
+    const sessionKey = crypto.randomBytes(32)
     const typeArray = []
     const encPacketDataContent = enc.make_packet_data_enc(encryptionMethod, sessionKey)
     typeArray.push(encPacketDataContent)
@@ -87,7 +88,7 @@ exports.encHeaderEdit = async function (secretkey, publicKeys, editlist) {
   try {
     // header part
     const encryptionMethod = new Uint32Array([0])
-    const sessionKey = helperfunction.randomBytes(32)
+    const sessionKey = crypto.randomBytes(32)
     const serializedData = await enc.encryption_edit(editlist, encryptionMethod, sessionKey, publicKeys, secretkey)
     return [serializedData, sessionKey]
   } catch (e) {
@@ -95,14 +96,13 @@ exports.encHeaderEdit = async function (secretkey, publicKeys, editlist) {
   }
 }
 
-exports.pureEncryption = async function (chunk, key) {
-  const nonce = helperfunction.randomBytes(12)
-  const chacha20poly1305 = new ChaCha20Poly1305.ChaCha20Poly1305(key)
-  const encChunk = chacha20poly1305.seal(nonce, chunk)
-  const nonceEnc = new Uint8Array(nonce.length + encChunk.length)
-  nonceEnc.set(nonce)
-  nonceEnc.set(encChunk, nonce.length)
-  return await Promise.resolve(nonceEnc)
+exports.pureEncryption = function (chunk, key) {
+  const algorithm = 'chacha20-poly1305'
+  const initVector = crypto.randomBytes(12)
+  const cipher = crypto.createCipheriv(algorithm, key, initVector)
+  const encryptedResult = Buffer.concat([initVector, cipher.update(chunk), cipher.final(), cipher.getAuthTag()])
+  const x = new Uint8Array(encryptedResult)
+  return x
 }
 
 /**
@@ -134,7 +134,8 @@ exports.make_packet_data_enc = function (encryptionMethode, sessionKey) {
  */
 exports.header_encrypt = function (headerContent, seckey, pubkeys) {
   try {
-    const nonce = helperfunction.randomBytes(12)
+    // const nonce = crypto.randomBytes(12)
+    const initVector = crypto.randomBytes(12)
     const k = x25519.generateKeyPairFromSeed(seckey)
     let sharedkey
     const encryptedHeader = []
@@ -157,14 +158,16 @@ exports.header_encrypt = function (headerContent, seckey, pubkeys) {
         blake2b.update(uint8Blake2b)
         const uint8FromBlake2b = blake2b.digest()
         sharedkey = uint8FromBlake2b.subarray(0, 32)
-        const chacha20poly1305 = new ChaCha20Poly1305.ChaCha20Poly1305(sharedkey)
-        const sealedHeader = chacha20poly1305.seal(nonce, headerContent[j])
-        tuple.push(sealedHeader)
+        const algorithm = 'chacha20-poly1305'
+        const cipher = crypto.createCipheriv(algorithm, sharedkey, initVector)
+        const encryptedResult = Buffer.concat([cipher.update(headerContent[j]), cipher.final(), cipher.getAuthTag()])
+        const x = new Uint8Array(encryptedResult)
+        tuple.push(x)
       }
       encryptedHeader.push(tuple)
     }
     const ke = k.publicKey
-    return [encrMethod, ke, nonce, encryptedHeader, sharedkey]
+    return [encrMethod, ke, initVector, encryptedHeader, sharedkey]
   } catch (e) {
     console.trace('header could not be encrypted.')
   }
@@ -325,7 +328,7 @@ exports.make_packet_edit_lists = function (editList) {
 exports.header_encrypt_multi_edit = function (editLists, encryptionPaket, seckey, pubkeys) {
   try {
     let headerContent = []
-    const nonce = helperfunction.randomBytes(12)
+    // const nonce = helperfunction.randomBytes(12)
     const k = x25519.generateKeyPairFromSeed(seckey)
     let sharedkey
     const encryptedHeader = []
@@ -347,9 +350,15 @@ exports.header_encrypt_multi_edit = function (editLists, encryptionPaket, seckey
         blake2b.update(uint8Blake2b)
         const uint8FromBlake2b = blake2b.digest()
         sharedkey = uint8FromBlake2b.subarray(0, 32)
+        const algorithm = 'chacha20-poly1305'
+        const initVector = crypto.randomBytes(12)
+        const cipher = crypto.createCipheriv(algorithm, sharedkey, initVector)
+        const encryptedResult = Buffer.concat([initVector, cipher.update(headerContent[j]), cipher.final(), cipher.getAuthTag()])
+        /*
         const chacha20poly1305 = new ChaCha20Poly1305.ChaCha20Poly1305(sharedkey)
         const sealedHeader = chacha20poly1305.seal(nonce, headerContent[j])
-        tuple.push(sealedHeader)
+        */
+        tuple.push(encryptedResult)
       }
       encryptedHeader.push(tuple)
     }

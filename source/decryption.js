@@ -3,6 +3,7 @@ const ChaCha20Poly1305 = require('@stablelib/chacha20poly1305')
 const x25519 = require('@stablelib/x25519')
 const Blake2b = require('@stablelib/blake2b')
 const dec = require('./decryption')
+const crypto = require('crypto')
 
 exports.SEGMENT_SIZE = 65536
 const fullSegment = 65564
@@ -49,10 +50,16 @@ exports.decryption = async function * (encryptedData, seckey, blocks = []) {
 }
 
 exports.pureDecryption = async function (d, key) {
-  const chacha20poly1305 = new ChaCha20Poly1305.ChaCha20Poly1305(key)
   const nonce = await d.subarray(0, 12)
   const enc = await d.subarray(12)
-  const plaintext = chacha20poly1305.open(nonce, enc)
+  const algorithm = 'chacha20-poly1305'
+  const decipher = crypto.createDecipheriv(algorithm, Buffer.from(key, 'hex'), nonce)
+  const decrypted = decipher.update(enc)
+  const plaintext = new Uint8Array(decrypted.slice(0, -16))
+
+  /*
+  const chacha20poly1305 = new ChaCha20Poly1305.ChaCha20Poly1305(key)
+  const plaintext = chacha20poly1305.open(nonce, enc) */
   return await Promise.resolve(plaintext)
 }
 
@@ -166,8 +173,14 @@ exports.decrypt_header = function (headerPackets, seckeys) {
         blake2b.update(uint8Blake2b)
         const uint8FromBlake2b = blake2b.digest()
         const sharedKey = uint8FromBlake2b.subarray(0, 32)
+        const algorithm = 'chacha20-poly1305'
+        const decipher = crypto.createDecipheriv(algorithm, Buffer.from(sharedKey, 'hex'), nonceUint8)
+        const decrypted = decipher.update(encryptedUint8)
+        const plaintext = new Uint8Array(decrypted.slice(0, -16))
+        /*
         const chacha20poly1305 = new ChaCha20Poly1305.ChaCha20Poly1305(sharedKey)
         const plaintext = chacha20poly1305.open(nonceUint8, encryptedUint8)
+        console.log(plaintext) */
         if (plaintext) {
           decryptedPackets.push(plaintext)
         } else {
