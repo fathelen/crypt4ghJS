@@ -148,3 +148,5 @@ testData/Dec256kb
 .gitignore
 testData/writestream1gb
 testData/editCase4values.crypt4gh
+testData/Re_abcd.txt
+testData/abcd.c4gh

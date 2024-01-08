@@ -329,6 +329,7 @@ exports.header_encrypt_multi_edit = function (editLists, encryptionPaket, seckey
   try {
     let headerContent = []
     // const nonce = helperfunction.randomBytes(12)
+    const initVector = crypto.randomBytes(12)
     const k = x25519.generateKeyPairFromSeed(seckey)
     let sharedkey
     const encryptedHeader = []
@@ -351,7 +352,6 @@ exports.header_encrypt_multi_edit = function (editLists, encryptionPaket, seckey
         const uint8FromBlake2b = blake2b.digest()
         sharedkey = uint8FromBlake2b.subarray(0, 32)
         const algorithm = 'chacha20-poly1305'
-        const initVector = crypto.randomBytes(12)
         const cipher = crypto.createCipheriv(algorithm, sharedkey, initVector)
         const encryptedResult = Buffer.concat([initVector, cipher.update(headerContent[j]), cipher.final(), cipher.getAuthTag()])
         /*
@@ -363,7 +363,7 @@ exports.header_encrypt_multi_edit = function (editLists, encryptionPaket, seckey
       encryptedHeader.push(tuple)
     }
     const ke = k.publicKey
-    return [encrMethod, ke, nonce, encryptedHeader]
+    return [encrMethod, ke, initVector, encryptedHeader]
   } catch (e) {
     console.trace('Header for encryption with mulitple edit lists could not be computed.')
   }
