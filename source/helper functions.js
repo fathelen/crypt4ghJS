@@ -58,6 +58,7 @@ exports.base64ToArrayBuffer = function (base64) {
  * @param {*} length => length of the resulting random bytes sequence
  * @returns => Uint8array of random bytes
  */
+/*
 exports.randomBytes = function (length) {
   try {
     function randomString (length, chars) {
@@ -71,4 +72,4 @@ exports.randomBytes = function (length) {
   } catch (e) {
     console.trace('Need an integer')
   }
-}
+} */

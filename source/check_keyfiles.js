@@ -1,5 +1,6 @@
 const helperfunction = require('./helper functions')
-const ChaCha20Poly1305 = require('@stablelib/chacha20poly1305')
+// const ChaCha20Poly1305 = require('@stablelib/chacha20poly1305')
+const crypto = require('crypto')
 const scrypt = require('scrypt-js')
 
 const magicBytestring = helperfunction.string2byte('c4gh-v1')
@@ -75,9 +76,13 @@ async function secret (keyContent, seckey, password) {
             const sharedkey = result
             const nonce = keyContent.subarray(58, 70)
             const encData = keyContent.subarray(70)
-            const chacha20poly1305 = new ChaCha20Poly1305.ChaCha20Poly1305(sharedkey)
-            const plaintext = chacha20poly1305.open(nonce, encData)
-            return plaintext
+            // const chacha20poly1305 = new ChaCha20Poly1305.ChaCha20Poly1305(sharedkey)
+            const algorithm = 'chacha20-poly1305'
+            const cipher = crypto.createCipheriv(algorithm, sharedkey, nonce)
+            const encryptedResult = cipher.update(encData)
+            const x = new Uint8Array(encryptedResult.subarray(0, 32))
+            // const plaintext = chacha20poly1305.open(nonce, encData)
+            return x
           })
           return await key
         }

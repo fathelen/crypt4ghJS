@@ -1,12 +1,12 @@
 const helperfunction = require('./helper functions')
-const ChaCha20Poly1305 = require('@stablelib/chacha20poly1305')
+// const ChaCha20Poly1305 = require('@stablelib/chacha20poly1305')
 const x25519 = require('@stablelib/x25519')
 const Blake2b = require('@stablelib/blake2b')
 const dec = require('./decryption')
 const crypto = require('crypto')
 
 exports.SEGMENT_SIZE = 65536
-const fullSegment = 65564
+// const fullSegment = 65564
 const PacketTypeDataEnc = '0000'
 const PacketTypeEditList = '1000'
 const encryptionMethod = '0000' // only (xchacha20poly1305)
@@ -21,6 +21,7 @@ const magicBytestring = helperfunction.string2byte('crypt4gh')
  * @returns => decrypted data in an ArrayList, each value is a 64kb block of the
  *             data
  */
+/*
 exports.decryption = async function * (encryptedData, seckey, blocks = []) {
   const header = await encryptedData.subarray(0, 1000)
   const headerInformation = dec.header_deconstruction(header, seckey)
@@ -47,7 +48,7 @@ exports.decryption = async function * (encryptedData, seckey, blocks = []) {
   } catch (e) {
     console.trace('Decryption was not possible')
   }
-}
+} */
 
 exports.pureDecryption = async function (d, key) {
   const nonce = await d.subarray(0, 12)
@@ -285,6 +286,7 @@ exports.applyEditlist = function (edlist, decryptedText) {
  * @param {*} chacha20poly1305 => encryption method
  * @returns => decrypted data
  */
+/*
 async function * decryptionBlocks (encryptedData, blocks, headerInformation, chacha20poly1305) {
   try {
     for (let i = 0; i < blocks.length; i++) {
@@ -296,7 +298,7 @@ async function * decryptionBlocks (encryptedData, blocks, headerInformation, cha
   } catch (e) {
     console.trace('Decryption with blocks not possible.')
   }
-}
+} */
 
 /**
  * blocks2encrypt is needed to prepare the edit informations to calculate new editlists for each block
@@ -428,6 +430,7 @@ function calculateEditlist (headerInformation) {
  * @param {*} encryptedData encrypted data whitch is about to be decrypted
  * @param {*} chacha20poly1305 decryption method
  */
+/*
 async function * decryptEdit (headerInformation, encryptedData, chacha20poly1305) {
   // 3.Step entschlüssle nur die gebrauchten blöcke
   const blocks = await calculateEditlist(headerInformation)
@@ -443,4 +446,4 @@ async function * decryptEdit (headerInformation, encryptedData, chacha20poly1305
       yield await Promise.resolve(plaintext)
     }
   }
-}
+} */

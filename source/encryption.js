@@ -1,11 +1,10 @@
 const helperfunction = require('./helper functions')
-const ChaCha20Poly1305 = require('@stablelib/chacha20poly1305')
 const x25519 = require('@stablelib/x25519')
 const Blake2b = require('@stablelib/blake2b')
 const enc = require('./encryption')
 const crypto = require('crypto')
 
-const SEGMENT_SIZE = 65536
+// const SEGMENT_SIZE = 65536
 const PacketTypeDataEnc = new Uint32Array([0])
 const PacketTypeEditList = new Uint32Array([1])
 const magicBytestring = helperfunction.string2byte('crypt4gh')
@@ -19,6 +18,7 @@ const magicBytestring = helperfunction.string2byte('crypt4gh')
  * @param {*} editlist => optional parameter, list of bytes which a decrypting person is allowed to decrypt.
  * @returns => Arraylist of encrypted data
  */
+/*
 exports.encryption = async function * (unencryptedData, secretkey, publicKeys, blocks, editlist) {
   try {
     // header part
@@ -66,7 +66,7 @@ exports.encryption = async function * (unencryptedData, secretkey, publicKeys, b
   } catch (e) {
     console.trace('Encryption not possible.')
   }
-}
+} */
 
 exports.encHeader = function (secretkey, publicKeys) {
   try {
@@ -378,6 +378,7 @@ exports.header_encrypt_multi_edit = function (editLists, encryptionPaket, seckey
  * @param {*} nonce => nonce for encryption (12byte)
  * @returns => List of Uint8Arrays containing the crypt4gh encrypted data
  */
+/*
 async function * encryptBlock (headerPackets, blocks, chacha20poly1305, unencryptedData, nonce) {
   try {
     const serializedData = enc.serialize(headerPackets[0], headerPackets[1], headerPackets[2], headerPackets[3])
@@ -403,7 +404,7 @@ async function * encryptBlock (headerPackets, blocks, chacha20poly1305, unencryp
     console.trace('Encryption with Blocks was not possible.')
   }
 }
-
+*/
 /**
  * Function to compute the encrypted body, if an edit list/s is given.
  * @param {*} editlist => list of bytes that the reader should be able to decrypt.
@@ -416,6 +417,7 @@ async function * encryptBlock (headerPackets, blocks, chacha20poly1305, unencryp
  * @param {*} nonce => => nonce for encryption (12byte)
  * @returns => List of Uint8Arrays containing the crypt4gh encrypted data
  */
+/*
 async function * encryptEditlist (editlist, encryptionMethod, sessionKey, publicKeys, secretkey, unencryptedData, chacha20poly1305, nonce) {
   try {
     const serializedData = await enc.encryption_edit(editlist, encryptionMethod, sessionKey, publicKeys, secretkey)
@@ -444,4 +446,4 @@ async function * encryptEditlist (editlist, encryptionMethod, sessionKey, public
   } catch (e) {
     console.trace('Encryption with Editlist was not possible.')
   }
-}
+} */
