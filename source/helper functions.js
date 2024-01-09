@@ -52,24 +52,3 @@ exports.base64ToArrayBuffer = function (base64) {
     console.trace('conversion not possible.')
   }
 }
-
-/**
- * Function to create a sequence of random bytes
- * @param {*} length => length of the resulting random bytes sequence
- * @returns => Uint8array of random bytes
- */
-/*
-exports.randomBytes = function (length) {
-  try {
-    function randomString (length, chars) {
-      let result = ''
-      for (let i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)]
-      return result
-    }
-    const rString = randomString(length, '0123456789abcdefghijklmnopqrstuvwxyz')
-    const buf1 = Uint8Array.from(rString.split('').map(x => x.charCodeAt()))
-    return buf1
-  } catch (e) {
-    console.trace('Need an integer')
-  }
-} */

@@ -1,6 +1,5 @@
 const helperfunction = require('./helper functions')
 const generateKeyPair = require('@stablelib/x25519')
-// const ChaCha20Poly1305 = require('@stablelib/chacha20poly1305')
 const scrypt = require('scrypt-js')
 const keygen = require('./keygen.js')
 const crypto = require('crypto')
@@ -22,9 +21,7 @@ exports.keygen = async function (pasphrase) {
   try {
     const keys = generateKeyPair.generateKeyPair()
     const pubkeyFile = keygen.create_pubkey(keys.publicKey)
-    console.log(pubkeyFile)
     const seckeyFile = await keygen.create_seckey(keys.secretKey, pasphrase)
-    console.log(seckeyFile)
     return [seckeyFile, pubkeyFile]
   } catch (e) {
     console.trace('Key generation not possible.')
@@ -63,8 +60,6 @@ exports.create_seckey = async function (seckey, passphrase) {
       const keyPrmoise = scrypt.scrypt(helperfunction.string2byte(passphrase), salt, N, r, p, dklen)
       const key = keyPrmoise.then(function (result) {
         const nonce = crypto.randomBytes(12)
-        // const chacha20poly1305 = new ChaCha20Poly1305.ChaCha20Poly1305(result)
-        // const sealedHeader = chacha20poly1305.seal(nonce, seckey)
         const algorithm = 'chacha20-poly1305'
         const cipher = crypto.createCipheriv(algorithm, result, nonce)
         const encryptedResult = Buffer.concat([cipher.update(seckey), cipher.final(), cipher.getAuthTag()])

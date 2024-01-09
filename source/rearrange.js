@@ -3,7 +3,6 @@ const dec = require('./decryption')
 const rea = require('./rearrange')
 
 const SEGMENT_SIZE = 65536
-// let encryptionMethod= new Uint32Array([0])
 const PacketTypeDataEnc = '0000'
 const PacketTypeEditList = '1000'
 

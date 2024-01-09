@@ -1,54 +1,14 @@
 const helperfunction = require('./helper functions')
-// const ChaCha20Poly1305 = require('@stablelib/chacha20poly1305')
 const x25519 = require('@stablelib/x25519')
 const Blake2b = require('@stablelib/blake2b')
 const dec = require('./decryption')
 const crypto = require('crypto')
 
 exports.SEGMENT_SIZE = 65536
-// const fullSegment = 65564
 const PacketTypeDataEnc = '0000'
 const PacketTypeEditList = '1000'
 const encryptionMethod = '0000' // only (xchacha20poly1305)
 const magicBytestring = helperfunction.string2byte('crypt4gh')
-
-/**
- * Main decryption function
- * @param {*} encryptedData => crypt4gh encrypted data in Uint8Array format
- * @param {*} seckey => Seckey as Uint8Array of 32bytes
- * @param {*} blocks => optional Parameter, if only defined blocks of size 64kb
- *                      should be ecrypted
- * @returns => decrypted data in an ArrayList, each value is a 64kb block of the
- *             data
- */
-/*
-exports.decryption = async function * (encryptedData, seckey, blocks = []) {
-  const header = await encryptedData.subarray(0, 1000)
-  const headerInformation = dec.header_deconstruction(header, seckey)
-  const chacha20poly1305 = new ChaCha20Poly1305.ChaCha20Poly1305(headerInformation[0])
-  try {
-    if (blocks && !headerInformation[3].length > 0) {
-      for await (const val of decryptionBlocks(encryptedData, blocks, headerInformation, chacha20poly1305)) {
-        yield await Promise.resolve(val[0])
-      }
-    } else if (headerInformation[3].length > 0 && blocks == null) {
-      for await (const val of decryptEdit(headerInformation, encryptedData, chacha20poly1305)) {
-        yield await Promise.resolve(val)
-      }
-    } else if (headerInformation[3].length > 0 && blocks != null) {
-      console.trace('Combination of blocks and edit list is not possible')
-    } else {
-      for (let i = headerInformation[4]; i < encryptedData.length; i = i + 65564) {
-        const nonce = await encryptedData.subarray(i, i + 12)
-        const enc = await encryptedData.subarray(i + 12, i + 12 + dec.SEGMENT_SIZE + 16)
-        const plaintext = chacha20poly1305.open(nonce, enc)
-        yield await Promise.resolve(plaintext)
-      }
-    }
-  } catch (e) {
-    console.trace('Decryption was not possible')
-  }
-} */
 
 exports.pureDecryption = async function (d, key) {
   const nonce = await d.subarray(0, 12)
@@ -57,10 +17,6 @@ exports.pureDecryption = async function (d, key) {
   const decipher = crypto.createDecipheriv(algorithm, Buffer.from(key, 'hex'), nonce)
   const decrypted = decipher.update(enc)
   const plaintext = new Uint8Array(decrypted.slice(0, -16))
-
-  /*
-  const chacha20poly1305 = new ChaCha20Poly1305.ChaCha20Poly1305(key)
-  const plaintext = chacha20poly1305.open(nonce, enc) */
   return await Promise.resolve(plaintext)
 }
 
@@ -178,10 +134,6 @@ exports.decrypt_header = function (headerPackets, seckeys) {
         const decipher = crypto.createDecipheriv(algorithm, Buffer.from(sharedKey, 'hex'), nonceUint8)
         const decrypted = decipher.update(encryptedUint8)
         const plaintext = new Uint8Array(decrypted.slice(0, -16))
-        /*
-        const chacha20poly1305 = new ChaCha20Poly1305.ChaCha20Poly1305(sharedKey)
-        const plaintext = chacha20poly1305.open(nonceUint8, encryptedUint8)
-        console.log(plaintext) */
         if (plaintext) {
           decryptedPackets.push(plaintext)
         } else {
@@ -277,28 +229,6 @@ exports.applyEditlist = function (edlist, decryptedText) {
     console.trace('edit list could not be applied.')
   }
 }
-
-/**
- * Function to decrypt data with blocks parameter
- * @param {*} encryptedData => crypt4gh encrypted data in Uint8Array format
- * @param {*} blocks => List of 64k data blocks that should be decrypted
- * @param {*} headerInformation => Information contained in decrypted header package
- * @param {*} chacha20poly1305 => encryption method
- * @returns => decrypted data
- */
-/*
-async function * decryptionBlocks (encryptedData, blocks, headerInformation, chacha20poly1305) {
-  try {
-    for (let i = 0; i < blocks.length; i++) {
-      const nonce = await encryptedData.subarray((blocks[i] - 1) * fullSegment + headerInformation[4], (blocks[i] - 1) * fullSegment + headerInformation[4] + 12)
-      const enc = await encryptedData.subarray((blocks[i] - 1) * fullSegment + headerInformation[4] + 12, (blocks[i] - 1) * fullSegment + headerInformation[4] + 12 + dec.SEGMENT_SIZE + 16)
-      const plaintext = chacha20poly1305.open(nonce, enc)
-      yield await Promise.resolve([plaintext, i, blocks[i]])
-    }
-  } catch (e) {
-    console.trace('Decryption with blocks not possible.')
-  }
-} */
 
 /**
  * blocks2encrypt is needed to prepare the edit informations to calculate new editlists for each block
@@ -423,27 +353,3 @@ function calculateEditlist (headerInformation) {
   }
   return [blocks, preEdit[2]]
 }
-
-/**
- * decryptEdit is used to decrypt the parts received from the edit lists
- * @param {*} headerInformation 2 dim array containing the header Informations, needed to decrypt the data
- * @param {*} encryptedData encrypted data whitch is about to be decrypted
- * @param {*} chacha20poly1305 decryption method
- */
-/*
-async function * decryptEdit (headerInformation, encryptedData, chacha20poly1305) {
-  // 3.Step entschlüssle nur die gebrauchten blöcke
-  const blocks = await calculateEditlist(headerInformation)
-  for await (const val of decryptionBlocks(encryptedData, Array.from(blocks[0].keys()), headerInformation, chacha20poly1305)) {
-    const edit = dec.applyEditlist(blocks[0].get(val[2]), val[0])
-    yield await Promise.resolve(edit)
-  }
-  if (blocks[1] === true) {
-    for (let i = headerInformation[4] + 65564 * Math.max(...blocks[0].keys()); i < encryptedData.length; i = i + 65564) {
-      const nonce = await encryptedData.subarray(i, i + 12)
-      const enc = await encryptedData.subarray(i + 12, i + 12 + dec.SEGMENT_SIZE + 16)
-      const plaintext = chacha20poly1305.open(nonce, enc)
-      yield await Promise.resolve(plaintext)
-    }
-  }
-} */

@@ -4,69 +4,9 @@ const Blake2b = require('@stablelib/blake2b')
 const enc = require('./encryption')
 const crypto = require('crypto')
 
-// const SEGMENT_SIZE = 65536
 const PacketTypeDataEnc = new Uint32Array([0])
 const PacketTypeEditList = new Uint32Array([1])
 const magicBytestring = helperfunction.string2byte('crypt4gh')
-
-/**
- * Main function to encrypt given data in crypt4gh format.
- * @param {*} unencryptedData => unencrypted data that will be encrypted according to crypt4gh
- * @param {*} secretkey => secretkey of the uploading person (32 byte Uint8array)
- * @param {*} publicKeys => List of public keys for all persons, that will be able to decrypt the data (List of 32 byte Uint8arrays)
- * @param {*} blocks => optional parameter, if only certain blocks (64kb) of the data should be encrypted and stored
- * @param {*} editlist => optional parameter, list of bytes which a decrypting person is allowed to decrypt.
- * @returns => Arraylist of encrypted data
- */
-/*
-exports.encryption = async function * (unencryptedData, secretkey, publicKeys, blocks, editlist) {
-  try {
-    // header part
-    const encryptionMethod = new Uint32Array([0])
-    const sessionKey = helperfunction.randomBytes(32)
-    const typeArray = []
-    const encPacketDataContent = enc.make_packet_data_enc(encryptionMethod, sessionKey)
-    typeArray.push(encPacketDataContent)
-    const headerPackets = enc.header_encrypt(typeArray, secretkey, publicKeys)
-    let serializedData
-    // body encryption
-    const nonce = helperfunction.randomBytes(12)
-    const chacha20poly1305 = new ChaCha20Poly1305.ChaCha20Poly1305(sessionKey)
-    if (blocks && !editlist) {
-      for await (const val of encryptBlock(headerPackets, blocks, chacha20poly1305, unencryptedData, nonce)) {
-        yield await Promise.resolve(val)
-      }
-    } else if (editlist && !blocks) {
-      for await (const val of encryptEditlist(editlist, encryptionMethod, sessionKey, publicKeys, secretkey, unencryptedData, chacha20poly1305, nonce)) {
-        yield await Promise.resolve(val)
-      }
-    } else if (!blocks && !editlist) {
-      serializedData = enc.serialize(headerPackets[0], headerPackets[1], headerPackets[2], headerPackets[3])
-      const chunksize = SEGMENT_SIZE
-      let offset = 0
-      while (offset < unencryptedData.length) {
-        const chunkfile = await unencryptedData.subarray(offset, offset + chunksize)
-        const encChunk = chacha20poly1305.seal(nonce, chunkfile)
-        if (offset === 0) {
-          const nonceEnc = new Uint8Array(serializedData.length + nonce.length + encChunk.length)
-          nonceEnc.set(serializedData)
-          nonceEnc.set(nonce, serializedData.length)
-          nonceEnc.set(encChunk, nonce.length + serializedData.length)
-          offset += chunksize
-          yield await Promise.resolve(nonceEnc)
-        } else {
-          const nonceEnc = new Uint8Array(nonce.length + encChunk.length)
-          nonceEnc.set(nonce)
-          nonceEnc.set(encChunk, nonce.length)
-          offset += chunksize
-          yield await Promise.resolve(nonceEnc)
-        }
-      }
-    }
-  } catch (e) {
-    console.trace('Encryption not possible.')
-  }
-} */
 
 exports.encHeader = function (secretkey, publicKeys) {
   try {
@@ -328,7 +268,6 @@ exports.make_packet_edit_lists = function (editList) {
 exports.header_encrypt_multi_edit = function (editLists, encryptionPaket, seckey, pubkeys) {
   try {
     let headerContent = []
-    // const nonce = helperfunction.randomBytes(12)
     const initVector = crypto.randomBytes(12)
     const k = x25519.generateKeyPairFromSeed(seckey)
     let sharedkey
@@ -354,10 +293,6 @@ exports.header_encrypt_multi_edit = function (editLists, encryptionPaket, seckey
         const algorithm = 'chacha20-poly1305'
         const cipher = crypto.createCipheriv(algorithm, sharedkey, initVector)
         const encryptedResult = Buffer.concat([initVector, cipher.update(headerContent[j]), cipher.final(), cipher.getAuthTag()])
-        /*
-        const chacha20poly1305 = new ChaCha20Poly1305.ChaCha20Poly1305(sharedkey)
-        const sealedHeader = chacha20poly1305.seal(nonce, headerContent[j])
-        */
         tuple.push(encryptedResult)
       }
       encryptedHeader.push(tuple)
@@ -368,82 +303,3 @@ exports.header_encrypt_multi_edit = function (editLists, encryptionPaket, seckey
     console.trace('Header for encryption with mulitple edit lists could not be computed.')
   }
 }
-
-/**
- * Function to compute the encrypted body if the parameter block ist given.
- * @param {*} headerPackets => encrypted header packets
- * @param {*} blocks => blocks to encrypt
- * @param {*} chacha20poly1305 => encryption method
- * @param {*} unencryptedData => given data
- * @param {*} nonce => nonce for encryption (12byte)
- * @returns => List of Uint8Arrays containing the crypt4gh encrypted data
- */
-/*
-async function * encryptBlock (headerPackets, blocks, chacha20poly1305, unencryptedData, nonce) {
-  try {
-    const serializedData = enc.serialize(headerPackets[0], headerPackets[1], headerPackets[2], headerPackets[3])
-    for (let i = 0; i < blocks.length; i++) {
-      const offset = (blocks[i] - 1) * SEGMENT_SIZE
-      const chunksize = SEGMENT_SIZE
-      const chunkfile = await unencryptedData.subarray(offset, offset + chunksize)
-      const encChunk = chacha20poly1305.seal(nonce, chunkfile)
-      if (i === 0) {
-        const nonceEnc = new Uint8Array(nonce.length + encChunk.length + serializedData.length)
-        nonceEnc.set(serializedData)
-        nonceEnc.set(nonce, serializedData.length)
-        nonceEnc.set(encChunk, nonce.length + serializedData.length)
-        yield await Promise.resolve(nonceEnc)
-      } else {
-        const nonceEnc = new Uint8Array(nonce.length + encChunk.length)
-        nonceEnc.set(nonce)
-        nonceEnc.set(encChunk, nonce.length)
-        yield await Promise.resolve(nonceEnc)
-      }
-    }
-  } catch (e) {
-    console.trace('Encryption with Blocks was not possible.')
-  }
-}
-*/
-/**
- * Function to compute the encrypted body, if an edit list/s is given.
- * @param {*} editlist => list of bytes that the reader should be able to decrypt.
- * @param {*} encryptionMethod => only chacha20poly1305 implemented
- * @param {*} sessionKey => key for encryption
- * @param {*} publicKeys => list of public keys
- * @param {*} secretkey => uploader's secret key
- * @param {*} unencryptedData => given data
- * @param {*} chacha20poly1305 => encryption method
- * @param {*} nonce => => nonce for encryption (12byte)
- * @returns => List of Uint8Arrays containing the crypt4gh encrypted data
- */
-/*
-async function * encryptEditlist (editlist, encryptionMethod, sessionKey, publicKeys, secretkey, unencryptedData, chacha20poly1305, nonce) {
-  try {
-    const serializedData = await enc.encryption_edit(editlist, encryptionMethod, sessionKey, publicKeys, secretkey)
-    const chunksize = SEGMENT_SIZE
-    let offset = 0
-    while (offset < unencryptedData.length) {
-      if (offset === 0) {
-        const chunkfile = await unencryptedData.subarray(offset, offset + chunksize)
-        const encChunk = chacha20poly1305.seal(nonce, chunkfile)
-        const nonceEnc = new Uint8Array(nonce.length + encChunk.length + serializedData[0].length)
-        nonceEnc.set(serializedData[0])
-        nonceEnc.set(nonce, serializedData[0].length)
-        nonceEnc.set(encChunk, nonce.length + serializedData[0].length)
-        offset += chunksize
-        yield await Promise.resolve(nonceEnc)
-      } else {
-        const chunkfile = await unencryptedData.subarray(offset, offset + chunksize)
-        const encChunk = chacha20poly1305.seal(nonce, chunkfile)
-        const nonceEnc = new Uint8Array(nonce.length + encChunk.length)
-        nonceEnc.set(nonce)
-        nonceEnc.set(encChunk, nonce.length)
-        offset += chunksize
-        yield await Promise.resolve(nonceEnc)
-      }
-    }
-  } catch (e) {
-    console.trace('Encryption with Editlist was not possible.')
-  }
-} */
