@@ -72,6 +72,19 @@ async function secret (keyContent, seckey, password) {
           const N = 16384; const r = 8; const p = 1
           const dklen = 32
           const keyPrmoise = scrypt.scrypt(helperfunction.string2byte(password), salt, N, r, p, dklen)
+          /*
+          crypto.scrypt(password, salt, dklen, { N: 16384, r: 8, p: 1 }, (err, derivedKey) => {
+            if (err) throw err
+
+            const sharedkey = derivedKey
+            const nonce = keyContent.subarray(58, 70)
+            const encData = keyContent.subarray(70)
+            const chacha20poly1305 = new ChaCha20Poly1305.ChaCha20Poly1305(sharedkey)
+            const algorithm = 'chacha20-poly1305'
+            const cipher = crypto.createCipheriv(algorithm, sharedkey, nonce)
+            const encryptedResult = cipher.update(encData)
+            const x2 = new Uint8Array(encryptedResult.subarray(0, 32))
+          }) */
           const key = keyPrmoise.then(function (result) {
             const sharedkey = result
             const nonce = keyContent.subarray(58, 70)
