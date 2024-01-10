@@ -1,3 +1,4 @@
+/*
 const keygen = require('./keygen')
 const keyfiles = require('./check_keyfiles')
 const encryption = require('./encryption')
@@ -5,6 +6,13 @@ const decryption = require('./decryption')
 const reeencryption = require('./reeencryption')
 const rearrangment = require('./rearrange')
 const checkFileformat = require('./check_fileformat')
+*/
+import { encryption_keyfiles } from './check_keyfiles'
+import { decryption } from './decryption'
+import { keygen } from './keygen'
+import { encryption } from './encryption'
+import { reencrypt } from './reeencryption'
+import { rearrange } from './rearrange'
 
 // Decryption
 document.getElementById('input').addEventListener('change', function (e) {
@@ -17,7 +25,7 @@ document.getElementById('input').addEventListener('change', function (e) {
       const seckeyFile = await file.text()
       const block = blocks.split(',')
       const fileContents = document.getElementById('filecontents')
-      const keys = await keyfiles.encryption_keyfiles([seckeyFile], password)
+      const keys = await encryption_keyfiles([seckeyFile], password)
       const plaintext = await decryption(file2, keys[0], block)
       fileContents.innerText = plaintext
     })()
@@ -29,7 +37,7 @@ button.addEventListener('click', async function (event) {
   const seckey = document.getElementById('seckeyfile')
   seckey.innerText = 'hallo'
   const password = await document.getElementById('psw2').value
-  const result = keygen.keygen(password)
+  const result = keygen(password)
   const erg = await result
   const pubkey = document.getElementById('pubkeyfile')
   pubkey.innerText = erg[1]
@@ -37,4 +45,4 @@ button.addEventListener('click', async function (event) {
   // seckey.innerText = erg[0]
 })
 
-module.exports = { keygen, keyfiles, encryption, decryption, reeencryption, rearrangment, check_fileformat: checkFileformat }
+// module.exports = { keygen, keyfiles, encryption, decryption, reeencryption, rearrangment, check_fileformat: checkFileformat }
