@@ -6,8 +6,6 @@ const reeencryption = require('./reeencryption')
 const rearrangment = require('./rearrange')
 const checkFileformat = require('./check_fileformat')
 
-module.exports = { keygen, keyfiles, encryption, decryption, reeencryption, rearrangment, check_fileformat: checkFileformat }
-
 // Decryption
 document.getElementById('input').addEventListener('change', function (e) {
   const file = document.getElementById('input').files[0]
@@ -38,3 +36,5 @@ button.addEventListener('click', async function (event) {
   // const seckey = document.getElementById('seckeyfile')
   // seckey.innerText = erg[0]
 })
+
+module.exports = { keygen, keyfiles, encryption, decryption, reeencryption, rearrangment, check_fileformat: checkFileformat }

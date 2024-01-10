@@ -17,7 +17,7 @@
     "keygen"
   ],
   "author": "Fabienne Thelen",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@stablelib/blake2b": "^1.0.1",
     "@stablelib/chacha20poly1305": "^1.0.1",
