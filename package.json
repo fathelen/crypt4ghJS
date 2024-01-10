@@ -2,7 +2,7 @@
   "name": "crypt4gh_js",
   "version": "1.0.0",
   "description": "Crypt4GH Version JavaScript",
-  "main": "./source/index.js",
+  "private": true,
   "scripts": {
     "test": "jest"
   },
@@ -35,5 +35,8 @@
     "eslint-plugin-promise": "^6.1.1",
     "jest": "^29.7.0",
     "typescript": "^5.2.2"
+  },
+  "browser": {
+    "crypto": false
   }
 }

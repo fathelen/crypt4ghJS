@@ -1,1 +1,127 @@
-Hello World!!!
+<!DOCTYPE html>
+<html>
+<style > 
+    #filecontents {
+        border: double;
+        overflow-y: scroll;
+        height: 400px;
+    }
+    #seckeyfile {
+        border: double;
+        overflow-y: scroll;
+        height: 400px;
+    }
+    #pubkeyfile {
+        border: double;
+        overflow-y: scroll;
+        height: 400px;
+    }
+    #encfile {
+        border: double;
+        overflow-y: scroll;
+        height: 400px;
+    }
+    #reencryption {
+        border: double;
+        overflow-y: scroll;
+        height: 400px;
+    }
+    #rearrange {
+        border: double;
+        overflow-y: scroll;
+        height: 400px;
+    }
+  
+</style>
+<head>
+  <meta charset="utf-8" />
+  <title>Getting Started</title>
+</head>
+<body>
+  <div>Decryption </div>
+  <label for="psw">Password (optional)</label>
+  <input type="password" id="psw" name="psw" required>
+  <br />
+  <br />
+  <label for="block">Blocks (optional)</label>
+  <input type="text" id="block" />
+  <br />
+  <br />
+  <input type="file" id="input" multiple />
+  <div>File Content</div>
+  <div id="filecontents"></div>
+  <br />
+  <br />
+  <div>Key Generation</div>
+  <br />
+  <br />
+  <label for="psw2">Password (optional)</label>
+  <input type="password" id="psw2" name="psw2" required>
+    <input type="submit" value="Submit" id="submit">
+  <br />
+  <br />
+  <div>Seckey File Content</div>
+  <div id="seckeyfile"></div>
+  <br />
+  <br />
+  <div>Pubkey File Content</div>
+  <div id="pubkeyfile"></div>
+  <br />
+  <br />
+  <div>Encryption</div>
+  <br />
+  <br />
+  <label for="psw3">Password (optional)</label>
+  <input type="password" id="psw3" name="psw3" required>
+  <br />
+  <br />
+  <label for="block2">Blocks (optional)</label>
+  <input type="text" id="block2" />
+  <br />
+  <br />
+  <label for="block3">Editlist (optional)</label>
+  <input type="text" id="block3" />
+  <br />
+  <br />
+  <input type="file" id="input2" multiple />
+  <br />
+  <br />
+  <div>Encrypted File Content</div>
+  <div id="encfile"></div>
+  <br />
+  <br />
+  <div>Reeencryption</div>
+  <br />
+  <br />
+  <label for="psw4">Password (optional)</label>
+  <input type="password" id="psw4" name="psw4" required>
+  <br />
+  <br />
+  <input type="file" id="input3" multiple />
+  <br />
+  <br />
+  <div>Reeencrypted File Content</div>
+  <div id="reencryption"></div>
+  <br />
+  <br />
+  <div>Rearrangement</div>
+  <br />
+  <br />
+  <label for="psw5">Password (optional)</label>
+  <input type="password" id="psw5" name="psw5" required>
+  <br />
+  <br />
+  <label for="block4">Editlist (optional)</label>
+  <input type="text" id="block4" />
+  <br />
+  <br />
+  <input type="file" id="input4" multiple />
+  <br />
+  <br />
+  <div>Rearranged File Content</div>
+  <div id="rearrange"></div>
+  <br />
+  <br />
+  <script src="./dist/main.js"> </script>
+</body>
+</html>
