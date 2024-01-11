@@ -63,6 +63,7 @@ exports.encryption_keyfiles = async (keys, password = '') => {
 async function secret (keyContent, seckey, password) {
   console.log('secret und password: ', keyContent, '  ', password)
   try {
+    console.log('3')
     if (helperfunction.equal(keyContent.subarray(0, 7), magicBytestring)) {
       if (helperfunction.equal(keyContent.subarray(9, 13), kdfNoneBytestring)) {
         if (helperfunction.equal(keyContent.subarray(15, 19), chiperNoneBytestring)) {
@@ -70,6 +71,7 @@ async function secret (keyContent, seckey, password) {
           return seckey
         }
       } else if (helperfunction.equal(keyContent.subarray(9, 15), kdfScript)) {
+        console.log('4')
         const kdfoptions = keyContent.subarray(17, 37)
         const salt = kdfoptions.subarray(4)
         if (helperfunction.equal(keyContent.subarray(39, 56), chiperChacha)) {
@@ -80,10 +82,12 @@ async function secret (keyContent, seckey, password) {
             const sharedkey = result
             const nonce = keyContent.subarray(58, 70)
             const encData = keyContent.subarray(70)
+            console.log('5')
             const algorithm = 'chacha20-poly1305'
             const cipher = crypto.createCipheriv(algorithm, sharedkey, nonce)
             const encryptedResult = cipher.update(encData)
             const x = new Uint8Array(encryptedResult.subarray(0, 32))
+            console.log('x: ', x)
             return x
           })
           return await key
