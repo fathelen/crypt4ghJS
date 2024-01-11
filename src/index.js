@@ -9,6 +9,7 @@ const checkFileformat = require('./check_fileformat')
 // Decryption
 
 document.getElementById('input').addEventListener('change', function (e) {
+  console.log('hier')
   const file = document.getElementById('input').files[0]
   const file2 = document.getElementById('input').files[1]
   const password = document.getElementById('psw').value

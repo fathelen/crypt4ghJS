@@ -21,7 +21,7 @@ const pubkeyEnd = '-----END CRYPT4GH PUBLIC KEY-----'
  * @returns => list of 32byte keys, starting with the seckret key, pubkeys second
  */
 exports.encryption_keyfiles = async (keys, password = '') => {
-  console.log(keys)
+  console.log('seckey in enc: ', keys)
   const solvedKeys = []
   try {
     for (let i = 0; i < keys.length; i++) {
@@ -58,6 +58,7 @@ exports.encryption_keyfiles = async (keys, password = '') => {
  * @returns => secret key (Uint8array 32 bytes)
  */
 async function secret (keyContent, seckey, password) {
+  console.log('secret und password: ', keyContent, '  ', password)
   try {
     if (helperfunction.equal(keyContent.subarray(0, 7), magicBytestring)) {
       if (helperfunction.equal(keyContent.subarray(9, 13), kdfNoneBytestring)) {
