@@ -1,4 +1,4 @@
-const helperfunction = require('./helper functions')
+const helperfunction = require('./helper functions.js')
 const generateKeyPair = require('@stablelib/x25519')
 const scrypt = require('scrypt-js')
 const keygen = require('./keygen.js')
