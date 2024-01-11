@@ -12,7 +12,7 @@ const pubkeyPass = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nvHrVpBpFLpX/OquK2Ze4Mfz
 const seckeyPass = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAGc2NyeXB0ABQAAAAAMHZyZm0wb3JrM2E5d2QyeQARY2hhY2hhMjBfcG9seTEzMDUAPHUyY2lhbDQ1dWZydxzqFWikrPHQc6dKqWySS59BoMAe1L0FRmBXnwPd80N4fJBJS5f+vnmlA+JZ8qCpow==\n-----END CRYPT4GH PRIVATE KEY-----\n'
 
 async function encryption (input, output) {
-  const keys = await index.keyfiles.encryption_keyfiles([ts, tp])
+  const keys = await index.keyfiles.encryption_keyfiles([seckeyPass, pubkeyPass], 'gunpass')
   edit = null
   block = null
   const header = index.encryption.encHeader(keys[0], [keys[1]], block, edit)

@@ -1,6 +1,7 @@
 const helperfunction = require('./helper functions')
-const crypto = require('crypto')
+// const crypto = require('crypto')
 const scrypt = require('scrypt-js')
+const sodium = require('libsodium-wrappers')
 
 const magicBytestring = helperfunction.string2byte('c4gh-v1')
 const kdfNoneBytestring = helperfunction.string2byte('none')
@@ -84,18 +85,13 @@ async function secret (keyContent, seckey, password) {
             const sharedkey = result
             const nonce = keyContent.subarray(58, 70)
             const encData = keyContent.subarray(70)
-            console.log('shared: ', sharedkey)
-            console.log('5')
-            console.log('shared: ', sharedkey)
-            // const algorithm = 'chacha20-poly1305'
-            const dec = new TextDecoder()
-            const plaintext = await crypto.subtle.decrypt({
-              name: 'chacha20-poly1305',
-              nonce
-            }, sharedkey, encData)
-            console.log(plaintext, '   ', dec.decode(plaintext))
-            return dec.decode(plaintext)
+            console.log(nonce)
+            const encKey = sodium.crypto_aead_chacha20poly1305_ietf_decrypt(null, encData, null, nonce, sharedkey)
+            console.log('enc: ', encKey)
+            return encKey
+
             /*
+            const algorithm = 'chacha20-poly1305'
             const cipher = crypto.createCipheriv(algorithm, sharedkey, nonce)
             console.log('cipher: ', cipher)
             const encryptedResult = cipher.update(encData)
@@ -111,6 +107,6 @@ async function secret (keyContent, seckey, password) {
       }
     }
   } catch (e) {
-    console.trace('Secret key data could not be decrypted!')
+    console.trace(e)
   }
 }
