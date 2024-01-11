@@ -64,7 +64,9 @@ async function secret (keyContent, seckey, password) {
   console.log('secret und password: ', keyContent, '  ', password)
   try {
     console.log('3')
+    console.log(keyContent.subarray(0, 7), '   ', keyContent.subarray(9, 15))
     if (helperfunction.equal(keyContent.subarray(0, 7), magicBytestring)) {
+      console.log('8')
       if (helperfunction.equal(keyContent.subarray(9, 13), kdfNoneBytestring)) {
         if (helperfunction.equal(keyContent.subarray(15, 19), chiperNoneBytestring)) {
           seckey = keyContent.subarray(21)
