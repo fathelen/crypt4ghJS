@@ -15,7 +15,7 @@ document.getElementById('input').addEventListener('change', function (e) {
   const blocks = document.getElementById('block').value;
   (async () => {
     const seckeyFile = await file.text()
-    console.log(seckeyFile)
+    console.log('seckey: ', seckeyFile)
     const keys = await keyfiles.encryption_keyfiles([seckeyFile], password)
     console.log(keys)
     const fileContents = document.getElementById('filecontents')
