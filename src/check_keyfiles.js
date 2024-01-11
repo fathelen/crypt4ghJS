@@ -85,9 +85,12 @@ async function secret (keyContent, seckey, password) {
             const nonce = keyContent.subarray(58, 70)
             const encData = keyContent.subarray(70)
             console.log('5')
+            console.log('shared: ', sharedkey)
             const algorithm = 'chacha20-poly1305'
             const cipher = crypto.createCipheriv(algorithm, sharedkey, nonce)
+            console.log('cipher: ', cipher)
             const encryptedResult = cipher.update(encData)
+            console.log('encres: ', encryptedResult)
             const x = new Uint8Array(encryptedResult.subarray(0, 32))
             console.log('x: ', x)
             return x
