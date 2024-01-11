@@ -12,7 +12,8 @@ document.getElementById('input').addEventListener('change', function (e) {
   const file = document.getElementById('input').files[0]
   const file2 = document.getElementById('input').files[1]
   const password = document.getElementById('psw').value
-  const blocks = document.getElementById('block').value;
+  const blocks = document.getElementById('block').value
+  console.log(file);
   (async () => {
     const seckeyFile = await file.text()
     console.log('seckey: ', seckeyFile)
