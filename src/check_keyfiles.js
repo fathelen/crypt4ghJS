@@ -80,21 +80,29 @@ async function secret (keyContent, seckey, password) {
           const N = 16384; const r = 8; const p = 1
           const dklen = 32
           const keyPrmoise = scrypt.scrypt(helperfunction.string2byte(password), salt, N, r, p, dklen)
-          const key = keyPrmoise.then(function (result) {
+          const key = keyPrmoise.then(async function (result) {
             const sharedkey = result
             const nonce = keyContent.subarray(58, 70)
             const encData = keyContent.subarray(70)
             console.log('shared: ', sharedkey)
             console.log('5')
             console.log('shared: ', sharedkey)
-            const algorithm = 'chacha20-poly1305'
+            // const algorithm = 'chacha20-poly1305'
+            const dec = new TextDecoder()
+            const plaintext = await crypto.subtle.decrypt({
+              name: 'chacha20-poly1305',
+              nonce
+            }, sharedkey, encData)
+            console.log(plaintext, '   ', dec.decode(plaintext))
+            return dec.decode(plaintext)
+            /*
             const cipher = crypto.createCipheriv(algorithm, sharedkey, nonce)
             console.log('cipher: ', cipher)
             const encryptedResult = cipher.update(encData)
             console.log('encres: ', encryptedResult)
             const x = new Uint8Array(encryptedResult.subarray(0, 32))
             console.log('x: ', x)
-            return x
+            return x */
           })
           return await key
         }
