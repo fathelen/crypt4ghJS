@@ -76,7 +76,7 @@ exports.make_packet_data_enc = function (encryptionMethode, sessionKey) {
 exports.header_encrypt = function (headerContent, seckey, pubkeys) {
   try {
     // const nonce = crypto.randomBytes(12)
-    const initVector = crypto.randomBytes(12)
+    const initVector = sodium.randombytes_buf(12)
     const k = x25519.generateKeyPairFromSeed(seckey)
     let sharedkey
     const encryptedHeader = []
