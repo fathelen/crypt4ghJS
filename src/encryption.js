@@ -38,12 +38,15 @@ exports.encHeaderEdit = async function (secretkey, publicKeys, editlist) {
 }
 
 exports.pureEncryption = function (chunk, key) {
+  const initVector = sodium.randombytes_buf(12)
+  const decData = sodium.crypto_aead_chacha20poly1305_ietf_encrypt(chunk, null, null, initVector, key)
+  /*
   const algorithm = 'chacha20-poly1305'
   const initVector = crypto.randomBytes(12)
   const cipher = crypto.createCipheriv(algorithm, key, initVector)
   const encryptedResult = Buffer.concat([initVector, cipher.update(chunk), cipher.final(), cipher.getAuthTag()])
-  const x = new Uint8Array(encryptedResult)
-  return x
+  const x = new Uint8Array(encryptedResult) */
+  return decData
 }
 
 /**

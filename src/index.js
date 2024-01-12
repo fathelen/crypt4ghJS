@@ -71,9 +71,19 @@ document.getElementById('input2').addEventListener('change', function (e) {
     }
     const fileContents = document.getElementById('encfile')
     const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile], password)
-    console.log(keys)
     const header = encryption.encHeader(keys[0], [keys[1]], block, editlist)
-    fileContents.innerText = header
+    fileContents.innerText += header
+    const chunksize = 65536
+    let offset = 0
+    while (offset < file4.size) {
+      const chunkfile = await file4.slice(offset, offset + chunksize)
+      const chunk = await chunkfile.arrayBuffer()
+      const encryptedtext = await encryption.pureEncryption(new Uint8Array(chunk), header[1])
+      const encoder = new TextEncoder()
+      fileContents.innerText += encoder.encode(encryptedtext)
+      offset += chunksize
+    }
+    console.log('all done')
     /*
     const encryptedtext = await encryption(file4, keys[0], [keys[1], keys[2]], block, editlist)
     fileContents.innerText = encryptedtext */
