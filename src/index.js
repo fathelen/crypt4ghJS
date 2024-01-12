@@ -24,6 +24,17 @@ document.getElementById('input').addEventListener('change', function (e) {
     const fileContents = document.getElementById('filecontents')
     const keys = await keyfiles.encryption_keyfiles([seckeyFile], password)
     const stream = file2.stream()
+    const readableStream = new ReadableStream({
+    },
+    {
+      highWaterMark: 10,
+      size (chunk) {
+        return chunk.length
+      }
+    }
+    )
+    console.log(readableStream)
+    /*
     const reader = stream.getReader()
     while (true) {
       const chunk = await reader.readBytes(65536)
@@ -37,7 +48,6 @@ document.getElementById('input').addEventListener('change', function (e) {
     }
     console.log('all done')
 
-    /*
     const plaintext = await decryption.pureDecryption(file2, keys[0], block)
     console.log(plaintext)
     fileContents.innerText = plaintext */
