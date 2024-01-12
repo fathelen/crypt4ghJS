@@ -50,9 +50,8 @@ button.addEventListener('click', async function (event) {
 // Encryption
 document.getElementById('input2').addEventListener('change', function (e) {
   const file = document.getElementById('input2').files[0]
-  const file2 = document.getElementById('input2').files[1]
-  const file3 = document.getElementById('input2').files[2]
-  const file4 = document.getElementById('input2').files[3]
+  const file3 = document.getElementById('input2').files[1]
+  const file4 = document.getElementById('input2').files[2]
   const password = document.getElementById('psw3').value
   const blocks = document.getElementById('block2').value
   const edit = document.getElementById('block3').value;
