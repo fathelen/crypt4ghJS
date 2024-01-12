@@ -12,7 +12,6 @@ const encryptionMethod = '0000' // only (xchacha20poly1305)
 const magicBytestring = helperfunction.string2byte('crypt4gh')
 
 exports.pureDecryption = function (d, key) {
-  //console.log(d)
   const nonce = d.subarray(0, 12)
   const enc = d.subarray(12)
   const encData = sodium.crypto_aead_chacha20poly1305_ietf_decrypt(null, enc, null, nonce, key)

@@ -28,7 +28,7 @@ document.getElementById('input').addEventListener('change', function (e) {
     const chunkHeader = await headerChunk.arrayBuffer()
     const header = decryption.header_deconstruction(new Uint8Array(chunkHeader), keys[0])
     fileContents.innerText = header
-    const chunksize = 65536
+    const chunksize = 65564
     let offset = header[4]
     while (offset < file2.size) {
       const chunkfile = await file2.slice(offset, offset + chunksize)
