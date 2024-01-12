@@ -37,10 +37,15 @@ exports.pureEdit = function (d) {
  */
 exports.header_deconstruction = function (header, seckeys) {
   try {
+    console.log(header, '   ', seckeys)
     const headerPackets = dec.parse(header)
+    console.log('1')
     const decryptedPackets = dec.decrypt_header(headerPackets[0], seckeys)
+    console.log('2')
     const partitionedPackages = partitionPackets(decryptedPackets[0])
+    console.log('3')
     const sessionKey = parseEncPacket(partitionedPackages[0][0])
+    console.log('4')
     return [sessionKey, decryptedPackets[2], headerPackets[1], partitionedPackages[1], headerPackets[2]]
   } catch (e) {
     console.trace('header deconstruction not possible.')
