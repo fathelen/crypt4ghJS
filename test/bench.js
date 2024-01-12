@@ -53,6 +53,7 @@ async function decryption (input, output) {
       const readStream2 = fs.createReadStream(input, { start: val[4], highWaterMark: 65564 })
       readStream2
         .on('data', async function (d2) {
+          console.log(Uint8Array.from(d2))
           const plaintext = await index.decryption.pureDecryption(Uint8Array.from(d2), val[0])
           fs.appendFile(output, plaintext, (err) => {
             if (err) {
