@@ -39,11 +39,43 @@ document.getElementById('input').addEventListener('change', function (e) {
 const button = document.getElementById('submit')
 button.addEventListener('click', async function (event) {
   const password = await document.getElementById('psw2').value
-  console.log('password: ', password)
   const result = keygen.keygen(password)
   const erg = await result
   const pubkey = document.getElementById('pubkeyfile')
   pubkey.innerText = erg[1]
   const seckey = document.getElementById('seckeyfile')
   seckey.innerText = erg[0]
+})
+
+// Encryption
+document.getElementById('input2').addEventListener('change', function (e) {
+  const file = document.getElementById('input2').files[0]
+  const file2 = document.getElementById('input2').files[1]
+  const file3 = document.getElementById('input2').files[2]
+  const file4 = document.getElementById('input2').files[3]
+  const password = document.getElementById('psw3').value
+  const blocks = document.getElementById('block2').value
+  const edit = document.getElementById('block3').value;
+
+  (async () => {
+    const pubkeyFile = await file.text()
+    const seckeyFile = await file3.text()
+    const block = blocks.split(',')
+    let editlist = []
+    if (edit.includes(';')) {
+      const step = edit.split(';')
+      for (let i = 0; i < step.length; i++) {
+        editlist.push(step[i].split(','))
+      }
+    } else {
+      editlist = edit.split(',')
+    }
+    const fileContents = document.getElementById('encfile')
+    const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile], password)
+    const header = encryption.encHeader(keys[0], [keys[1]], block, editlist)
+    fileContents.innerText = header
+    /*
+    const encryptedtext = await encryption(file4, keys[0], [keys[1], keys[2]], block, editlist)
+    fileContents.innerText = encryptedtext */
+  })()
 })

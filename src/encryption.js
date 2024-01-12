@@ -3,6 +3,7 @@ const x25519 = require('@stablelib/x25519')
 const Blake2b = require('@stablelib/blake2b')
 const enc = require('./encryption')
 const crypto = require('crypto')
+const sodium = require('libsodium-wrappers')
 
 const PacketTypeDataEnc = new Uint32Array([0])
 const PacketTypeEditList = new Uint32Array([1])
@@ -98,11 +99,13 @@ exports.header_encrypt = function (headerContent, seckey, pubkeys) {
         blake2b.update(uint8Blake2b)
         const uint8FromBlake2b = blake2b.digest()
         sharedkey = uint8FromBlake2b.subarray(0, 32)
+        const decData = sodium.crypto_aead_chacha20poly1305_ietf_encrypt(headerContent[j], null, null, initVector, sharedkey)
+        /*
         const algorithm = 'chacha20-poly1305'
         const cipher = crypto.createCipheriv(algorithm, sharedkey, initVector)
         const encryptedResult = Buffer.concat([cipher.update(headerContent[j]), cipher.final(), cipher.getAuthTag()])
-        const x = new Uint8Array(encryptedResult)
-        tuple.push(x)
+        const x = new Uint8Array(encryptedResult) */
+        tuple.push(decData)
       }
       encryptedHeader.push(tuple)
     }
