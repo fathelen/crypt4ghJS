@@ -24,6 +24,7 @@ document.getElementById('input').addEventListener('change', function (e) {
     const fileContents = document.getElementById('filecontents')
     const keys = await keyfiles.encryption_keyfiles([seckeyFile], password)
     const plaintext = await decryption.pureDecryption(file2, keys[0], block)
+    console.log(plaintext)
     fileContents.innerText = plaintext
   })()
 })
