@@ -28,18 +28,13 @@ document.getElementById('input').addEventListener('change', function (e) {
     const chunkHeader = await headerChunk.arrayBuffer()
     const header = decryption.header_deconstruction(new Uint8Array(chunkHeader), keys[0])
     fileContents.innerText = header
-    /*
     const chunksize = 65536
-    let offset = 0
+    let offset = header[4]
     while (offset < file2.size) {
       const chunkfile = await file2.slice(offset, offset + chunksize)
       // Blob.arrayBuffer() can be polyfilled with a FileReader
       const chunk = await chunkfile.arrayBuffer()
-      const val = decryption.header_deconstruction(Uint8Array.from(chunk), keys[0])
-      console.log(val)
-      fileContents.innerText = val
-      console.log('chunk: ', chunk)
-      const plaintext = decryption.pureDecryption(file2, keys[0], block)
+      const plaintext = decryption.pureDecryption(chunk, keys[0], block)
       console.log(plaintext)
       fileContents.innerText = plaintext
       offset += chunksize
