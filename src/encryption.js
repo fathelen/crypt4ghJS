@@ -13,7 +13,7 @@ exports.encHeader = function (secretkey, publicKeys) {
   try {
     // header part
     const encryptionMethod = new Uint32Array([0])
-    const sessionKey = crypto.randomBytes(32)
+    const sessionKey = sodium.randombytes_buf(32)
     const typeArray = []
     const encPacketDataContent = enc.make_packet_data_enc(encryptionMethod, sessionKey)
     typeArray.push(encPacketDataContent)
