@@ -39,7 +39,8 @@ exports.header_deconstruction = function (header, seckeys) {
   try {
     // console.log(header, '   ', seckeys)
     const headerPackets = dec.parse(header)
-    console.log('1:  ', headerPackets)
+    // console.log('1:  ', headerPackets)
+    console.log(headerPackets[0])
     const decryptedPackets = dec.decrypt_header(headerPackets[0], seckeys)
     // console.log('2:  ', decryptedPackets)
     const partitionedPackages = partitionPackets(decryptedPackets[0])
@@ -120,7 +121,6 @@ exports.extract_packets = function (packetNum, header) {
  * @returns => List containing the decrypted package, the undecrypted packages and the nonce
  */
 exports.decrypt_header = function (headerPackets, seckeys) {
-  console.log(headerPackets)
   try {
     seckeys = [seckeys]
     const decryptedPackets = []
