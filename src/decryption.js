@@ -12,7 +12,7 @@ const encryptionMethod = '0000' // only (xchacha20poly1305)
 const magicBytestring = helperfunction.string2byte('crypt4gh')
 
 exports.pureDecryption = function (d, key) {
-  console.log(d)
+  //console.log(d)
   const nonce = d.subarray(0, 12)
   const enc = d.subarray(12)
   const encData = sodium.crypto_aead_chacha20poly1305_ietf_decrypt(null, enc, null, nonce, key)
@@ -37,15 +37,15 @@ exports.pureEdit = function (d) {
  */
 exports.header_deconstruction = function (header, seckeys) {
   try {
-    console.log(header, '   ', seckeys)
+    // console.log(header, '   ', seckeys)
     const headerPackets = dec.parse(header)
     console.log('1:  ', headerPackets)
     const decryptedPackets = dec.decrypt_header(headerPackets[0], seckeys)
-    console.log('2:  ', decryptedPackets)
+    // console.log('2:  ', decryptedPackets)
     const partitionedPackages = partitionPackets(decryptedPackets[0])
-    console.log('3:  ', partitionedPackages)
+    // console.log('3:  ', partitionedPackages)
     const sessionKey = parseEncPacket(partitionedPackages[0][0])
-    console.log('4:  ', sessionKey)
+    // console.log('4:  ', sessionKey)
     return [sessionKey, decryptedPackets[2], headerPackets[1], partitionedPackages[1], headerPackets[2]]
   } catch (e) {
     console.trace('header deconstruction not possible.')
@@ -120,6 +120,7 @@ exports.extract_packets = function (packetNum, header) {
  * @returns => List containing the decrypted package, the undecrypted packages and the nonce
  */
 exports.decrypt_header = function (headerPackets, seckeys) {
+  console.log(headerPackets)
   try {
     seckeys = [seckeys]
     const decryptedPackets = []
