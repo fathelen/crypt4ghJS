@@ -72,7 +72,7 @@ document.getElementById('input2').addEventListener('change', function (e) {
     const fileContents = document.getElementById('encfile')
     const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile], password)
     const header = encryption.encHeader(keys[0], [keys[1]], block, editlist)
-    fileContents.innerText += header
+    fileContents.innerText += header[0]
     const chunksize = 65536
     let offset = 0
     while (offset < file4.size) {
