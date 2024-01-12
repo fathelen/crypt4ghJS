@@ -3,6 +3,7 @@ const x25519 = require('@stablelib/x25519')
 const Blake2b = require('@stablelib/blake2b')
 const dec = require('./decryption')
 const crypto = require('crypto')
+const sodium = require('libsodium-wrappers')
 
 exports.SEGMENT_SIZE = 65536
 const PacketTypeDataEnc = '0000'
@@ -13,11 +14,14 @@ const magicBytestring = helperfunction.string2byte('crypt4gh')
 exports.pureDecryption = async function (d, key) {
   const nonce = await d.subarray(0, 12)
   const enc = await d.subarray(12)
+  const encData = sodium.crypto_aead_chacha20poly1305_ietf_decrypt(null, enc, null, nonce, key)
+
+  /*
   const algorithm = 'chacha20-poly1305'
   const decipher = crypto.createDecipheriv(algorithm, Buffer.from(key, 'hex'), nonce)
   const decrypted = decipher.update(enc)
-  const plaintext = new Uint8Array(decrypted.slice(0, -16))
-  return await Promise.resolve(plaintext)
+  const plaintext = new Uint8Array(decrypted.slice(0, -16)) */
+  return await Promise.resolve(encData)
 }
 
 exports.pureEdit = function (d) {

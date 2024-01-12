@@ -22,22 +22,18 @@ const pubkeyEnd = '-----END CRYPT4GH PUBLIC KEY-----'
  * @returns => list of 32byte keys, starting with the seckret key, pubkeys second
  */
 exports.encryption_keyfiles = async (keys, password = '') => {
-  console.log('seckey in enc: ', keys)
   const solvedKeys = []
   try {
     for (let i = 0; i < keys.length; i++) {
       let seckey = new Uint8Array(32)
       let pubkey = new Uint8Array(32)
       const wordWrap1 = keys[i].indexOf('\n')
-      console.log('1')
       const wordWrap2 = keys[i].indexOf('\n', wordWrap1 + 1)
       const wordWrap3 = keys[i].indexOf('\n', wordWrap2 + 1)
       const row1 = keys[i].substring(0, wordWrap1)
-      console.log('2')
       const row2 = keys[i].substring(wordWrap1 + 1, wordWrap2)
       const row3 = keys[i].substring(wordWrap2 + 1, wordWrap3)
       const row2Array = helperfunction.base64ToArrayBuffer(row2)
-      console.log(row1)
       if (row1 === seckeyStart && row3 === seckeyEnd) {
         seckey = await secret(row2Array, seckey, password)
         solvedKeys.push(seckey)
@@ -62,19 +58,14 @@ exports.encryption_keyfiles = async (keys, password = '') => {
  * @returns => secret key (Uint8array 32 bytes)
  */
 async function secret (keyContent, seckey, password) {
-  console.log('secret und password: ', keyContent, '  ', password)
   try {
-    console.log('3')
-    console.log(keyContent.subarray(0, 7), '   ', keyContent.subarray(9, 15))
     if (helperfunction.equal(keyContent.subarray(0, 7), magicBytestring)) {
-      console.log('8')
       if (helperfunction.equal(keyContent.subarray(9, 13), kdfNoneBytestring)) {
         if (helperfunction.equal(keyContent.subarray(15, 19), chiperNoneBytestring)) {
           seckey = keyContent.subarray(21)
           return seckey
         }
       } else if (helperfunction.equal(keyContent.subarray(9, 15), kdfScript)) {
-        console.log('4')
         const kdfoptions = keyContent.subarray(17, 37)
         const salt = kdfoptions.subarray(4)
         if (helperfunction.equal(keyContent.subarray(39, 56), chiperChacha)) {
@@ -85,9 +76,7 @@ async function secret (keyContent, seckey, password) {
             const sharedkey = result
             const nonce = keyContent.subarray(58, 70)
             const encData = keyContent.subarray(70)
-            console.log(nonce)
             const encKey = sodium.crypto_aead_chacha20poly1305_ietf_decrypt(null, encData, null, nonce, sharedkey)
-            console.log('enc: ', encKey)
             return encKey
 
             /*
