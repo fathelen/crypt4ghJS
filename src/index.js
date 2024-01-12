@@ -14,25 +14,17 @@ document.getElementById('input').addEventListener('change', function (e) {
   const password = document.getElementById('psw').value
   const blocks = document.getElementById('block').value;
   (async () => {
-    /*
-    const seckeyFile = await file.text()
-    const keys = await keyfiles.encryption_keyfiles([seckeyFile], password)
-    const fileContents = document.getElementById('filecontents')
-    fileContents.innerText = keys */
     const seckeyFile = await file.text()
     const block = blocks.split(',')
     const fileContents = document.getElementById('filecontents')
     const keys = await keyfiles.encryption_keyfiles([seckeyFile], password)
-    // const stream = file2.stream()
     const headerChunk = await file2.slice(0, 1000)
     const chunkHeader = await headerChunk.arrayBuffer()
     const header = decryption.header_deconstruction(new Uint8Array(chunkHeader), keys[0])
-    fileContents.innerText = header
     const chunksize = 65564
     let offset = header[4]
     while (offset < file2.size) {
       const chunkfile = await file2.slice(offset, offset + chunksize)
-      // Blob.arrayBuffer() can be polyfilled with a FileReader
       const chunk = await chunkfile.arrayBuffer()
       const plaintext = decryption.pureDecryption(new Uint8Array(chunk), header[0], block)
       const decoder = new TextDecoder()
@@ -40,23 +32,6 @@ document.getElementById('input').addEventListener('change', function (e) {
       offset += chunksize
     }
     console.log('all done')
-    /*
-    const reader = stream.getReader()
-    while (true) {
-      const chunk = await reader.readBytes(65536)
-      if (chunk === undefined) {
-        break
-      }
-      console.log(chunk.length)
-      const plaintext = decryption.pureDecryption(chunk, keys[0], block)
-      console.log(plaintext)
-      fileContents.innerText = plaintext
-    }
-    console.log('all done')
-
-    const plaintext = await decryption.pureDecryption(file2, keys[0], block)
-    console.log(plaintext)
-    fileContents.innerText = plaintext */
   })()
 })
 
