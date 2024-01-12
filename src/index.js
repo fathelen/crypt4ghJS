@@ -23,17 +23,20 @@ document.getElementById('input').addEventListener('change', function (e) {
     const block = blocks.split(',')
     const fileContents = document.getElementById('filecontents')
     const keys = await keyfiles.encryption_keyfiles([seckeyFile], password)
-    const stream = file2.stream()
-    const readableStream = new ReadableStream({
-    },
-    {
-      highWaterMark: 10,
-      size (chunk) {
-        return chunk.length
-      }
+    // const stream = file2.stream()
+    const chunksize = 65536
+    let offset = 0
+    while (offset < file2.size) {
+      const chunkfile = await file2.slice(offset, offset + chunksize)
+      // Blob.arrayBuffer() can be polyfilled with a FileReader
+      const chunk = await chunkfile.arrayBuffer()
+      console.log(chunk.length)
+      const plaintext = decryption.pureDecryption(file2, keys[0], block)
+      console.log(plaintext)
+      fileContents.innerText = plaintext
+      offset += chunksize
     }
-    )
-    console.log(readableStream)
+    console.log('all done')
     /*
     const reader = stream.getReader()
     while (true) {
