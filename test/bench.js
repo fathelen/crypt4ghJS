@@ -44,14 +44,12 @@ async function decryption (input, output) {
   const readStream = fs.createReadStream(input, { end: 1000 })
   readStream
     .on('data', async function (d) {
-      console.log(Uint8Array.from(d).slice(100))
       fs.writeFile(output, '', (err) => {
         if (err) {
           console.log(err)
         }
       })
       const val = index.decryption.header_deconstruction(Uint8Array.from(d), keys[0])
-      console.log(val[4])
       const readStream2 = fs.createReadStream(input, { start: val[4], highWaterMark: 65564 })
       readStream2
         .on('data', async function (d2) {
