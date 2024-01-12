@@ -39,13 +39,13 @@ exports.header_deconstruction = function (header, seckeys) {
   try {
     console.log(header, '   ', seckeys)
     const headerPackets = dec.parse(header)
-    console.log('1')
+    console.log('1:  ', headerPackets)
     const decryptedPackets = dec.decrypt_header(headerPackets[0], seckeys)
-    console.log('2')
+    console.log('2:  ', decryptedPackets)
     const partitionedPackages = partitionPackets(decryptedPackets[0])
-    console.log('3')
+    console.log('3:  ', partitionedPackages)
     const sessionKey = parseEncPacket(partitionedPackages[0][0])
-    console.log('4')
+    console.log('4:  ', sessionKey)
     return [sessionKey, decryptedPackets[2], headerPackets[1], partitionedPackages[1], headerPackets[2]]
   } catch (e) {
     console.trace('header deconstruction not possible.')
