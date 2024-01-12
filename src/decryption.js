@@ -126,6 +126,7 @@ exports.decrypt_header = function (headerPackets, seckeys) {
     const decryptedPackets = []
     const undecryptablePackets = []
     let nonceUint8
+    console.log(headerPackets.length)
     for (let i = 0; i < headerPackets.length; i++) {
       const wKeyUint8 = new Uint8Array(headerPackets[i].slice(8, 40))
       nonceUint8 = new Uint8Array(headerPackets[i].slice(40, 52))
