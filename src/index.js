@@ -34,7 +34,7 @@ document.getElementById('input').addEventListener('change', function (e) {
       const chunkfile = await file2.slice(offset, offset + chunksize)
       // Blob.arrayBuffer() can be polyfilled with a FileReader
       const chunk = await chunkfile.arrayBuffer()
-      const plaintext = decryption.pureDecryption(chunk, keys[0], block)
+      const plaintext = decryption.pureDecryption(new Uint8Array(chunk), keys[0], block)
       console.log(plaintext)
       fileContents.innerText = plaintext
       offset += chunksize

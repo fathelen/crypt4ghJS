@@ -40,7 +40,7 @@ exports.header_deconstruction = function (header, seckeys) {
     // console.log(header, '   ', seckeys)
     const headerPackets = dec.parse(header)
     // console.log('1:  ', headerPackets)
-    console.log(headerPackets[0])
+    // console.log(headerPackets[0])
     const decryptedPackets = dec.decrypt_header(headerPackets[0], seckeys)
     // console.log('2:  ', decryptedPackets)
     const partitionedPackages = partitionPackets(decryptedPackets[0])
