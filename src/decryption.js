@@ -142,12 +142,14 @@ exports.decrypt_header = function (headerPackets, seckeys) {
         blake2b.update(uint8Blake2b)
         const uint8FromBlake2b = blake2b.digest()
         const sharedKey = uint8FromBlake2b.subarray(0, 32)
+        const encKey = sodium.crypto_aead_chacha20poly1305_ietf_decrypt(null, encryptedUint8, null, nonceUint8, sharedKey)
+        /*
         const algorithm = 'chacha20-poly1305'
         const decipher = crypto.createDecipheriv(algorithm, Buffer.from(sharedKey, 'hex'), nonceUint8)
         const decrypted = decipher.update(encryptedUint8)
-        const plaintext = new Uint8Array(decrypted.slice(0, -16))
-        if (plaintext) {
-          decryptedPackets.push(plaintext)
+        const plaintext = new Uint8Array(decrypted.slice(0, -16)) */
+        if (encKey) {
+          decryptedPackets.push(encKey)
         } else {
           undecryptablePackets.push(headerPackets[i])
         }
