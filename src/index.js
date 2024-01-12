@@ -23,9 +23,22 @@ document.getElementById('input').addEventListener('change', function (e) {
     const block = blocks.split(',')
     const fileContents = document.getElementById('filecontents')
     const keys = await keyfiles.encryption_keyfiles([seckeyFile], password)
+    const stream = file2.stream()
+    const reader = stream.getReader()
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) { break }
+      console.log(value.length)
+      const plaintext = decryption.pureDecryption(value, keys[0], block)
+      console.log(plaintext)
+      fileContents.innerText = plaintext
+    }
+    console.log('all done')
+
+    /*
     const plaintext = await decryption.pureDecryption(file2, keys[0], block)
     console.log(plaintext)
-    fileContents.innerText = plaintext
+    fileContents.innerText = plaintext */
   })()
 })
 
