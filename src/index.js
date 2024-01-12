@@ -24,6 +24,11 @@ document.getElementById('input').addEventListener('change', function (e) {
     const fileContents = document.getElementById('filecontents')
     const keys = await keyfiles.encryption_keyfiles([seckeyFile], password)
     // const stream = file2.stream()
+    const headerChunk = await file2.slice(0, 1000)
+    const chunkHeader = await headerChunk.arrayBuffer()
+    const header = decryption.header_deconstruction(Uint8Array.from(chunkHeader), keys[0])
+    fileContents.innerText = header
+    /*
     const chunksize = 65536
     let offset = 0
     while (offset < file2.size) {
@@ -33,12 +38,11 @@ document.getElementById('input').addEventListener('change', function (e) {
       const val = decryption.header_deconstruction(Uint8Array.from(chunk), keys[0])
       console.log(val)
       fileContents.innerText = val
-      /*
       console.log('chunk: ', chunk)
       const plaintext = decryption.pureDecryption(file2, keys[0], block)
       console.log(plaintext)
       fileContents.innerText = plaintext
-      offset += chunksize */
+      offset += chunksize
     }
     console.log('all done')
     /*
