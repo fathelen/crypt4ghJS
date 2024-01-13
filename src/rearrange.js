@@ -21,7 +21,7 @@ exports.rearrange = async function (infile, seckey, pubkey, editlist) {
 
 exports.streamRearrange = async function (header, seckey, pubkey, editlist) {
   const headerPackets = dec.parse(header)
-  const decryptedPackets = dec.decrypt_header(headerPackets[0], seckey)
+  const decryptedPackets = await dec.decrypt_header(headerPackets[0], seckey)
   const sessionk = decryptedPackets[0][0].subarray(8)
   const newEditPacket = await headerRearrange(decryptedPackets[0], editlist, headerPackets[1].length, pubkey, seckey, sessionk)
   return [newEditPacket[0], headerPackets[2]]

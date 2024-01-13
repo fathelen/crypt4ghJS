@@ -11,6 +11,7 @@ const tp = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nfQCgFp/dPaDOELnzrgEEQUeOmOlMj9M
 const pubkeyPass = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nvHrVpBpFLpX/OquK2Ze4Mfzb8aVrn05XmTgT4ymVwzE=\n-----END CRYPT4GH PUBLIC KEY-----\n'
 const seckeyPass = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAGc2NyeXB0ABQAAAAAMHZyZm0wb3JrM2E5d2QyeQARY2hhY2hhMjBfcG9seTEzMDUAPHUyY2lhbDQ1dWZydxzqFWikrPHQc6dKqWySS59BoMAe1L0FRmBXnwPd80N4fJBJS5f+vnmlA+JZ8qCpow==\n-----END CRYPT4GH PRIVATE KEY-----\n'
 
+/*
 async function encryption (input, output) {
   const keys = await index.keyfiles.encryption_keyfiles([ts, tp])
   edit = null
@@ -35,8 +36,8 @@ async function encryption (input, output) {
   }
 }
 
-encryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.txt', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_ohnepw.c4gh')
-
+encryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.txt', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.c4gh')
+*/
 /*
 async function decryption (input, output) {
   const keys = await index.keyfiles.encryption_keyfiles([ts])
@@ -71,3 +72,58 @@ async function generateKeys (password) {
 }
 
 generateKeys('abd') */
+/*
+// Reencryption
+async function reencryption (input, output) {
+  const keys = await index.keyfiles.encryption_keyfiles([ts, tp])
+  const readStream = fs.createReadStream(input, { end: 1000 })
+  readStream
+    .on('data', async function (d) {
+      const reencryptHeader = await index.reeencryption.streamReencryptHeader(Uint8Array.from(d), [keys[1]], keys[0])
+      fs.writeFile(output, reencryptHeader[0], (err) => {
+        if (err) {
+          console.log(err)
+        }
+      })
+      const readStream2 = fs.createReadStream(input, { start: reencryptHeader[1], highWaterMark: 65564 })
+      readStream2
+        .on('data', async function (d2) {
+          fs.appendFile(output, d2, (err) => {
+            if (err) {
+              console.log(err)
+            }
+          })
+        })
+      readStream.destroy()
+    })
+}
+
+reencryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_reenc.c4gh') */
+
+// Rearrangement
+async function rearrangement (input, output) {
+  const keys = await index.keyfiles.encryption_keyfiles([ts, tp])
+  const editlist = [0, 5]
+  const readStream = fs.createReadStream(input, { end: 1000 })
+  readStream
+    .on('data', async function (d) {
+      const rearrangeHeader = await index.rearrangment.streamRearrange(Uint8Array.from(d), keys[0], [keys[1]], editlist)
+      fs.writeFile(output, rearrangeHeader[0], (err) => {
+        if (err) {
+          console.log(err)
+        }
+      })
+      const readStream2 = fs.createReadStream(input, { start: rearrangeHeader[1], highWaterMark: 65564 })
+      readStream2
+        .on('data', async function (d2) {
+          fs.appendFile(output, d2, (err) => {
+            if (err) {
+              console.log(err)
+            }
+          })
+        })
+      readStream.destroy()
+    })
+}
+
+rearrangement('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_rearr.c4gh')

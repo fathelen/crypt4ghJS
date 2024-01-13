@@ -44,13 +44,13 @@ exports.reencrypt = async function * (encryptedData, keysPub, keySec) {
   }
 }
 
-exports.streamReencryptHeader = function (header, keysPub, keySec) {
+exports.streamReencryptHeader = async function (header, keysPub, keySec) {
   const headerPackets = dec.parse(header)
-  const decryptedPackets = dec.decrypt_header(headerPackets[0], keySec)
+  const decryptedPackets = await dec.decrypt_header(headerPackets[0], keySec)
   const headers = [decryptedPackets[0][0]]
   headers.push(decryptedPackets[0][0])
   keysPub.unshift(newKey.publicKey)
-  const encr = enc.header_encrypt(headers, newKey.secretKey, keysPub)
+  const encr = await enc.header_encrypt(headers, newKey.secretKey, keysPub)
   const serializedData = enc.serialize(encr[0], keysPub[0], encr[2], encr[3])
   return [serializedData, headerPackets[2]]
 }

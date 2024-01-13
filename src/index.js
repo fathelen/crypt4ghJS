@@ -7,7 +7,6 @@ const rearrangment = require('./rearrange')
 const checkFileformat = require('./check_fileformat')
 
 // Decryption
-
 document.getElementById('input').addEventListener('change', function (e) {
   const file = document.getElementById('input').files[0]
   const file2 = document.getElementById('input').files[1]
@@ -100,7 +99,9 @@ document.getElementById('input3').addEventListener('change', function (e) {
     const seckeyFile = await file2.text()
     const fileContents = document.getElementById('reencryption')
     const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile], password)
-    const plaintext = await reeencryption.reencrypt(file3, [keys[1]], keys[0])
-    fileContents.innerText = plaintext
+    const headerChunk = await file3.slice(0, 1000)
+    const chunkHeader = await headerChunk.arrayBuffer()
+    const reencryptHeader = await reeencryption.streamReencryptHeader(new Uint8Array(chunkHeader), [keys[1]], keys[0])
+    fileContents.innerText += reencryptHeader
   })()
 })

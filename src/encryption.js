@@ -215,7 +215,7 @@ exports.encryption_edit = async function (editList, encryptionMethod, sessionKey
       const editPacket = enc.make_packet_edit_list(editList)
       const encPacketDataContent = enc.make_packet_data_enc(encryptionMethod, sessionKey)
       typeArray.push(encPacketDataContent, editPacket)
-      const headerPackets = enc.header_encrypt(typeArray, secretkey, publicKeys)
+      const headerPackets = await enc.header_encrypt(typeArray, secretkey, publicKeys)
       const serializedData = enc.serialize(headerPackets[0], headerPackets[1], headerPackets[2], headerPackets[3])
       return [serializedData, 1]
     }
