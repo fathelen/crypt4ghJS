@@ -3,6 +3,7 @@ const generateKeyPair = require('@stablelib/x25519')
 const scrypt = require('scrypt-js')
 const keygen = require('./keygen.js')
 const _sodium = require('libsodium-wrappers')
+const Buffer = require('buffer/').Buffer
 
 const magicBytestring = helperfunction.string2byte('c4gh-v1')
 // without passphrase
