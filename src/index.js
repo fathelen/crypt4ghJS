@@ -39,8 +39,8 @@ document.getElementById('input').addEventListener('change', function (e) {
 const button = document.getElementById('submit')
 button.addEventListener('click', async function (event) {
   const password = await document.getElementById('psw2').value
-  const result = keygen.keygen(password)
-  const erg = await result
+  const result = await keygen.keygen(password)
+  const erg = result
   const pubkey = document.getElementById('pubkeyfile')
   pubkey.innerText = erg[1]
   const seckey = document.getElementById('seckeyfile')
