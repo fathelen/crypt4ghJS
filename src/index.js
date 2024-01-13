@@ -113,3 +113,30 @@ document.getElementById('input3').addEventListener('change', function (e) {
     }
   })()
 })
+
+// Rearrangement
+document.getElementById('input3').addEventListener('change', function (e) {
+  const file = document.getElementById('input3').files[0]
+  const file2 = document.getElementById('input3').files[1]
+  const file3 = document.getElementById('input3').files[2]
+  const password = document.getElementById('psw4').value;
+
+  (async () => {
+    const pubkeyFile = await file2.text()
+    const seckeyFile = await file.text()
+    const fileContents = document.getElementById('reencryption')
+    const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile], password)
+    const headerChunk = await file3.slice(0, 1000)
+    const chunkHeader = await headerChunk.arrayBuffer()
+    const rearrangeHeader = await rearrangment.streamRearrange(new Uint8Array(chunkHeader), keys[0], [keys[1]], editlist)
+    fileContents.innerText += rearrangeHeader
+    const chunksize = 65564
+    let offset = rearrangeHeader[1]
+    while (offset < file3.size) {
+      const chunkfile = await file3.slice(offset, offset + chunksize)
+      const chunk = await chunkfile.arrayBuffer()
+      fileContents.innerText += new Uint8Array(chunk)
+      offset += chunksize
+    }
+  })()
+})
