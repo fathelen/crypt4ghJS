@@ -4,6 +4,7 @@ const Blake2b = require('@stablelib/blake2b')
 const enc = require('./encryption')
 const crypto = require('crypto')
 const _sodium = require('libsodium-wrappers')
+const Buffer = require('buffer/').Buffer
 
 const PacketTypeDataEnc = new Uint32Array([0])
 const PacketTypeEditList = new Uint32Array([1])
