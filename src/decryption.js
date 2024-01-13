@@ -118,8 +118,6 @@ exports.extract_packets = function (packetNum, header) {
  * @returns => List containing the decrypted package, the undecrypted packages and the nonce
  */
 exports.decrypt_header = async function (headerPackets, seckeys) {
-  console.log('1: ', headerPackets)
-  console.log('2: ', seckeys)
   seckeys = [seckeys]
   const decryptedPackets = []
   const undecryptablePackets = []
@@ -143,9 +141,7 @@ exports.decrypt_header = async function (headerPackets, seckeys) {
           blake2b.update(uint8Blake2b)
           const uint8FromBlake2b = blake2b.digest()
           const sharedKey = uint8FromBlake2b.subarray(0, 32)
-          console.log('hier')
           const encKey = sodium.crypto_aead_chacha20poly1305_ietf_decrypt(null, encryptedUint8, null, nonceUint8, sharedKey)
-          console.log(encKey)
           /*
         const algorithm = 'chacha20-poly1305'
         const decipher = crypto.createDecipheriv(algorithm, Buffer.from(sharedKey, 'hex'), nonceUint8)

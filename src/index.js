@@ -99,10 +99,17 @@ document.getElementById('input3').addEventListener('change', function (e) {
     const seckeyFile = await file.text()
     const fileContents = document.getElementById('reencryption')
     const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile], password)
-    console.log(keys[0], '   ', keys[1])
     const headerChunk = await file3.slice(0, 1000)
     const chunkHeader = await headerChunk.arrayBuffer()
     const reencryptHeader = await reeencryption.streamReencryptHeader(new Uint8Array(chunkHeader), [keys[1]], keys[0])
     fileContents.innerText += reencryptHeader
+    const chunksize = 65564
+    let offset = reencryptHeader[1]
+    while (offset < file3.size) {
+      const chunkfile = await file3.slice(offset, offset + chunksize)
+      const chunk = await chunkfile.arrayBuffer()
+      fileContents.innerText += new Uint8Array(chunk)
+      offset += chunksize
+    }
   })()
 })
