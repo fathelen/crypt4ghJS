@@ -142,6 +142,7 @@ exports.decrypt_header = async function (headerPackets, seckeys) {
           const uint8FromBlake2b = blake2b.digest()
           const sharedKey = uint8FromBlake2b.subarray(0, 32)
           const encKey = sodium.crypto_aead_chacha20poly1305_ietf_decrypt(null, encryptedUint8, null, nonceUint8, sharedKey)
+          console.log(encKey)
           /*
         const algorithm = 'chacha20-poly1305'
         const decipher = crypto.createDecipheriv(algorithm, Buffer.from(sharedKey, 'hex'), nonceUint8)
