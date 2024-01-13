@@ -68,6 +68,7 @@ exports.create_seckey = async function (seckey, passphrase) {
           const nonce = sodium.randombytes_buf(12)
           console.log(nonce)
           const decData = sodium.crypto_aead_chacha20poly1305_ietf_encrypt(seckey, null, null, nonce, result)
+          console.log('dec: ', decData)
           const decNonce = Buffer.concat([magicBytestring, kdfScript, saltround, chiperChacha, nonce, decData])
           const x = new Uint8Array(decNonce)
           console.log(x)
