@@ -49,7 +49,7 @@ exports.create_pubkey = function (pubkey) {
  * @returns => seckey content as string
  */
 exports.create_seckey = async function (seckey, passphrase) {
-  console.log(seckey)
+  console.log(passphrase)
   try {
     let a = ''
     await (async () => {
