@@ -2,7 +2,6 @@ const helperfunction = require('./helper functions.js')
 const generateKeyPair = require('@stablelib/x25519')
 const scrypt = require('scrypt-js')
 const keygen = require('./keygen.js')
-const crypto = require('crypto')
 const _sodium = require('libsodium-wrappers')
 
 const magicBytestring = helperfunction.string2byte('c4gh-v1')
@@ -51,48 +50,35 @@ exports.create_pubkey = function (pubkey) {
  */
 exports.create_seckey = async function (seckey, passphrase) {
   try {
-    if (passphrase !== '') {
-      const salt = crypto.randomBytes(16)
-      const saltround = new Uint8Array(4 + salt.length)
-      saltround.set([0, 0, 0, 0])
-      saltround.set(salt, 4)
-      const N = 16384; const r = 8; const p = 1
-      const dklen = 32
-      const keyPrmoise = scrypt.scrypt(helperfunction.string2byte(passphrase), salt, N, r, p, dklen)
-      const key = keyPrmoise.then(function (result) {
-        const nonce = crypto.randomBytes(12)
-        const algorithm = 'chacha20-poly1305'
-        const cipher = crypto.createCipheriv(algorithm, result, nonce)
-        const encryptedResult = Buffer.concat([cipher.update(seckey), cipher.final(), cipher.getAuthTag()])
-        const x = new Uint8Array(encryptedResult)
-        const fullUint8 = new Uint8Array(magicBytestring.length + kdfScript.length + chiperChacha.length + x.length + 8 + nonce.length + saltround.length)
-        fullUint8.set(magicBytestring)
-        fullUint8.set([0, 6], magicBytestring.length)
-        fullUint8.set(kdfScript, magicBytestring.length + 2)
-        fullUint8.set([0, 20], magicBytestring.length + kdfScript.length + 2)
-        fullUint8.set(saltround, magicBytestring.length + kdfScript.length + 4)
-        fullUint8.set([0, 17], magicBytestring.length + kdfScript.length + saltround.length + 4)
-        fullUint8.set(chiperChacha, magicBytestring.length + kdfScript.length + saltround.length + 6)
-        fullUint8.set([0, 12 + x.length], magicBytestring.length + kdfScript.length + chiperChacha.length + saltround.length + 6)
-        fullUint8.set(nonce, magicBytestring.length + kdfScript.length + chiperChacha.length + saltround.length + 8)
-        fullUint8.set(x, magicBytestring.length + kdfScript.length + chiperChacha.length + nonce.length + saltround.length + 8)
-        const b64 = btoa(String.fromCharCode.apply(null, fullUint8))
-        return '-----BEGIN CRYPT4GH PRIVATE KEY-----\n' + b64 + '\n-----END CRYPT4GH PRIVATE KEY-----\n'
-      })
-      const a = await key
-      return a
-    } else {
-      const fullUint8 = new Uint8Array(magicBytestring.length + kdfNoneBestring.length + chiperNoneBytestring.length + seckey.length + 6)
-      fullUint8.set(magicBytestring)
-      fullUint8.set([0, 4], magicBytestring.length)
-      fullUint8.set(kdfNoneBestring, magicBytestring.length + 2)
-      fullUint8.set([0, 4], magicBytestring.length + kdfNoneBestring.length + 2)
-      fullUint8.set(chiperNoneBytestring, magicBytestring.length + kdfNoneBestring.length + 4)
-      fullUint8.set([0, 32], magicBytestring.length + kdfNoneBestring.length + chiperNoneBytestring.length + 4)
-      fullUint8.set(seckey, magicBytestring.length + kdfNoneBestring.length + chiperNoneBytestring.length + 6)
-      const b64 = btoa(String.fromCharCode.apply(null, fullUint8))
-      return '-----BEGIN CRYPT4GH PRIVATE KEY-----\n' + b64 + '\n-----END CRYPT4GH PRIVATE KEY-----\n'
-    }
+    let a = ''
+    await (async () => {
+      await _sodium.ready
+      const sodium = _sodium
+      if (passphrase) {
+        const salt = sodium.randombytes_buf(16)
+        const saltround = new Uint8Array(4 + salt.length)
+        saltround.set([0, 0, 0, 0])
+        saltround.set(salt, 4)
+        const N = 16384; const r = 8; const p = 1
+        const dklen = 32
+        const keyPrmoise = scrypt.scrypt(helperfunction.string2byte(passphrase), salt, N, r, p, dklen)
+        const key = keyPrmoise.then(function (result) {
+          const nonce = sodium.randombytes_buf(12)
+          const decData = _sodium.crypto_aead_chacha20poly1305_ietf_encrypt(seckey, null, null, nonce, result)
+          const decNonce = Buffer.concat([magicBytestring, kdfScript, saltround, chiperChacha, nonce, decData])
+          const x = new Uint8Array(decNonce)
+          const b64 = btoa(String.fromCharCode.apply(null, x))
+          return '-----BEGIN CRYPT4GH PRIVATE KEY-----\n' + b64 + '\n-----END CRYPT4GH PRIVATE KEY-----\n'
+        })
+        a = await key
+      } else {
+        const decNonce = Buffer.concat([magicBytestring, kdfNoneBestring, chiperNoneBytestring, seckey])
+        const x = new Uint8Array(decNonce)
+        const b64 = btoa(String.fromCharCode.apply(null, x))
+        a = '-----BEGIN CRYPT4GH PRIVATE KEY-----\n' + b64 + '\n-----END CRYPT4GH PRIVATE KEY-----\n'
+      }
+    })()
+    return a
   } catch (e) {
     console.trace('Secret key generation not possible.')
   }

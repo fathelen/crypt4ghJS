@@ -67,7 +67,8 @@ decryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.c4gh
 */
 
 async function generateKeys (password) {
-   await index.keygen.keygen(password)
+   const keys = await index.keygen.keygen(password)
+   console.log(keys)
 }
 
-console.log(await generateKeys('abc'))
+generateKeys('abd')
