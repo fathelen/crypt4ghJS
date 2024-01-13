@@ -116,10 +116,20 @@ document.getElementById('input3').addEventListener('change', function (e) {
 
 // Rearrangement
 document.getElementById('input3').addEventListener('change', function (e) {
-  const file = document.getElementById('input3').files[0]
-  const file2 = document.getElementById('input3').files[1]
-  const file3 = document.getElementById('input3').files[2]
-  const password = document.getElementById('psw4').value;
+  const file = document.getElementById('input4').files[0]
+  const file2 = document.getElementById('input4').files[1]
+  const file3 = document.getElementById('input4').files[2]
+  const password = document.getElementById('psw5').value
+  const edit = document.getElementById('block4').value
+  let editlist = []
+  if (edit.includes(';')) {
+    const step = edit.split(';')
+    for (let i = 0; i < step.length; i++) {
+      editlist.push(step[i].split(','))
+    }
+  } else {
+    editlist = edit.split(',')
+  }
 
   (async () => {
     const pubkeyFile = await file2.text()
