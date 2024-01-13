@@ -115,7 +115,7 @@ document.getElementById('input3').addEventListener('change', function (e) {
 })
 
 // Rearrangement
-document.getElementById('input3').addEventListener('change', function (e) {
+document.getElementById('input4').addEventListener('change', function (e) {
   const file = document.getElementById('input4').files[0]
   const file2 = document.getElementById('input4').files[1]
   const file3 = document.getElementById('input4').files[2]
@@ -134,7 +134,7 @@ document.getElementById('input3').addEventListener('change', function (e) {
   (async () => {
     const pubkeyFile = await file2.text()
     const seckeyFile = await file.text()
-    const fileContents = document.getElementById('reencryption')
+    const fileContents = document.getElementById('rearrange')
     const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile], password)
     const headerChunk = await file3.slice(0, 1000)
     const chunkHeader = await headerChunk.arrayBuffer()
