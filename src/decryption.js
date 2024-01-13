@@ -118,6 +118,8 @@ exports.extract_packets = function (packetNum, header) {
  * @returns => List containing the decrypted package, the undecrypted packages and the nonce
  */
 exports.decrypt_header = async function (headerPackets, seckeys) {
+  console.log('1: ', headerPackets)
+  console.log('2: ', seckeys)
   seckeys = [seckeys]
   const decryptedPackets = []
   const undecryptablePackets = []
