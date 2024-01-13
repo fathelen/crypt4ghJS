@@ -95,8 +95,8 @@ document.getElementById('input3').addEventListener('change', function (e) {
   const password = document.getElementById('psw4').value;
 
   (async () => {
-    const pubkeyFile = await file.text()
-    const seckeyFile = await file2.text()
+    const pubkeyFile = await file2.text()
+    const seckeyFile = await file.text()
     const fileContents = document.getElementById('reencryption')
     const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile], password)
     console.log(keys[0], '   ', keys[1])
