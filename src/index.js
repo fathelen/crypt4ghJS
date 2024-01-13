@@ -21,14 +21,14 @@ document.getElementById('input').addEventListener('change', function (e) {
     console.log(keys)
     const headerChunk = await file2.slice(0, 1000)
     const chunkHeader = await headerChunk.arrayBuffer()
-    const header = decryption.header_deconstruction(new Uint8Array(chunkHeader), keys[0])
+    const header = await decryption.header_deconstruction(new Uint8Array(chunkHeader), keys[0])
     console.log(header)
     const chunksize = 65564
     let offset = header[4]
     while (offset < file2.size) {
       const chunkfile = await file2.slice(offset, offset + chunksize)
       const chunk = await chunkfile.arrayBuffer()
-      const plaintext = decryption.pureDecryption(new Uint8Array(chunk), header[0], block)
+      const plaintext = await decryption.pureDecryption(new Uint8Array(chunk), header[0], block)
       console.log(plaintext)
       const decoder = new TextDecoder()
       fileContents.innerText += decoder.decode(plaintext)
