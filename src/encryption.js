@@ -47,17 +47,16 @@ exports.encHeaderEdit = async function (secretkey, publicKeys, editlist) {
   }
 }
 
-exports.pureEncryption = function (chunk, key) {
-  const initVector = Uint8Array.from(crypto.webcrypto.getRandomValues(new Uint8Array(12)))
-  const decData = _sodium.crypto_aead_chacha20poly1305_ietf_encrypt(chunk, null, null, initVector, key)
-  const decNonce = Buffer.concat([initVector, decData])
-  const x = new Uint8Array(decNonce)
-  /*
-  const algorithm = 'chacha20-poly1305'
-  const initVector = crypto.randomBytes(12)
-  const cipher = crypto.createCipheriv(algorithm, key, initVector)
-  const encryptedResult = Buffer.concat([initVector, cipher.update(chunk), cipher.final(), cipher.getAuthTag()])
-  const x = new Uint8Array(encryptedResult) */
+exports.pureEncryption = async function (chunk, key) {
+  let x = new Uint8Array()
+  await (async () => {
+    await _sodium.ready
+    const sodium = _sodium
+    const initVector = sodium.randombytes_buf(12)
+    const decData = sodium.crypto_aead_chacha20poly1305_ietf_encrypt(chunk, null, null, initVector, key)
+    const decNonce = Buffer.concat([initVector, decData])
+    x = new Uint8Array(decNonce)
+  })()
   return x
 }
 

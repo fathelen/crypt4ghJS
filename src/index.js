@@ -18,18 +18,15 @@ document.getElementById('input').addEventListener('change', function (e) {
     const block = blocks.split(',')
     const fileContents = document.getElementById('filecontents')
     const keys = await keyfiles.encryption_keyfiles([seckeyFile], password)
-    console.log(keys)
     const headerChunk = await file2.slice(0, 1000)
     const chunkHeader = await headerChunk.arrayBuffer()
     const header = await decryption.header_deconstruction(new Uint8Array(chunkHeader), keys[0])
-    console.log(header)
     const chunksize = 65564
     let offset = header[4]
     while (offset < file2.size) {
       const chunkfile = await file2.slice(offset, offset + chunksize)
       const chunk = await chunkfile.arrayBuffer()
       const plaintext = await decryption.pureDecryption(new Uint8Array(chunk), header[0], block)
-      console.log(plaintext)
       const decoder = new TextDecoder()
       fileContents.innerText += decoder.decode(plaintext)
       offset += chunksize
@@ -75,14 +72,14 @@ document.getElementById('input2').addEventListener('change', function (e) {
     }
     const fileContents = document.getElementById('encfile')
     const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile], password)
-    const header = encryption.encHeader(keys[0], [keys[1]], block, editlist)
+    const header = await encryption.encHeader(keys[0], [keys[1]], block, editlist)
     fileContents.innerText += header[0]
     const chunksize = 65536
     let offset = 0
     while (offset < file4.size) {
       const chunkfile = await file4.slice(offset, offset + chunksize)
       const chunk = await chunkfile.arrayBuffer()
-      const encryptedtext = encryption.pureEncryption(new Uint8Array(chunk), header[1])
+      const encryptedtext = await encryption.pureEncryption(new Uint8Array(chunk), header[1])
       const encoder = new TextEncoder()
       fileContents.innerText += encoder.encode(encryptedtext)
       offset += chunksize

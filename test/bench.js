@@ -5,7 +5,7 @@ const index = require('crypt4gh_js')
 const fs = require('fs')
 // const { Transform } = require('stream')
 // const { pipeline } = require('stream')
-/*
+
 const ts = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAEbm9uZQAEbm9uZQAgrpd+v2ZGymbextTp5nMt298h1yEFBigB+bS+1WJT/lM=\n-----END CRYPT4GH PRIVATE KEY-----\n'
 const tp = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nfQCgFp/dPaDOELnzrgEEQUeOmOlMj9M/dTP7bIiuxyw=\n-----END CRYPT4GH PUBLIC KEY-----\n'
 const pubkeyPass = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nvHrVpBpFLpX/OquK2Ze4Mfzb8aVrn05XmTgT4ymVwzE=\n-----END CRYPT4GH PUBLIC KEY-----\n'
@@ -25,7 +25,7 @@ async function encryption (input, output) {
       const readStream = fs.createReadStream(input)
         readStream
           .on('data', async function (d) {
-            const val = index.encryption.pureEncryption(d, header[1])
+            const val = await index.encryption.pureEncryption(d, header[1])
             fs.appendFile(output, val, (err) => {
               if (err) {
                 console.log(err)
@@ -35,8 +35,8 @@ async function encryption (input, output) {
   }
 }
 
-encryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.txt', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.c4gh')
-*/
+encryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.txt', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_ohnepw.c4gh')
+
 /*
 async function decryption (input, output) {
   const keys = await index.keyfiles.encryption_keyfiles([ts])
@@ -64,11 +64,10 @@ async function decryption (input, output) {
 }
 
 decryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/Re_abcd.txt')
-*/
 
 async function generateKeys (password) {
    const keys = await index.keygen.keygen(password)
    console.log(keys)
 }
 
-generateKeys('abd')
+generateKeys('abd') */
