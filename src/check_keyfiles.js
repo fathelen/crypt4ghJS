@@ -78,16 +78,6 @@ async function secret (keyContent, seckey, password) {
             const encData = keyContent.subarray(70)
             const encKey = sodium.crypto_aead_chacha20poly1305_ietf_decrypt(null, encData, null, nonce, sharedkey)
             return encKey
-
-            /*
-            const algorithm = 'chacha20-poly1305'
-            const cipher = crypto.createCipheriv(algorithm, sharedkey, nonce)
-            console.log('cipher: ', cipher)
-            const encryptedResult = cipher.update(encData)
-            console.log('encres: ', encryptedResult)
-            const x = new Uint8Array(encryptedResult.subarray(0, 32))
-            console.log('x: ', x)
-            return x */
           })
           return await key
         }

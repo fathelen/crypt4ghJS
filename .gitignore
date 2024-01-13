@@ -150,3 +150,4 @@ testData/writestream1gb
 testData/editCase4values.crypt4gh
 testData/Re_abcd.txt
 testData/abcd.c4gh
+testData/hyperfine_128mb_enc

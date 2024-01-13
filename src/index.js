@@ -78,14 +78,28 @@ document.getElementById('input2').addEventListener('change', function (e) {
     while (offset < file4.size) {
       const chunkfile = await file4.slice(offset, offset + chunksize)
       const chunk = await chunkfile.arrayBuffer()
-      const encryptedtext = await encryption.pureEncryption(new Uint8Array(chunk), header[1])
+      const encryptedtext = encryption.pureEncryption(new Uint8Array(chunk), header[1])
       const encoder = new TextEncoder()
       fileContents.innerText += encoder.encode(encryptedtext)
       offset += chunksize
     }
     console.log('all done')
-    /*
-    const encryptedtext = await encryption(file4, keys[0], [keys[1], keys[2]], block, editlist)
-    fileContents.innerText = encryptedtext */
+  })()
+})
+
+// Reencryption
+document.getElementById('input3').addEventListener('change', function (e) {
+  const file = document.getElementById('input3').files[0]
+  const file2 = document.getElementById('input3').files[1]
+  const file3 = document.getElementById('input3').files[2]
+  const password = document.getElementById('psw4').value;
+
+  (async () => {
+    const pubkeyFile = await file.text()
+    const seckeyFile = await file2.text()
+    const fileContents = document.getElementById('reencryption')
+    const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile], password)
+    const plaintext = await reeencryption.reencrypt(file3, [keys[1]], keys[0])
+    fileContents.innerText = plaintext
   })()
 })

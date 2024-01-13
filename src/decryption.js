@@ -2,8 +2,7 @@ const helperfunction = require('./helper functions')
 const x25519 = require('@stablelib/x25519')
 const Blake2b = require('@stablelib/blake2b')
 const dec = require('./decryption')
-const crypto = require('crypto')
-const sodium = require('libsodium-wrappers')
+const _sodium = require('libsodium-wrappers')
 
 exports.SEGMENT_SIZE = 65536
 const PacketTypeDataEnc = '0000'
@@ -11,10 +10,15 @@ const PacketTypeEditList = '1000'
 const encryptionMethod = '0000' // only (xchacha20poly1305)
 const magicBytestring = helperfunction.string2byte('crypt4gh')
 
-exports.pureDecryption = function (d, key) {
-  const nonce = d.subarray(0, 12)
-  const enc = d.subarray(12)
-  const encData = sodium.crypto_aead_chacha20poly1305_ietf_decrypt(null, enc, null, nonce, key)
+exports.pureDecryption = async function (d, key) {
+  let encData = new Uint8Array()
+  await (async () => {
+    await _sodium.ready
+    const sodium = _sodium
+    const nonce = d.subarray(0, 12)
+    const enc = d.subarray(12)
+    encData = sodium.crypto_aead_chacha20poly1305_ietf_decrypt(null, enc, null, nonce, key)
+  })()
 
   /*
   const algorithm = 'chacha20-poly1305'
@@ -34,18 +38,12 @@ exports.pureEdit = function (d) {
  * @param {*} seckeys => secret key to decrypt header packet
  * @returns => List containing the sessionkey, nonce, body, editlist and position bodystart
  */
-exports.header_deconstruction = function (header, seckeys) {
+exports.header_deconstruction = async function (header, seckeys) {
   try {
-    // console.log(header, '   ', seckeys)
     const headerPackets = dec.parse(header)
-    // console.log('1:  ', headerPackets)
-    // console.log(headerPackets[0])
-    const decryptedPackets = dec.decrypt_header(headerPackets[0], seckeys)
-    // console.log('2:  ', decryptedPackets)
+    const decryptedPackets = await dec.decrypt_header(headerPackets[0], seckeys)
     const partitionedPackages = partitionPackets(decryptedPackets[0])
-    // console.log('3:  ', partitionedPackages)
     const sessionKey = parseEncPacket(partitionedPackages[0][0])
-    // console.log('4:  ', sessionKey)
     return [sessionKey, decryptedPackets[2], headerPackets[1], partitionedPackages[1], headerPackets[2]]
   } catch (e) {
     console.trace('header deconstruction not possible.')
@@ -119,44 +117,48 @@ exports.extract_packets = function (packetNum, header) {
  * @param {*} seckeys => seckey to decode a header package
  * @returns => List containing the decrypted package, the undecrypted packages and the nonce
  */
-exports.decrypt_header = function (headerPackets, seckeys) {
+exports.decrypt_header = async function (headerPackets, seckeys) {
+  seckeys = [seckeys]
+  const decryptedPackets = []
+  const undecryptablePackets = []
+  let nonceUint8 = new Uint8Array(12)
   try {
-    seckeys = [seckeys]
-    const decryptedPackets = []
-    const undecryptablePackets = []
-    let nonceUint8
-    for (let i = 0; i < headerPackets.length; i++) {
-      const wKeyUint8 = new Uint8Array(headerPackets[i].slice(8, 40))
-      nonceUint8 = new Uint8Array(headerPackets[i].slice(40, 52))
-      const encryptedUint8 = new Uint8Array(headerPackets[i].slice(52))
-      for (let j = 0; j < seckeys.length; j++) {
-        const k = x25519.generateKeyPairFromSeed(seckeys[j])
-        const dh = x25519.sharedKey(seckeys[j], wKeyUint8)
-        const uint8Blake2b = new Uint8Array(dh.length + wKeyUint8.length + k.publicKey.length)
-        uint8Blake2b.set(dh)
-        uint8Blake2b.set(k.publicKey, dh.length)
-        uint8Blake2b.set(wKeyUint8, dh.length + wKeyUint8.length)
-        const blake2b = new Blake2b.BLAKE2b()
-        blake2b.update(uint8Blake2b)
-        const uint8FromBlake2b = blake2b.digest()
-        const sharedKey = uint8FromBlake2b.subarray(0, 32)
-        const encKey = sodium.crypto_aead_chacha20poly1305_ietf_decrypt(null, encryptedUint8, null, nonceUint8, sharedKey)
-        /*
+    await (async () => {
+      await _sodium.ready
+      const sodium = _sodium
+      for (let i = 0; i < headerPackets.length; i++) {
+        const wKeyUint8 = new Uint8Array(headerPackets[i].slice(8, 40))
+        nonceUint8 = new Uint8Array(headerPackets[i].slice(40, 52))
+        const encryptedUint8 = new Uint8Array(headerPackets[i].slice(52))
+        for (let j = 0; j < seckeys.length; j++) {
+          const k = x25519.generateKeyPairFromSeed(seckeys[j])
+          const dh = x25519.sharedKey(seckeys[j], wKeyUint8)
+          const uint8Blake2b = new Uint8Array(dh.length + wKeyUint8.length + k.publicKey.length)
+          uint8Blake2b.set(dh)
+          uint8Blake2b.set(k.publicKey, dh.length)
+          uint8Blake2b.set(wKeyUint8, dh.length + wKeyUint8.length)
+          const blake2b = new Blake2b.BLAKE2b()
+          blake2b.update(uint8Blake2b)
+          const uint8FromBlake2b = blake2b.digest()
+          const sharedKey = uint8FromBlake2b.subarray(0, 32)
+          const encKey = sodium.crypto_aead_chacha20poly1305_ietf_decrypt(null, encryptedUint8, null, nonceUint8, sharedKey)
+          /*
         const algorithm = 'chacha20-poly1305'
         const decipher = crypto.createDecipheriv(algorithm, Buffer.from(sharedKey, 'hex'), nonceUint8)
         const decrypted = decipher.update(encryptedUint8)
         const plaintext = new Uint8Array(decrypted.slice(0, -16)) */
-        if (encKey) {
-          decryptedPackets.push(encKey)
-        } else {
-          undecryptablePackets.push(headerPackets[i])
+          if (encKey) {
+            decryptedPackets.push(encKey)
+          } else {
+            undecryptablePackets.push(headerPackets[i])
+          }
         }
       }
-    }
-    return [decryptedPackets, undecryptablePackets, nonceUint8]
+    })()
   } catch (e) {
     console.trace('Header could not be decrypted.')
   }
+  return [decryptedPackets, undecryptablePackets, nonceUint8]
 }
 
 /**
