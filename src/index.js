@@ -18,6 +18,7 @@ document.getElementById('input').addEventListener('change', function (e) {
       block = null
     } else if (blocks.includes(',')) {
       block = blocks.split(',')
+      console.log(block)
     } else {
       block = blocks
     }
