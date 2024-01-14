@@ -16,13 +16,13 @@ exports.decrypption = async function (headerInfo, text, counter, wantedblocks) {
     const plaintext = await dec.pureDecryption(Uint8Array.from(text), headerInfo[0])
     const aplliedEdit = dec.applyEditlist(headerInfo[5][0].get(counter), plaintext)
     return aplliedEdit
-  } else if (wantedblocks && !headerInfo[5][0]) {
+  } else if (wantedblocks && wantedblocks[0] !== '' && !headerInfo[5][0]) {
     console.log('2')
     if (wantedblocks.includes(counter)) {
       const plaintext = await dec.pureDecryption(Uint8Array.from(text), headerInfo[0])
       return plaintext
     }
-  } else if (!wantedblocks && !headerInfo[5][0]) {
+  } else if ((wantedblocks[0] !== '' && !headerInfo[5][0]) || (!wantedblocks && !headerInfo[5][0])) {
     console.log('3')
     const plaintext = await dec.pureDecryption(Uint8Array.from(text), headerInfo[0])
     return plaintext
