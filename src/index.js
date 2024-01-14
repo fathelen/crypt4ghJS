@@ -17,6 +17,7 @@ document.getElementById('input').addEventListener('change', function (e) {
     if (blocks === '') {
       block = null
     } else if (blocks.includes(',')) {
+      block = []
       const b = blocks.split(',')
       for (let i = 0; i < b.length; i++) {
         block.push(Number(b[i]))
