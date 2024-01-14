@@ -1,5 +1,4 @@
 const helperfunction = require('./helper functions')
-// const crypto = require('crypto')
 const scrypt = require('scrypt-js')
 const sodium = require('libsodium-wrappers')
 

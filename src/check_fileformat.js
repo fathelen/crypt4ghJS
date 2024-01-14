@@ -11,7 +11,7 @@ exports.check = async function (input, seckey) {
   try {
     const header = await input.subarray(0, 1000)
     const headerPackets = dec.parse(header)
-    const decryptedPackets = dec.decrypt_header(headerPackets[0], seckey)
+    const decryptedPackets = await dec.decrypt_header(headerPackets[0], seckey)
     if (decryptedPackets[0].length === 0) {
       return false
     } else {

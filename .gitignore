@@ -156,3 +156,8 @@ testData/hyperfine_abcd_enc
 testData/hyperfine_1gb_enc
 testData/abcd_reenc.c4gh
 testData/abcd_rearr.c4gh
+testData/Re_abcd_edit.txt
+testData/Re_abcd_blockDec.txt
+testData/Re_abcd_block.txt
+testData/abcd_edit.c4gh
+testData/abcd_block.c4gh

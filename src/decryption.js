@@ -10,6 +10,22 @@ const PacketTypeEditList = '1000'
 const encryptionMethod = '0000' // only (xchacha20poly1305)
 const magicBytestring = helperfunction.string2byte('crypt4gh')
 
+exports.decrypption = async function (headerInfo, text, counter, wantedblocks) {
+  if (headerInfo[5][0] && Array.from(headerInfo[5][0].keys()).includes(counter)) {
+    const plaintext = await dec.pureDecryption(Uint8Array.from(text), headerInfo[0])
+    const aplliedEdit = dec.applyEditlist(headerInfo[5][0].get(counter), plaintext)
+    return aplliedEdit
+  } else if (wantedblocks && !headerInfo[5][0]) {
+    if (wantedblocks.includes(counter)) {
+      const plaintext = await dec.pureDecryption(Uint8Array.from(text), headerInfo[0])
+      return plaintext
+    }
+  } else if (!wantedblocks && !headerInfo[5][0]) {
+    const plaintext = await dec.pureDecryption(Uint8Array.from(text), headerInfo[0])
+    return plaintext
+  }
+}
+
 exports.pureDecryption = async function (d, key) {
   let encData = new Uint8Array()
   await (async () => {
@@ -19,12 +35,6 @@ exports.pureDecryption = async function (d, key) {
     const enc = d.subarray(12)
     encData = sodium.crypto_aead_chacha20poly1305_ietf_decrypt(null, enc, null, nonce, key)
   })()
-
-  /*
-  const algorithm = 'chacha20-poly1305'
-  const decipher = crypto.createDecipheriv(algorithm, Buffer.from(key, 'hex'), nonce)
-  const decrypted = decipher.update(enc)
-  const plaintext = new Uint8Array(decrypted.slice(0, -16)) */
   return encData
 }
 
@@ -40,11 +50,15 @@ exports.pureEdit = function (d) {
  */
 exports.header_deconstruction = async function (header, seckeys) {
   try {
+    let editlist = new Uint8Array()
     const headerPackets = dec.parse(header)
     const decryptedPackets = await dec.decrypt_header(headerPackets[0], seckeys)
     const partitionedPackages = partitionPackets(decryptedPackets[0])
     const sessionKey = parseEncPacket(partitionedPackages[0][0])
-    return [sessionKey, decryptedPackets[2], headerPackets[1], partitionedPackages[1], headerPackets[2]]
+    if (partitionedPackages[1].length > 0) {
+      editlist = dec.pureEdit([sessionKey, decryptedPackets[2], headerPackets[1], partitionedPackages[1], headerPackets[2]])
+    }
+    return [sessionKey, decryptedPackets[2], headerPackets[1], partitionedPackages[1], headerPackets[2], editlist]
   } catch (e) {
     console.trace('header deconstruction not possible.')
   }
@@ -142,11 +156,6 @@ exports.decrypt_header = async function (headerPackets, seckeys) {
           const uint8FromBlake2b = blake2b.digest()
           const sharedKey = uint8FromBlake2b.subarray(0, 32)
           const encKey = sodium.crypto_aead_chacha20poly1305_ietf_decrypt(null, encryptedUint8, null, nonceUint8, sharedKey)
-          /*
-        const algorithm = 'chacha20-poly1305'
-        const decipher = crypto.createDecipheriv(algorithm, Buffer.from(sharedKey, 'hex'), nonceUint8)
-        const decrypted = decipher.update(encryptedUint8)
-        const plaintext = new Uint8Array(decrypted.slice(0, -16)) */
           if (encKey) {
             decryptedPackets.push(encKey)
           } else {

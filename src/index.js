@@ -4,7 +4,6 @@ const encryption = require('./encryption')
 const decryption = require('./decryption')
 const reeencryption = require('./reeencryption')
 const rearrangment = require('./rearrange')
-const checkFileformat = require('./check_fileformat')
 
 // Decryption
 document.getElementById('input').addEventListener('change', function (e) {

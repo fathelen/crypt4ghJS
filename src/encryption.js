@@ -2,13 +2,33 @@ const helperfunction = require('./helper functions')
 const x25519 = require('@stablelib/x25519')
 const Blake2b = require('@stablelib/blake2b')
 const enc = require('./encryption')
-const crypto = require('crypto')
 const _sodium = require('libsodium-wrappers')
 const Buffer = require('buffer/').Buffer
 
 const PacketTypeDataEnc = new Uint32Array([0])
 const PacketTypeEditList = new Uint32Array([1])
 const magicBytestring = helperfunction.string2byte('crypt4gh')
+
+exports.encryption = async function (headerInfo, text, counter, blocks) {
+  let encText = new Uint8Array()
+  if (blocks && blocks.includes(counter)) {
+    encText = await enc.pureEncryption(text, headerInfo[1])
+    return encText
+  } else if (!blocks) {
+    encText = await enc.pureEncryption(text, headerInfo[1])
+    return encText
+  }
+}
+
+exports.encHead = async function (seckey, pubkey, edit) {
+  let header = new Uint8Array()
+  if (edit) {
+    header = await enc.encHeaderEdit(seckey, pubkey, edit)
+  } else {
+    header = await enc.encHeader(seckey, pubkey)
+  }
+  return header
+}
 
 exports.encHeader = async function (secretkey, publicKeys) {
   let serializedData = []
@@ -19,8 +39,6 @@ exports.encHeader = async function (secretkey, publicKeys) {
       const sodium = _sodium
       const encryptionMethod = new Uint32Array([0])
       sessionKey = sodium.randombytes_buf(32)
-
-      // const sessionKey = Uint8Array.from(crypto.webcrypto.getRandomValues(new Uint8Array(32)))
       const typeArray = []
       const encPacketDataContent = enc.make_packet_data_enc(encryptionMethod, sessionKey)
       typeArray.push(encPacketDataContent)
@@ -37,10 +55,16 @@ exports.encHeader = async function (secretkey, publicKeys) {
 
 exports.encHeaderEdit = async function (secretkey, publicKeys, editlist) {
   try {
+    let serializedData = new Uint8Array()
+    let sessionKey = new Uint8Array()
     // header part
-    const encryptionMethod = new Uint32Array([0])
-    const sessionKey = Uint8Array.from(crypto.webcrypto.getRandomValues(new Uint8Array(32)))
-    const serializedData = await enc.encryption_edit(editlist, encryptionMethod, sessionKey, publicKeys, secretkey)
+    await (async () => {
+      await _sodium.ready
+      const sodium = _sodium
+      const encryptionMethod = new Uint32Array([0])
+      sessionKey = sodium.randombytes_buf(32)
+      serializedData = await enc.encryption_edit(editlist, encryptionMethod, sessionKey, publicKeys, secretkey)
+    })()
     return [serializedData, sessionKey]
   } catch (e) {
     console.trace('Header Encryption not possible.')
@@ -98,7 +122,6 @@ exports.header_encrypt = async function (headerContent, seckey, pubkeys) {
       await _sodium.ready
       const sodium = _sodium
       initVector = sodium.randombytes_buf(12)
-      // const initVector = Uint8Array.from(crypto.webcrypto.getRandomValues(new Uint8Array(12)))
       const k = x25519.generateKeyPairFromSeed(seckey)
       const uint8Data = new Uint8Array(PacketTypeDataEnc.buffer)
       let d = 0
@@ -119,11 +142,6 @@ exports.header_encrypt = async function (headerContent, seckey, pubkeys) {
           const uint8FromBlake2b = blake2b.digest()
           sharedkey = uint8FromBlake2b.subarray(0, 32)
           const decData = sodium.crypto_aead_chacha20poly1305_ietf_encrypt(headerContent[j], null, null, initVector, sharedkey)
-          /*
-        const algorithm = 'chacha20-poly1305'
-        const cipher = crypto.createCipheriv(algorithm, sharedkey, initVector)
-        const encryptedResult = Buffer.concat([cipher.update(headerContent[j]), cipher.final(), cipher.getAuthTag()])
-        const x = new Uint8Array(encryptedResult) */
           tuple.push(decData)
         }
         encryptedHeader.push(tuple)
@@ -207,9 +225,9 @@ exports.encryption_edit = async function (editList, encryptionMethod, sessionKey
       const editPackets = enc.make_packet_edit_lists(editList)
       const encPacketDataContent = enc.make_packet_data_enc(encryptionMethod, sessionKey)
       if (editPackets.length === publicKeys.length) {
-        const headerPackets = enc.header_encrypt_multi_edit(editPackets, encPacketDataContent, secretkey, publicKeys)
+        const headerPackets = await enc.header_encrypt_multi_edit(editPackets, encPacketDataContent, secretkey, publicKeys)
         const serializedData = enc.serialize(headerPackets[0], headerPackets[1], headerPackets[2], headerPackets[3])
-        return [serializedData, 0]
+        return serializedData
       }
     } else {
       const editPacket = enc.make_packet_edit_list(editList)
@@ -217,7 +235,7 @@ exports.encryption_edit = async function (editList, encryptionMethod, sessionKey
       typeArray.push(encPacketDataContent, editPacket)
       const headerPackets = await enc.header_encrypt(typeArray, secretkey, publicKeys)
       const serializedData = enc.serialize(headerPackets[0], headerPackets[1], headerPackets[2], headerPackets[3])
-      return [serializedData, 1]
+      return serializedData
     }
   } catch (e) {
     console.trace('Header including edit package could not be computed.')
@@ -288,39 +306,46 @@ exports.make_packet_edit_lists = function (editList) {
  * @param {*} pubkeys => List of public keys of the persons getting access to the data
  * @returns  List of encryption method, public key of the uploading person, nonce, encrypted headerpackages and sharedkey for decryption
  */
-exports.header_encrypt_multi_edit = function (editLists, encryptionPaket, seckey, pubkeys) {
+exports.header_encrypt_multi_edit = async function (editLists, encryptionPaket, seckey, pubkeys) {
   try {
     let headerContent = []
-    const initVector = crypto.randomBytes(12)
-    const k = x25519.generateKeyPairFromSeed(seckey)
-    let sharedkey
+    let x = new Uint8Array()
+    let initVector = new Uint8Array()
+    let encrMethod = new Uint8Array()
     const encryptedHeader = []
-    const uint8Data = new Uint8Array([0, 0, 0, 0])
-    let encrMethod
-    for (let i = 0; i < pubkeys.length; i++) {
-      headerContent = [encryptionPaket, editLists[i]]
-      const tuple = []
-      for (let j = 0; j < headerContent.length; j++) {
-        if (helperfunction.equal(headerContent[j].subarray(0, 4), uint8Data) === true) {
-          encrMethod = new Uint8Array([headerContent[0][4], headerContent[0][5], headerContent[0][6], headerContent[0][7]])
+    let ke = new Uint8Array()
+    await (async () => {
+      await _sodium.ready
+      const sodium = _sodium
+      initVector = sodium.randombytes_buf(12)
+      const k = x25519.generateKeyPairFromSeed(seckey)
+      let sharedkey
+      const uint8Data = new Uint8Array([0, 0, 0, 0])
+      for (let i = 0; i < pubkeys.length; i++) {
+        headerContent = [encryptionPaket, editLists[i]]
+        const tuple = []
+        for (let j = 0; j < headerContent.length; j++) {
+          if (helperfunction.equal(headerContent[j].subarray(0, 4), uint8Data) === true) {
+            encrMethod = new Uint8Array([headerContent[0][4], headerContent[0][5], headerContent[0][6], headerContent[0][7]])
+          }
+          const dh = x25519.sharedKey(seckey, pubkeys[i])
+          const uint8Blake2b = new Uint8Array(dh.length + k.publicKey.length + pubkeys[i].length)
+          uint8Blake2b.set(dh)
+          uint8Blake2b.set(pubkeys[i], dh.length)
+          uint8Blake2b.set(k.publicKey, dh.length + pubkeys[i].length)
+          const blake2b = new Blake2b.BLAKE2b()
+          blake2b.update(uint8Blake2b)
+          const uint8FromBlake2b = blake2b.digest()
+          sharedkey = uint8FromBlake2b.subarray(0, 32)
+          const decData = sodium.crypto_aead_chacha20poly1305_ietf_encrypt(headerContent[j], null, null, initVector, sharedkey)
+          const decNonce = Buffer.concat([initVector, decData])
+          x = new Uint8Array(decNonce)
+          tuple.push(x)
         }
-        const dh = x25519.sharedKey(seckey, pubkeys[i])
-        const uint8Blake2b = new Uint8Array(dh.length + k.publicKey.length + pubkeys[i].length)
-        uint8Blake2b.set(dh)
-        uint8Blake2b.set(pubkeys[i], dh.length)
-        uint8Blake2b.set(k.publicKey, dh.length + pubkeys[i].length)
-        const blake2b = new Blake2b.BLAKE2b()
-        blake2b.update(uint8Blake2b)
-        const uint8FromBlake2b = blake2b.digest()
-        sharedkey = uint8FromBlake2b.subarray(0, 32)
-        const algorithm = 'chacha20-poly1305'
-        const cipher = crypto.createCipheriv(algorithm, sharedkey, initVector)
-        const encryptedResult = Buffer.concat([initVector, cipher.update(headerContent[j]), cipher.final(), cipher.getAuthTag()])
-        tuple.push(encryptedResult)
+        encryptedHeader.push(tuple)
       }
-      encryptedHeader.push(tuple)
-    }
-    const ke = k.publicKey
+      ke = k.publicKey
+    })()
     return [encrMethod, ke, initVector, encryptedHeader]
   } catch (e) {
     console.trace('Header for encryption with mulitple edit lists could not be computed.')

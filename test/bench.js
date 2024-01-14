@@ -3,43 +3,57 @@
 /* eslint no-undef: */
 const index = require('crypt4gh_js')
 const fs = require('fs')
-// const { Transform } = require('stream')
-// const { pipeline } = require('stream')
 
 const ts = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAEbm9uZQAEbm9uZQAgrpd+v2ZGymbextTp5nMt298h1yEFBigB+bS+1WJT/lM=\n-----END CRYPT4GH PRIVATE KEY-----\n'
 const tp = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nfQCgFp/dPaDOELnzrgEEQUeOmOlMj9M/dTP7bIiuxyw=\n-----END CRYPT4GH PUBLIC KEY-----\n'
 const pubkeyPass = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nvHrVpBpFLpX/OquK2Ze4Mfzb8aVrn05XmTgT4ymVwzE=\n-----END CRYPT4GH PUBLIC KEY-----\n'
 const seckeyPass = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAGc2NyeXB0ABQAAAAAMHZyZm0wb3JrM2E5d2QyeQARY2hhY2hhMjBfcG9seTEzMDUAPHUyY2lhbDQ1dWZydxzqFWikrPHQc6dKqWySS59BoMAe1L0FRmBXnwPd80N4fJBJS5f+vnmlA+JZ8qCpow==\n-----END CRYPT4GH PRIVATE KEY-----\n'
 
-/*
-async function encryption (input, output) {
+async function encryption (input, output, edit, blocks) {
   const keys = await index.keyfiles.encryption_keyfiles([ts, tp])
-  edit = null
-  block = null
-  const header = await index.encryption.encHeader(keys[0], [keys[1]], block, edit)
-  fs.writeFile(output, header[0], (err) => {
-    if (err) {
-      console.log(err)
-    }
-  })
-  if (header[1]) {
+  const header = await index.encryption.encHead(keys[0], [keys[1]], edit)
+    fs.writeFile(output, header[0], (err) => {
+      if (err) {
+        console.log(err)
+      }
+    })
+   if (header[1]) {
+    let counter = 0
       const readStream = fs.createReadStream(input)
         readStream
           .on('data', async function (d) {
-            const val = await index.encryption.pureEncryption(d, header[1])
-            fs.appendFile(output, val, (err) => {
-              if (err) {
-                console.log(err)
-              }
-            })
+            counter++
+            const text = await index.encryption.encryption(header, d, counter, blocks)
+            if (text) {
+              fs.appendFile(output, text, (err) => {
+                if (err) {
+                  console.log(err)
+                }
+              })
+            }
+            /*
+            if (blocks && blocks.includes(counter)) {
+              const val = await index.encryption.pureEncryption(d, header[1])
+              fs.appendFile(output, val, (err) => {
+                if (err) {
+                  console.log(err)
+                }
+              })
+            } else if (!blocks) {
+              const val = await index.encryption.pureEncryption(d, header[1])
+              fs.appendFile(output, val, (err) => {
+                if (err) {
+                  console.log(err)
+                }
+              })
+            } */
           })
   }
 }
 
-encryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.txt', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.c4gh')
-*/
-/*
-async function decryption (input, output) {
+// encryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.txt', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_edit.c4gh', [0, 5])
+
+async function decryption (input, output, wantedblocks) {
   const keys = await index.keyfiles.encryption_keyfiles([ts])
   const readStream = fs.createReadStream(input, { end: 1000 })
   readStream
@@ -49,30 +63,35 @@ async function decryption (input, output) {
           console.log(err)
         }
       })
+      let counter = 0
       const val = await index.decryption.header_deconstruction(Uint8Array.from(d), keys[0])
       const readStream2 = fs.createReadStream(input, { start: val[4], highWaterMark: 65564 })
       readStream2
         .on('data', async function (d2) {
-          const plaintext = await index.decryption.pureDecryption(Uint8Array.from(d2), val[0])
-          fs.appendFile(output, plaintext, (err) => {
-            if (err) {
-              console.log(err)
-            }
-          })
+          counter++
+          const text = await index.decryption.decrypption(val, d2, counter, wantedblocks)
+          if (text) {
+            fs.appendFile(output, text, (err) => {
+              if (err) {
+                console.log(err)
+              }
+            })
+          }
         })
+
       readStream.destroy()
     })
 }
 
-decryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/Re_abcd.txt')
+decryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_block.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/Re_abcd_block.txt')
 
 async function generateKeys (password) {
    const keys = await index.keygen.keygen(password)
    console.log(keys)
 }
 
-generateKeys('abd') */
-/*
+// generateKeys('abd')
+
 // Reencryption
 async function reencryption (input, output) {
   const keys = await index.keyfiles.encryption_keyfiles([ts, tp])
@@ -98,7 +117,7 @@ async function reencryption (input, output) {
     })
 }
 
-reencryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_reenc.c4gh') */
+// reencryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_reenc.c4gh')
 
 // Rearrangement
 async function rearrangement (input, output) {
@@ -126,4 +145,4 @@ async function rearrangement (input, output) {
     })
 }
 
-rearrangement('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_rearr.c4gh')
+// rearrangement('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_rearr.c4gh')
