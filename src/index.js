@@ -26,6 +26,7 @@ document.getElementById('input').addEventListener('change', function (e) {
       counter++
       const chunkfile = await file2.slice(offset, offset + chunksize)
       const chunk = await chunkfile.arrayBuffer()
+      console.log(block, '   ', blocks)
       const plaintext = await decryption.decrypption(header, new Uint8Array(chunk), counter, block)
       console.log(plaintext)
       const decoder = new TextDecoder()
