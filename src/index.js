@@ -16,8 +16,10 @@ document.getElementById('input').addEventListener('change', function (e) {
     const seckeyFile = await file.text()
     if (blocks === '') {
       block = null
-    } else {
+    } else if (blocks.includes(',')) {
       block = blocks.split(',')
+    } else {
+      block = blocks
     }
     const fileContents = document.getElementById('filecontents')
     const keys = await keyfiles.encryption_keyfiles([seckeyFile], password)
@@ -31,9 +33,7 @@ document.getElementById('input').addEventListener('change', function (e) {
       counter++
       const chunkfile = await file2.slice(offset, offset + chunksize)
       const chunk = await chunkfile.arrayBuffer()
-      console.log(block, '   ', blocks)
       const plaintext = await decryption.decrypption(header, new Uint8Array(chunk), counter, block)
-      console.log(plaintext)
       const decoder = new TextDecoder()
       if (plaintext) {
         fileContents.innerText += decoder.decode(plaintext)
@@ -48,7 +48,6 @@ document.getElementById('input').addEventListener('change', function (e) {
 const button = document.getElementById('submit')
 button.addEventListener('click', async function (event) {
   const password = await document.getElementById('psw2').value
-  console.log(password)
   const result = await keygen.keygen(password)
   const erg = result
   const pubkey = document.getElementById('pubkeyfile')

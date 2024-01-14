@@ -12,18 +12,15 @@ const magicBytestring = helperfunction.string2byte('crypt4gh')
 
 exports.decrypption = async function (headerInfo, text, counter, wantedblocks) {
   if (headerInfo[5][0] && Array.from(headerInfo[5][0].keys()).includes(counter)) {
-    console.log('1')
     const plaintext = await dec.pureDecryption(Uint8Array.from(text), headerInfo[0])
     const aplliedEdit = dec.applyEditlist(headerInfo[5][0].get(counter), plaintext)
     return aplliedEdit
   } else if (wantedblocks && !headerInfo[5][0]) {
-    console.log('2')
     if (wantedblocks.includes(counter)) {
       const plaintext = await dec.pureDecryption(Uint8Array.from(text), headerInfo[0])
       return plaintext
     }
   } else if (!wantedblocks && !headerInfo[5][0]) {
-    console.log('3')
     const plaintext = await dec.pureDecryption(Uint8Array.from(text), headerInfo[0])
     return plaintext
   }
