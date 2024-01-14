@@ -22,8 +22,6 @@ document.getElementById('input').addEventListener('change', function (e) {
       for (let i = 0; i < b.length; i++) {
         block.push(Number(b[i]))
       }
-
-      console.log(block)
     } else {
       block = blocks
     }
@@ -74,7 +72,18 @@ document.getElementById('input2').addEventListener('change', function (e) {
   (async () => {
     const pubkeyFile = await file.text()
     const seckeyFile = await file3.text()
-    const block = blocks.split(',')
+    let block = null | []
+    if (blocks === '') {
+      block = null
+    } else if (blocks.includes(',')) {
+      block = []
+      const b = blocks.split(',')
+      for (let i = 0; i < b.length; i++) {
+        block.push(Number(b[i]))
+      }
+    } else {
+      block = blocks
+    }
     let editlist = []
     if (edit.includes(';')) {
       const step = edit.split(';')
@@ -86,16 +95,21 @@ document.getElementById('input2').addEventListener('change', function (e) {
     }
     const fileContents = document.getElementById('encfile')
     const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile], password)
-    const header = await encryption.encHeader(keys[0], [keys[1]], block, editlist)
+    const header = await encryption.encHead(keys[0], [keys[1]], editlist)
     fileContents.innerText += header[0]
     const chunksize = 65536
+    let counter = 0
     let offset = 0
     while (offset < file4.size) {
+      counter++
       const chunkfile = await file4.slice(offset, offset + chunksize)
       const chunk = await chunkfile.arrayBuffer()
-      const encryptedtext = await encryption.pureEncryption(new Uint8Array(chunk), header[1])
+      const encryptedtext = await encryption.encryption(header, new Uint8Array(chunk), counter, block)
       const encoder = new TextEncoder()
-      fileContents.innerText += encoder.encode(encryptedtext)
+      if (encryptedtext) {
+        fileContents.innerText += encoder.encode(encryptedtext)
+      }
+
       offset += chunksize
     }
     console.log('all done')
