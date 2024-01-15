@@ -63,6 +63,7 @@ button.addEventListener('click', async function (event) {
 // Encryption
 document.getElementById('input2').addEventListener('change', function (e) {
   const file = document.getElementById('input2').files[0]
+  const file2 = document.getElementById('input2').files[3]
   const file3 = document.getElementById('input2').files[1]
   const file4 = document.getElementById('input2').files[2]
   const password = document.getElementById('psw3').value
@@ -71,6 +72,7 @@ document.getElementById('input2').addEventListener('change', function (e) {
 
   (async () => {
     const pubkeyFile = await file.text()
+    const pubkeyFile2 = await file2.text()
     const seckeyFile = await file3.text()
     let block = null | []
     if (blocks === '') {
@@ -94,8 +96,8 @@ document.getElementById('input2').addEventListener('change', function (e) {
       editlist = edit.split(',')
     }
     const fileContents = document.getElementById('encfile')
-    const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile], password)
-    const header = await encryption.encHead(keys[0], [keys[1]], editlist)
+    const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile, pubkeyFile2], password)
+    const header = await encryption.encHead(keys[0], [keys[1], keys[2]], editlist)
     fileContents.innerText += header[0]
     const chunksize = 65536
     let counter = 0
