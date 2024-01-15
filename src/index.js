@@ -97,6 +97,7 @@ document.getElementById('input2').addEventListener('change', function (e) {
     }
     const fileContents = document.getElementById('encfile')
     const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile, pubkeyFile2], password)
+    console.log(keys)
     const header = await encryption.encHead(keys[0], [keys[1], keys[2]], editlist)
     fileContents.innerText += header[0]
     const chunksize = 65536
