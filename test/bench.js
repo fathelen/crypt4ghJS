@@ -10,8 +10,8 @@ const pubkeyPass = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nvHrVpBpFLpX/OquK2Ze4Mfz
 const seckeyPass = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAGc2NyeXB0ABQAAAAAMHZyZm0wb3JrM2E5d2QyeQARY2hhY2hhMjBfcG9seTEzMDUAPHUyY2lhbDQ1dWZydxzqFWikrPHQc6dKqWySS59BoMAe1L0FRmBXnwPd80N4fJBJS5f+vnmlA+JZ8qCpow==\n-----END CRYPT4GH PRIVATE KEY-----\n'
 
 async function encryption (input, output, edit, blocks) {
-  const keys = await index.keyfiles.encryption_keyfiles([ts, tp])
-  const header = await index.encryption.encHead(keys[0], [keys[1]], edit)
+  const keys = await index.keyfiles.encryption_keyfiles([ts, tp, pubkeyPass])
+  const header = await index.encryption.encHead(keys[0], [keys[1], keys[2]], edit)
     fs.writeFile(output, header[0], (err) => {
       if (err) {
         console.log(err)
@@ -31,27 +31,11 @@ async function encryption (input, output, edit, blocks) {
                 }
               })
             }
-            /*
-            if (blocks && blocks.includes(counter)) {
-              const val = await index.encryption.pureEncryption(d, header[1])
-              fs.appendFile(output, val, (err) => {
-                if (err) {
-                  console.log(err)
-                }
-              })
-            } else if (!blocks) {
-              const val = await index.encryption.pureEncryption(d, header[1])
-              fs.appendFile(output, val, (err) => {
-                if (err) {
-                  console.log(err)
-                }
-              })
-            } */
           })
   }
 }
 
-// encryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.txt', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_edit.c4gh', [0, 5])
+encryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.txt', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_multi_singleedit.c4gh', [0, 5])
 
 async function decryption (input, output, wantedblocks) {
   const keys = await index.keyfiles.encryption_keyfiles([ts])
@@ -83,11 +67,10 @@ async function decryption (input, output, wantedblocks) {
     })
 }
 
-decryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_block.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/Re_abcd_block.txt')
+// decryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_edit.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/Re_abcd_edit.txt')
 
 async function generateKeys (password) {
    const keys = await index.keygen.keygen(password)
-   console.log(keys)
 }
 
 // generateKeys('abd')
