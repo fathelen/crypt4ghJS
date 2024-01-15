@@ -35,7 +35,7 @@ async function encryption (input, output, edit, blocks) {
   }
 }
 
-encryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.txt', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_multi_singleedit.c4gh', [0, 5])
+// encryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.txt', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_multi_multiedit.c4gh', [[0, 2], [0, 3]])
 
 async function decryption (input, output, wantedblocks) {
   const keys = await index.keyfiles.encryption_keyfiles([ts])
@@ -67,7 +67,7 @@ async function decryption (input, output, wantedblocks) {
     })
 }
 
-// decryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_edit.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/Re_abcd_edit.txt')
+decryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_multi_multiedit.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/Re_abcd_multi_multiedit.txt')
 
 async function generateKeys (password) {
    const keys = await index.keygen.keygen(password)

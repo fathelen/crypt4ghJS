@@ -1,4 +1,3 @@
-/* eslint-disable no-labels */
 const helperfunction = require('./helper functions')
 const x25519 = require('@stablelib/x25519')
 const Blake2b = require('@stablelib/blake2b')
@@ -53,9 +52,7 @@ exports.header_deconstruction = async function (header, seckeys) {
   try {
     let editlist = new Uint8Array()
     const headerPackets = dec.parse(header)
-    // console.log(headerPackets)
     const decryptedPackets = await dec.decrypt_header(headerPackets[0], seckeys)
-    // console.log(decryptedPackets)
     const partitionedPackages = partitionPackets(decryptedPackets[0])
     const sessionKey = parseEncPacket(partitionedPackages[0][0])
     if (partitionedPackages[1].length > 0) {
@@ -143,7 +140,6 @@ exports.decrypt_header = async function (headerPackets, seckeys) {
     await (async () => {
       await _sodium.ready
       const sodium = _sodium
-      loop:
       for (let i = 0; i < headerPackets.length; i++) {
         const wKeyUint8 = new Uint8Array(headerPackets[i].slice(8, 40))
         nonceUint8 = new Uint8Array(headerPackets[i].slice(40, 52))
@@ -162,7 +158,6 @@ exports.decrypt_header = async function (headerPackets, seckeys) {
           try {
             const encKey = sodium.crypto_aead_chacha20poly1305_ietf_decrypt(null, encryptedUint8, null, nonceUint8, sharedKey)
             decryptedPackets.push(encKey)
-            break loop
           } catch {
             undecryptablePackets.push(headerPackets[i])
           }

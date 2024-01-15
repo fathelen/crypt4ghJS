@@ -166,3 +166,5 @@ testData/Re_abcd_multi_singleedit.txt
 testData/abcd_multi.c4gh
 testData/abcd_multi_singleedit.c4gh
 testData/abcd_edit_multi.c4gh
+testData/Re_abcd_multi_multiedit.txt
+testData/abcd_multi_multiedit.c4gh

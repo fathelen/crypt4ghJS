@@ -338,8 +338,8 @@ exports.header_encrypt_multi_edit = async function (editLists, encryptionPaket, 
           const uint8FromBlake2b = blake2b.digest()
           sharedkey = uint8FromBlake2b.subarray(0, 32)
           const decData = sodium.crypto_aead_chacha20poly1305_ietf_encrypt(headerContent[j], null, null, initVector, sharedkey)
-          const decNonce = Buffer.concat([initVector, decData])
-          x = new Uint8Array(decNonce)
+          // const decNonce = Buffer.concat([initVector, decData])
+          x = new Uint8Array(decData)
           tuple.push(x)
         }
         encryptedHeader.push(tuple)
