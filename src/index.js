@@ -95,7 +95,7 @@ document.getElementById('input2').addEventListener('change', function (e) {
     } else {
       editlist = edit.split(',')
       for (let i = 0; i < editlist.length; i++) {
-        block.push(Number(editlist[i]))
+        editlist.push(Number(editlist[i]))
       }
     }
     console.log(editlist)
