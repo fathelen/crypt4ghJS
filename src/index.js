@@ -87,29 +87,28 @@ document.getElementById('input2').addEventListener('change', function (e) {
       block = blocks
     }
     let editlist = []
+    let ed = []
     if (edit.includes(';')) {
       const step = edit.split(';')
       for (let i = 0; i < step.length; i++) {
-        console.log(step[i].split(','))
-        /*
-        console.log(Number(step[i].split(',')))
-        editlist.push(Number(step[i].split(','))) */
+        editlist = step[i].split(',')
+        for (let i = 0; i < editlist.length; i++) {
+          ed.push(Number(editlist[i]))
+        }
       }
     } else if (edit === '') {
-      editlist = null
+      ed = null
     } else {
       editlist = edit.split(',')
       console.log(editlist)
-      /*
-      for (let i = 0; i < edit.length; i++) {
-        console.log(edit[i])
-        editlist.push(Number(editlist[i]))
-      } */
+      for (let i = 0; i < editlist.length; i++) {
+        ed.push(Number(editlist[i]))
+      }
     }
-    console.log(editlist)
+    console.log(ed)
     const fileContents = document.getElementById('encfile')
     const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile, pubkeyFile2], password)
-    const header = await encryption.encHead(keys[0], [keys[1], keys[2]], editlist)
+    const header = await encryption.encHead(keys[0], [keys[1], keys[2]], ed)
     fileContents.innerText += header[0]
     const chunksize = 65536
     let counter = 0
