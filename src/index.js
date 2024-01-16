@@ -91,15 +91,20 @@ document.getElementById('input2').addEventListener('change', function (e) {
       const step = edit.split(';')
       for (let i = 0; i < step.length; i++) {
         console.log(step[i].split(','))
+        /*
         console.log(Number(step[i].split(',')))
-        editlist.push(Number(step[i].split(',')))
+        editlist.push(Number(step[i].split(','))) */
       }
+    } else if (edit === '') {
+      editlist = null
     } else {
       editlist = edit.split(',')
-      for (let i = 0; i < editlist.length; i++) {
-        console.log(editlist[i])
+      console.log(editlist)
+      /*
+      for (let i = 0; i < edit.length; i++) {
+        console.log(edit[i])
         editlist.push(Number(editlist[i]))
-      }
+      } */
     }
     console.log(editlist)
     const fileContents = document.getElementById('encfile')
