@@ -109,7 +109,6 @@ document.getElementById('input2').addEventListener('change', function (e) {
         ed.push(Number(editlist[i]))
       }
     }
-    console.log(ed)
     const fileContents = document.getElementById('encfile')
     const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile, pubkeyFile2], password)
     const header = await encryption.encHead(keys[0], [keys[1], keys[2]], ed)
@@ -168,15 +167,28 @@ document.getElementById('input4').addEventListener('change', function (e) {
   const password = document.getElementById('psw5').value
   const edit = document.getElementById('block4').value
   let editlist = []
+  let ed = []
   if (edit.includes(';')) {
     const step = edit.split(';')
     for (let i = 0; i < step.length; i++) {
-      editlist.push(step[i].split(','))
+      editlist = step[i].split(',')
+      for (let j = 0; j < editlist.length; j++) {
+        if (j === 0) {
+          ed.push([Number(editlist[j])])
+        } else {
+          ed[i].push(Number(editlist[j]))
+        }
+      }
     }
+  } else if (edit === '') {
+    ed = null
   } else {
     editlist = edit.split(',')
+    console.log(editlist)
+    for (let i = 0; i < editlist.length; i++) {
+      ed.push(Number(editlist[i]))
+    }
   }
-
   (async () => {
     const pubkeyFile = await file2.text()
     const seckeyFile = await file.text()
@@ -184,7 +196,7 @@ document.getElementById('input4').addEventListener('change', function (e) {
     const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile], password)
     const headerChunk = await file3.slice(0, 1000)
     const chunkHeader = await headerChunk.arrayBuffer()
-    const rearrangeHeader = await rearrangment.streamRearrange(new Uint8Array(chunkHeader), keys[0], [keys[1]], editlist)
+    const rearrangeHeader = await rearrangment.streamRearrange(new Uint8Array(chunkHeader), keys[0], [keys[1]], ed)
     fileContents.innerText += rearrangeHeader
     const chunksize = 65564
     let offset = rearrangeHeader[1]

@@ -67,7 +67,7 @@ async function decryption (input, output, wantedblocks) {
     })
 }
 
-decryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_multi_multiedit.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/Re_abcd_multi_multiedit.txt')
+decryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_rearr_multiedit.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/Re_abcd_rearredit_multi1.txt')
 
 async function generateKeys (password) {
    const keys = await index.keygen.keygen(password)
@@ -100,16 +100,16 @@ async function reencryption (input, output) {
     })
 }
 
-// reencryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_reenc.c4gh')
+// reencryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_multi_multiedit.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_reenc_edit.c4gh')
 
 // Rearrangement
 async function rearrangement (input, output) {
-  const keys = await index.keyfiles.encryption_keyfiles([ts, tp])
-  const editlist = [0, 5]
+  const keys = await index.keyfiles.encryption_keyfiles([ts, tp, pubkeyPass])
+  const editlist = [[0, 1], [0, 2]]
   const readStream = fs.createReadStream(input, { end: 1000 })
   readStream
     .on('data', async function (d) {
-      const rearrangeHeader = await index.rearrangment.streamRearrange(Uint8Array.from(d), keys[0], [keys[1]], editlist)
+      const rearrangeHeader = await index.rearrangment.streamRearrange(Uint8Array.from(d), keys[0], [keys[1], keys[2]], editlist)
       fs.writeFile(output, rearrangeHeader[0], (err) => {
         if (err) {
           console.log(err)
@@ -128,4 +128,4 @@ async function rearrangement (input, output) {
     })
 }
 
-// rearrangement('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_rearr.c4gh')
+// rearrangement('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_multi_multiedit.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_rearr_multiedit.c4gh')

@@ -211,7 +211,7 @@ async function rearrHeaderMultiEdits (editlist, big64Oldedit, inputlänge, b, ou
   }
   if (!outOfRange.includes(1)) {
     const s = await enc.encryption_edit(editlist, encryptionMethod, key, pubkeys, seckey)
-    return s
+    return [s]
   }
 }
 
@@ -244,7 +244,7 @@ async function rearrHeaderEdit (big64Oldedit, inputlänge, b, editlist, decPacke
     }
     if (unallowedEdit === 0) {
       const newEditPacket = enc.make_packet_edit_list(editlist)
-      const encr = enc.header_encrypt([decPackets[0], newEditPacket], seckey, pubkeys)
+      const encr = await enc.header_encrypt([decPackets[0], newEditPacket], seckey, pubkeys)
       const serializedData = enc.serialize(encr[0], encr[1], encr[2], encr[3])
       return [serializedData, 1]
     }
