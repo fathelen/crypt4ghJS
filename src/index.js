@@ -90,10 +90,13 @@ document.getElementById('input2').addEventListener('change', function (e) {
     if (edit.includes(';')) {
       const step = edit.split(';')
       for (let i = 0; i < step.length; i++) {
-        editlist.push(step[i].split(','))
+        editlist.push(Number(step[i].split(',')))
       }
     } else {
       editlist = edit.split(',')
+      for (let i = 0; i < editlist.length; i++) {
+        block.push(Number(editlist[i]))
+      }
     }
     console.log(editlist)
     const fileContents = document.getElementById('encfile')
