@@ -94,9 +94,9 @@ document.getElementById('input2').addEventListener('change', function (e) {
         editlist = step[i].split(',')
         for (let j = 0; j < editlist.length; j++) {
           if (j === 0) {
-            ed.push([Number(editlist[i])])
+            ed.push([Number(editlist[j])])
           } else {
-            ed[i].push(Number(editlist[i]))
+            ed[i].push(Number(editlist[j]))
           }
         }
       }
