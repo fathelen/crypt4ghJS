@@ -92,8 +92,12 @@ document.getElementById('input2').addEventListener('change', function (e) {
       const step = edit.split(';')
       for (let i = 0; i < step.length; i++) {
         editlist = step[i].split(',')
-        for (let i = 0; i < editlist.length; i++) {
-          ed.push(Number(editlist[i]))
+        for (let j = 0; j < editlist.length; j++) {
+          if (j === 0) {
+            ed.push([Number(editlist[i])])
+          } else {
+            ed[i].push(Number(editlist[i]))
+          }
         }
       }
     } else if (edit === '') {
