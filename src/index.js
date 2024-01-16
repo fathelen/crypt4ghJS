@@ -90,11 +90,14 @@ document.getElementById('input2').addEventListener('change', function (e) {
     if (edit.includes(';')) {
       const step = edit.split(';')
       for (let i = 0; i < step.length; i++) {
+        console.log(step[i].split(','))
+        console.log(Number(step[i].split(',')))
         editlist.push(Number(step[i].split(',')))
       }
     } else {
       editlist = edit.split(',')
       for (let i = 0; i < editlist.length; i++) {
+        console.log(editlist[i])
         editlist.push(Number(editlist[i]))
       }
     }
