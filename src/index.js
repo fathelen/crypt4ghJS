@@ -32,6 +32,44 @@ button.addEventListener('click', async function (event) {
   console.log(result)
 })
 
+// Encryption
+document.getElementById('input2').addEventListener('change', function (e) {
+  const file = document.getElementById('input')
+  const file2 = document.getElementById('input2')
+  const file3 = document.getElementById('input3')
+  const password = document.getElementById('psw2').value
+  const blocks = document.getElementById('block2').value
+  const edit = document.getElementById('editlist').value
+  const ed = null;
+
+  (async () => {
+    const pubkeyFile = await file.text()
+    const pubkeyFile2 = await file2.text()
+    const seckeyFile = await file3.text()
+    const block = null
+    const fileContents = document.getElementById('encfile')
+    const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile, pubkeyFile2], password)
+    const header = await encryption.encHead(keys[0], [keys[1], keys[2]], ed)
+    fileContents.innerText += header[0]
+    const chunksize = 65536
+    let counter = 0
+    let offset = 0
+    while (offset < file3.size) {
+      counter++
+      const chunkfile = await file3.slice(offset, offset + chunksize)
+      const chunk = await chunkfile.arrayBuffer()
+      const encryptedtext = await encryption.encryption(header, new Uint8Array(chunk), counter, block)
+      const encoder = new TextEncoder()
+      if (encryptedtext) {
+        fileContents.innerText += encoder.encode(encryptedtext)
+      }
+
+      offset += chunksize
+    }
+    console.log('all done')
+  })()
+})
+
 /*
 // Decryption
 document.getElementById('input').addEventListener('change', function (e) {
