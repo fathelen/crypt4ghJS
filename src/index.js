@@ -50,7 +50,8 @@ document.getElementById('submit2').addEventListener('change', function (e) {
     const fileContents = document.getElementById('encfile')
     const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile, pubkeyFile2], password)
     const header = await encryption.encHead(keys[0], [keys[1], keys[2]], ed)
-    fileContents.innerText += header[0]
+    console.log(header[0])
+    // fileContents.innerText += header[0]
     const chunksize = 65536
     let counter = 0
     let offset = 0
@@ -61,7 +62,8 @@ document.getElementById('submit2').addEventListener('change', function (e) {
       const encryptedtext = await encryption.encryption(header, new Uint8Array(chunk), counter, block)
       const encoder = new TextEncoder()
       if (encryptedtext) {
-        fileContents.innerText += encoder.encode(encryptedtext)
+        console.log(encoder.encode(encryptedtext))
+        // fileContents.innerText += encoder.encode(encryptedtext)
       }
 
       offset += chunksize
