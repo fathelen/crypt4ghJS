@@ -1,127 +1,145 @@
 <!DOCTYPE html>
 <html>
-<style > 
-    #filecontents {
-        border: double;
-        overflow-y: scroll;
-        height: 400px;
-    }
-    #seckeyfile {
-        border: double;
-        overflow-y: scroll;
-        height: 400px;
-    }
-    #pubkeyfile {
-        border: double;
-        overflow-y: scroll;
-        height: 400px;
-    }
-    #encfile {
-        border: double;
-        overflow-y: scroll;
-        height: 400px;
-    }
-    #reencryption {
-        border: double;
-        overflow-y: scroll;
-        height: 400px;
-    }
-    #rearrange {
-        border: double;
-        overflow-y: scroll;
-        height: 400px;
-    }
-  
-</style>
-<head>
-  <meta charset="utf-8" />
-  <title>Crypt4GH-JS</title>
-</head>
-<body>
-  <div>Decryption </div>
-  <label for="psw">Password (optional)</label>
-  <input type="password" id="psw" name="psw" required>
-  <br />
-  <br />
-  <label for="block">Blocks (optional)</label>
-  <input type="text" id="block" />
-  <br />
-  <br />
-  <input type="file" id="input" multiple />
-  <div>File Content</div>
-  <div id="filecontents"></div>
-  <br />
-  <br />
-  <div>Key Generation</div>
-  <br />
-  <br />
-  <label for="psw2">Password (optional)</label>
-  <input type="password" id="psw2" name="psw2" required>
-    <input type="submit" value="Submit" id="submit">
-  <br />
-  <br />
-  <div>Seckey File Content</div>
-  <div id="seckeyfile"></div>
-  <br />
-  <br />
-  <div>Pubkey File Content</div>
-  <div id="pubkeyfile"></div>
-  <br />
-  <br />
-  <div>Encryption</div>
-  <br />
-  <br />
-  <label for="psw3">Password (optional)</label>
-  <input type="password" id="psw3" name="psw3" required>
-  <br />
-  <br />
-  <label for="block2">Blocks (optional)</label>
-  <input type="text" id="block2" />
-  <br />
-  <br />
-  <label for="block3">Editlist (optional)</label>
-  <input type="text" id="block3" />
-  <br />
-  <br />
-  <input type="file" id="input2" multiple />
-  <br />
-  <br />
-  <div>Encrypted File Content</div>
-  <div id="encfile"></div>
-  <br />
-  <br />
-  <div>Reeencryption</div>
-  <br />
-  <br />
-  <label for="psw4">Password (optional)</label>
-  <input type="password" id="psw4" name="psw4" required>
-  <br />
-  <br />
-  <input type="file" id="input3" multiple />
-  <br />
-  <br />
-  <div>Reeencrypted File Content</div>
-  <div id="reencryption"></div>
-  <br />
-  <br />
-  <div>Rearrangement</div>
-  <br />
-  <br />
-  <label for="psw5">Password (optional)</label>
-  <input type="password" id="psw5" name="psw5" required>
-  <br />
-  <br />
-  <label for="block4">Editlist (optional)</label>
-  <input type="text" id="block4" />
-  <br />
-  <br />
-  <input type="file" id="input4" multiple />
-  <br />
-  <br />
-  <div>Rearranged File Content</div>
-  <div id="rearrange"></div>
-  <br />
-  <br />
-  <script src="./dist/main.js"> </script>
-</body>
+    <style > 
+        .header {
+            padding: 60px;
+            text-align: center;
+            background: #13056a;
+            color: white;
+            font-size: 30px;
+        }
+        .accordion {
+            background-color: #eee;
+            color: #444;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 25px;
+            transition: 0.4s;
+        }
+
+        .active, .accordion:hover {
+            background-color: #ccc; 
+        }
+
+        .panel {
+            padding: 0 18px;
+            display: none;
+            background-color: white;
+            overflow: hidden;
+        }
+        .tut {
+            padding: 60px;
+            background: #aca8c3;
+            color: black;
+        }
+      
+    </style>
+    <head>
+        <meta charset="utf-8" />
+        <title>Crypt4GH-JS Demo Website</title>
+      </head>
+      <body>
+        <div class="header">
+            <h1 style="font-family:Garamond">Crypt4GH-JS Demo Website</h1>
+          </div> 
+          <h2 style="font-family:Garamond" >This website was created to demonstrate the use of Crypt4GH-JS.</h2>
+          <h2 style="font-family:Garamond">The following three step tutorial shows you: How to create a keypair, how to encrypt your data and how to decrypt your encrypted data.</h2>
+          <button class="accordion">1. Step: create your key pair</button>
+        <div class="panel">
+            <div class='tut'> 
+                <p style="font-family:Garamond"> Keypair generation:  </p>
+                <p style="font-family:Garamond"> 1: Step (optional): to create a keypair a password can be chosen. </p>
+                <ul>
+                <li>If a password is chosen the secret key is encrypted. The password is needed for encryption and decryption. </li>
+                <li>If no password is chosen, the secret key is not encrypted. No password is needed for encryption and decryption.</li>
+                </ul>
+            <p style="font-family:Garamond"> 2: Step: After clicking the submit button the secret and public key-files can be downloaded. </p>
+            </div>
+            
+            <br />
+            <br />
+            <label for="psw">Password (optional)</label>
+            <input type="password" id="psw" name="psw" required> 
+            <input type="submit" value="Submit" id="submit">
+            <br />
+            <br />
+            <button class="btn"><i class="fa fa-download"></i> Download secret key</button>
+            <button class="btn"><i class="fa fa-download"></i> Download public key</button>
+            <br />
+            <br />
+        </div>
+        <button class="accordion">2. Step: encrypt your data</button>
+        <div class="panel">
+            <div class='tut'> 
+                <p style="font-family:Garamond"> For data encryption: </p>
+                <p style="font-family:Garamond"> 1. Step: upload the secret and public key file. </p>
+                <p style="font-family:Garamond"> 2. Step: upload the file, that is going to be encrypted.</p>
+                <p style="font-family:Garamond"> 3. Step (optional):, enter blocks or  editlist (parameters to decide which parts of the file can be decrypted). </p>
+                <ul>
+                    <li>Blocks: 64kb blocks of the original file. If added a single number for example '1', the first 64kb of the original file can be decrypted. If added a list for example '1,5', the first 64kb and the fifth 64kb of the original file can be decrypted. </li>
+                    <li>Editlist: a list containing bytes that will be skipped or decrypted. Example: '0,500,300,200' means: skip the first zero bytes, encrypt the next 500 bytes, then skip 300 bytes and encrypt the next 200 bytes.</li>
+                  </ul>
+                <p style="font-family:Garamond"> 4. Step (optional): enter password, if a password was used to generate the key files. </p>
+                <p style="font-family:Garamond"> 5. Step: After clicking the submit button the encrypted c4gh-file can be downloaded.</p>
+            </div>
+           
+            <br />
+            <br />
+            <label for="input"> Choose your secret keyfile: </label>
+            <input type="file" id="input" />
+            <br />
+            <br />
+            <label for="input2"> Choose your public keyfile: </label>
+            <input type="file" id="input2" />
+            <br />
+            <br />
+            <label for="input3"> Choose zur data file: </label>
+            <input type="file" id="input3" />
+            <br />
+            <br />
+            <label for="block">Blocks (optional)</label>
+            <input type="text" id="block" />
+            <label for="editlist"> OR!    Editlist (optional)</label>
+            <input type="text" id="editlist" />
+            <br />
+            <br />
+            <label for="psw2">Password (optional)</label>
+            <input type="password" id="psw2" name="psw2" required>
+            <input type="submit" value="Submit" id="submit2">
+            <br />
+            <br />
+        </div>
+        <button class="accordion">3. Step: decrypt your data </button>
+        <div class="panel">
+            <div class='tut'> 
+                <p style="font-family:Garamond"> For data decryption: </p>
+                <p style="font-family:Garamond"> 1. Step: upload the secret key file. </p>
+                <p style="font-family:Garamond"> 2. Step: choose the c4gh file for decryption </p>
+                <p style="font-family:Garamond"> 3. Step (optional): enter password, if a password was used to generate the key files. </p>
+                <p style="font-family:Garamond"> 4. Step: After clicking the submit button the decrypted file can be downloaded. </p>
+            </div>
+            <br />
+            <br />
+            <label for="input4"> Choose your secret keyfile: </label>
+            <input type="file" id="input4" />
+            <br />
+            <br />
+            <label for="input6"> Choose zur c4gh file: </label>
+            <input type="file" id="input6" />
+            <br />
+            <br />
+            <label for="psw3">Password (optional)</label>
+            <input type="password" id="psw" name="psw3" required>
+            <input type="submit" value="Submit" id="submit3">
+            <br />
+            <br />
+            <button class="btn"><i class="fa fa-download"></i> Download decrypted file</button>
+        </div>
+
+        <script src="./dist/main.js"> </script>
+      </body>
 </html>
