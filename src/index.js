@@ -33,7 +33,7 @@ button.addEventListener('click', async function (event) {
 })
 
 // Encryption
-document.getElementById('input2').addEventListener('change', function (e) {
+document.getElementById('submit2').addEventListener('change', function (e) {
   const file = document.getElementById('input')
   const file2 = document.getElementById('input2')
   const file3 = document.getElementById('input3')
