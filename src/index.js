@@ -24,6 +24,15 @@ for (i = 0; i < acc.length; i++) {
   })
 }
 
+// KeyGen
+const button = document.getElementById('submit')
+button.addEventListener('click', async function (event) {
+  const password = await document.getElementById('psw').value
+  const result = await keygen.keygen(password)
+  console.log(result)
+})
+
+/*
 // Decryption
 document.getElementById('input').addEventListener('change', function (e) {
   const file = document.getElementById('input').files[0]
@@ -225,4 +234,4 @@ document.getElementById('input4').addEventListener('change', function (e) {
       offset += chunksize
     }
   })()
-})
+}) */
