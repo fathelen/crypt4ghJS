@@ -39,7 +39,7 @@ function myFunction () {
   const fileInput = document.getElementById('input')
   console.log(fileInput.files[0]);
   (async () => {
-    const seckeyFile = await fileInput[0].text()
+    const seckeyFile = await fileInput[0].value
     console.log(seckeyFile)
   })()
   /*
