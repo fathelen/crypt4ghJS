@@ -43,8 +43,11 @@ function myFunction () {
   const file3 = document.getElementById('input3')
   console.log(file3)
   const password = document.getElementById('psw2').value
+  console.log(password)
   const blocks = document.getElementById('block2').value
+  console.log(blocks)
   const edit = document.getElementById('editlist').value
+  console.log(edit)
   const ed = null;
 
   (async () => {
