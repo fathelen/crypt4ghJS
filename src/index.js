@@ -75,7 +75,6 @@ function myFunction () {
     ed = null
   } else {
     editlist = edit.split(',')
-    console.log(editlist)
     for (let i = 0; i < editlist.length; i++) {
       ed.push(Number(editlist[i]))
     }
@@ -106,46 +105,39 @@ function myFunction () {
     console.log('all done')
   })()
 }
-/*
-const encr = document.getElementById('button')
-encr.addEventListener('click', async function (event) {
-  const file = document.getElementById('input')
-  const file2 = document.getElementById('input2')
-  const file3 = document.getElementById('input3')
-  const password = document.getElementById('psw2').value
-  const blocks = document.getElementById('block2').value
-  const edit = document.getElementById('editlist').value
-  const ed = null;
 
+document.getElementById('button2').onclick = function () { Decryption() }
+
+function Decryption () {
+  /*
+  const fileInput = document.getElementById('input')
+  const seckeyFile2 = await fileInput.files[0].text() */
+  const file = document.getElementById('input4')
+  const file2 = document.getElementById('input5')
+  const password = document.getElementById('psw3').value;
   (async () => {
-    const pubkeyFile = await file.text()
-    const pubkeyFile2 = await file2.text()
-    const seckeyFile = await file3.text()
-    const block = null
-    const fileContents = document.getElementById('encfile')
-    const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile, pubkeyFile2], password)
-    const header = await encryption.encHead(keys[0], [keys[1], keys[2]], ed)
-    console.log(header[0])
-    // fileContents.innerText += header[0]
-    const chunksize = 65536
+    const seckeyFile = await file.files[0].text()
+    const keys = await keyfiles.encryption_keyfiles([seckeyFile], password)
+    const headerChunk = await file2.files[0].slice(0, 1000)
+    const chunkHeader = await headerChunk.arrayBuffer()
+    const header = await decryption.header_deconstruction(new Uint8Array(chunkHeader), keys[0])
+    const chunksize = 65564
     let counter = 0
-    let offset = 0
-    while (offset < file3.size) {
+    let offset = header[4]
+    while (offset < file2.files[0].size) {
       counter++
-      const chunkfile = await file3.slice(offset, offset + chunksize)
+      const chunkfile = await file2.files[0].slice(offset, offset + chunksize)
       const chunk = await chunkfile.arrayBuffer()
-      const encryptedtext = await encryption.encryption(header, new Uint8Array(chunk), counter, block)
-      const encoder = new TextEncoder()
-      if (encryptedtext) {
-        console.log(encoder.encode(encryptedtext))
-        // fileContents.innerText += encoder.encode(encryptedtext)
+      const plaintext = await decryption.decrypption(header, new Uint8Array(chunk), counter)
+      const decoder = new TextDecoder()
+      if (plaintext) {
+        console.log(decoder.decode(plaintext))
       }
-
       offset += chunksize
     }
     console.log('all done')
   })()
-})
+}
 
 /*
 // Decryption
