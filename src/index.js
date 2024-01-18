@@ -45,14 +45,47 @@ function myFunction () {
   const password = document.getElementById('psw2').value
   const blocks = document.getElementById('block2').value
   const edit = document.getElementById('editlist').value
-  const ed = null;
+  let block = null | []
+  if (blocks === '') {
+    block = null
+  } else if (blocks.includes(',')) {
+    block = []
+    const b = blocks.split(',')
+    for (let i = 0; i < b.length; i++) {
+      block.push(Number(b[i]))
+    }
+  } else {
+    block = blocks
+  }
+  let editlist = []
+  let ed = []
+  if (edit.includes(';')) {
+    const step = edit.split(';')
+    for (let i = 0; i < step.length; i++) {
+      editlist = step[i].split(',')
+      for (let j = 0; j < editlist.length; j++) {
+        if (j === 0) {
+          ed.push([Number(editlist[j])])
+        } else {
+          ed[i].push(Number(editlist[j]))
+        }
+      }
+    }
+  } else if (edit === '') {
+    ed = null
+  } else {
+    editlist = edit.split(',')
+    console.log(editlist)
+    for (let i = 0; i < editlist.length; i++) {
+      ed.push(Number(editlist[i]))
+    }
+  }
 
   (async () => {
     const seckeyFile = await file.files[0].text()
     const pubkeyFile = await file2.files[0].text()
-    const block = null
     const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile], password)
-    const header = await encryption.encHead(keys[0], [keys[1], keys[2]], ed)
+    const header = await encryption.encHead(keys[0], [keys[1]], ed)
     console.log(header[0])
     const chunksize = 65536
     let counter = 0
@@ -62,7 +95,7 @@ function myFunction () {
       const chunkfile = await file3.files[0].slice(offset, offset + chunksize)
       const chunk = await chunkfile.arrayBuffer()
       const encryptedtext = await encryption.encryption(header, new Uint8Array(chunk), counter, block)
-      const encoder = new TextEncoder()
+      // const encoder = new TextEncoder()
       if (encryptedtext) {
         console.log(encryptedtext)
         // console.log(encoder.encode(encryptedtext))
