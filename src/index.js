@@ -36,8 +36,7 @@ button.addEventListener('click', async function (event) {
 document.getElementById('button').onclick = function () { myFunction() }
 
 function myFunction () {
-  const file = document.getElementById('input').textContent
-  console.log(file)
+  const file = document.getElementById('input')
   const file2 = document.getElementById('input2')
   const file3 = document.getElementById('input3')
   const password = document.getElementById('psw2').value
@@ -46,7 +45,8 @@ function myFunction () {
   const ed = null;
 
   (async () => {
-    const seckeyFile = await file.text()
+    const seckeyFile = await file[0].text()
+    console.log(seckeyFile)
     const pubkeyFile = await file2.text()
     const block = null
     const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile], password)
