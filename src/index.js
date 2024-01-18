@@ -37,10 +37,12 @@ document.getElementById('button').onclick = function () { myFunction() }
 
 function myFunction () {
   const fileInput = document.getElementById('input')
-  console.log(fileInput[0]);
+  console.log(fileInput.files[0]);
   (async () => {
-    const seckeyFile = await fileInput[0].value
+    const seckeyFile = await fileInput.files[0].value
     console.log(seckeyFile)
+    const seckeyFile2 = await fileInput.files[0].text()
+    console.log(seckeyFile2)
   })()
   /*
   const file = document.getElementById('input')
