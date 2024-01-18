@@ -32,6 +32,27 @@ button.addEventListener('click', async function (event) {
   console.log(result)
 })
 
+// Download
+document.getElementById('btn').addEventListener('click', function () {
+  const text = 'abc'
+  const filename = 'GFG.txt'
+
+  download(filename, text)
+}, false)
+
+function download (file, text) {
+  // creating an invisible element
+
+  const element = document.createElement('a')
+  element.setAttribute('href',
+    'data:text/plain;charset=utf-8, ' +
+        encodeURIComponent(text))
+  element.setAttribute('download', file)
+  document.body.appendChild(element)
+  element.click()
+
+  document.body.removeChild(element)
+}
 // Encryption
 document.getElementById('button').onclick = function () { myFunction() }
 
