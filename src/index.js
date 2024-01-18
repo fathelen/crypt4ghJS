@@ -37,16 +37,16 @@ document.getElementById('button').onclick = function () { myFunction() }
 
 function myFunction () {
   const file = document.getElementById('input')
+  console.log(file)
   const file2 = document.getElementById('input2')
   const file3 = document.getElementById('input3')
   const password = document.getElementById('psw2').value
   const blocks = document.getElementById('block2').value
   const edit = document.getElementById('editlist').value
   const ed = null;
-
+  /*
   (async () => {
     const seckeyFile = await file.text()
-    console.log(seckeyFile)
     const pubkeyFile = await file2.text()
     const block = null
     const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile], password)
@@ -68,7 +68,7 @@ function myFunction () {
       offset += chunksize
     }
     console.log('all done')
-  })()
+  })() */
 }
 /*
 const encr = document.getElementById('button')
