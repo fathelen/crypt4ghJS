@@ -82,11 +82,13 @@ async function encr () {
       ed.push(Number(editlist[i]))
     }
   }
+  const encoder = new TextEncoder()
   const seckeyFile = await file.files[0].text()
   const pubkeyFile = await file2.files[0].text()
   const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile], password)
   const header = await encryption.encHead(keys[0], [keys[1]], ed)
-  c4ghtext.push(header[0])
+  c4ghtext.push(encoder.encode(header[0])
+  )
   // console.log(header[0])
   const chunksize = 65536
   let counter = 0
@@ -96,7 +98,6 @@ async function encr () {
     const chunkfile = await file3.files[0].slice(offset, offset + chunksize)
     const chunk = await chunkfile.arrayBuffer()
     const encryptedtext = await encryption.encryption(header, new Uint8Array(chunk), counter, block)
-    const encoder = new TextEncoder()
     if (encryptedtext) {
       c4ghtext.push(encoder.encode(encryptedtext))
       // console.log(encryptedtext)
