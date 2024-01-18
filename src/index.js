@@ -130,8 +130,7 @@ document.getElementById('btn2').addEventListener('click', async function () {
 }, false)
 
 // Download c4gh file
-document.getElementById('btn3').addEventListener('click', async function () {
-  console.log('hier')
+document.getElementById('but').addEventListener('click', async function () {
   /*
   const enc = await encr()
   const encoder = new TextEncoder()
