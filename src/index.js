@@ -62,9 +62,9 @@ function myFunction () {
       const chunkfile = await file3.files[0].slice(offset, offset + chunksize)
       const chunk = await chunkfile.arrayBuffer()
       const encryptedtext = await encryption.encryption(header, new Uint8Array(chunk), counter, block)
-      console.log(encryptedtext.length)
       const encoder = new TextEncoder()
       if (encryptedtext) {
+        console.log(encryptedtext)
         // console.log(encoder.encode(encryptedtext))
       }
 
