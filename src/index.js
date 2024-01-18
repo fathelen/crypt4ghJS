@@ -132,9 +132,11 @@ document.getElementById('btn2').addEventListener('click', async function () {
 // Download c4gh file
 document.getElementById('btn3').addEventListener('click', async function () {
   console.log('hier')
+  /*
   const enc = await encr()
   const encoder = new TextEncoder()
-  const text = encoder.encode(enc)
+  const text = encoder.encode(enc) */
+  const text = 'enctest'
   const filename = 'public_keyfile'
 
   download(filename, text)
