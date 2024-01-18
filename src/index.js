@@ -96,9 +96,9 @@ async function encr () {
     const chunkfile = await file3.files[0].slice(offset, offset + chunksize)
     const chunk = await chunkfile.arrayBuffer()
     const encryptedtext = await encryption.encryption(header, new Uint8Array(chunk), counter, block)
-    // const encoder = new TextEncoder()
+    const encoder = new TextEncoder()
     if (encryptedtext) {
-      c4ghtext.push(encryptedtext)
+      c4ghtext.push(encoder.encode(encryptedtext))
       // console.log(encryptedtext)
       // console.log(encoder.encode(encryptedtext))
     }
@@ -132,8 +132,6 @@ document.getElementById('btn2').addEventListener('click', async function () {
 // Download c4gh file
 document.getElementById('but').addEventListener('click', async function () {
   const enc = await encr()
-  console.log(enc)
-  const encoder = new TextEncoder()
   const text = enc
   const filename = 'c4gh_file'
 
