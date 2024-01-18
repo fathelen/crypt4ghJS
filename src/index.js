@@ -36,7 +36,20 @@ button.addEventListener('click', async function (event) {
 document.getElementById('button').onclick = function () { myFunction() }
 
 function myFunction () {
-  const file = document.getElementById('input').file
+  const fileInput = document.getElementById('input')
+  console.log(fileInput)
+  console.log(fileInput.files instanceof FileList)
+  for (const file of fileInput.files) {
+    console.log(file.name) // prints file name
+    const fileDate = new Date(file.lastModified)
+    console.log(fileDate.toLocaleDateString()) // prints legible date
+    console.log(
+      file.size < 1000 ? file.size : Math.round(file.size / 1000) + 'KB'
+    )
+    console.log(file.type) // prints MIME type
+  }
+  /*
+  const file = document.getElementById('input')
   console.log(file)
   const file2 = document.getElementById('input2')
   const file3 = document.getElementById('input3')
@@ -44,7 +57,7 @@ function myFunction () {
   const blocks = document.getElementById('block2').value
   const edit = document.getElementById('editlist').value
   const ed = null;
-  /*
+
   (async () => {
     const seckeyFile = await file.text()
     const pubkeyFile = await file2.text()
