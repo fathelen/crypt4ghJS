@@ -117,6 +117,7 @@ function Decryption () {
   const password = document.getElementById('psw3').value;
   (async () => {
     const seckeyFile = await file.files[0].text()
+    console.log(seckeyFile)
     const keys = await keyfiles.encryption_keyfiles([seckeyFile], password)
     const headerChunk = await file2.files[0].slice(0, 1000)
     const chunkHeader = await headerChunk.arrayBuffer()
