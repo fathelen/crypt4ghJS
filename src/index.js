@@ -109,7 +109,7 @@ async function encr () {
 }
 
 async function decr () {
-  const decText = []
+  const decText = ''
   const file = document.getElementById('input4')
   const file2 = document.getElementById('input5')
   const password = document.getElementById('psw3').value
@@ -128,13 +128,12 @@ async function decr () {
     const plaintext = await decryption.decrypption(header, new Uint8Array(chunk), counter)
     const decoder = new TextDecoder()
     if (plaintext) {
-      decText.push(decoder.decode(plaintext))
+      decText.concat(decoder.decode(plaintext))
     }
     offset += chunksize
   }
   console.log('all done')
-  const buffered = Buffer.concat(decText)
-  return buffered
+  return decText
 }
 // Download secret
 document.getElementById('btn').addEventListener('click', async function () {
