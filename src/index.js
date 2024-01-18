@@ -37,29 +37,21 @@ document.getElementById('button').onclick = function () { myFunction() }
 
 function myFunction () {
   const file = document.getElementById('input')
-  console.log(file)
   const file2 = document.getElementById('input2')
-  console.log(file2)
   const file3 = document.getElementById('input3')
-  console.log(file3)
   const password = document.getElementById('psw2').value
-  console.log(password)
   const blocks = document.getElementById('block2').value
-  console.log(blocks)
   const edit = document.getElementById('editlist').value
-  console.log(edit)
   const ed = null;
 
   (async () => {
-    const pubkeyFile = await file.text()
-    const pubkeyFile2 = await file2.text()
-    const seckeyFile = await file3.text()
+    const seckeyFile = await file.text()
+    console.log(seckeyFile)
+    const pubkeyFile = await file2.text()
     const block = null
-    const fileContents = document.getElementById('encfile')
-    const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile, pubkeyFile2], password)
+    const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile], password)
     const header = await encryption.encHead(keys[0], [keys[1], keys[2]], ed)
     console.log(header[0])
-    // fileContents.innerText += header[0]
     const chunksize = 65536
     let counter = 0
     let offset = 0
@@ -71,7 +63,6 @@ function myFunction () {
       const encoder = new TextEncoder()
       if (encryptedtext) {
         console.log(encoder.encode(encryptedtext))
-        // fileContents.innerText += encoder.encode(encryptedtext)
       }
 
       offset += chunksize
