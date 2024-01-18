@@ -134,7 +134,7 @@ document.getElementById('but').addEventListener('click', async function () {
   const enc = await encr()
   console.log(enc)
   const encoder = new TextEncoder()
-  const text = encoder.encode(enc)
+  const text = enc
   const filename = 'c4gh_file'
 
   download(filename, text)
