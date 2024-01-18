@@ -38,11 +38,20 @@ async function keyfile () {
   return result
 }
 
-// Download
+// Download secret
 document.getElementById('btn').addEventListener('click', async function () {
   const keys = await keyfile()
   const text = keys[0]
   const filename = 'secret_keyfile'
+
+  download(filename, text)
+}, false)
+
+// Download public
+document.getElementById('btn2').addEventListener('click', async function () {
+  const keys = await keyfile()
+  const text = keys[1]
+  const filename = 'public_keyfile'
 
   download(filename, text)
 }, false)
