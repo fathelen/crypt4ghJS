@@ -135,8 +135,7 @@ document.getElementById('but').addEventListener('click', async function () {
   console.log(enc.toString())
   const text = enc.toString()
   const filename = 'c4gh_file'
-
-  // download(filename, text)
+  download(filename, text)
 }, false)
 
 function download (file, text) {
