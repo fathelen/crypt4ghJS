@@ -130,16 +130,17 @@ document.getElementById('btn2').addEventListener('click', async function () {
 }, false)
 
 // Download c4gh file
+/*
 document.getElementById('but').addEventListener('click', async function () {
   /*
   const enc = await encr()
   const encoder = new TextEncoder()
-  const text = encoder.encode(enc) */
+  const text = encoder.encode(enc) 
   const text = 'enctest'
   const filename = 'public_keyfile'
 
   download(filename, text)
-}, false)
+}, false) */
 
 function download (file, text) {
   // creating an invisible element
