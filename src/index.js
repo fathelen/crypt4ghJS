@@ -34,7 +34,7 @@ button.addEventListener('click', async function (event) {
 
 // Encryption
 
-const encr = document.getElementById('submit2').submit()
+const encr = document.getElementById('submit2')
 encr.addEventListener('click', async function (event) {
   const file = document.getElementById('input')
   const file2 = document.getElementById('input2')
