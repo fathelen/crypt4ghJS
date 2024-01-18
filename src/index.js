@@ -4,6 +4,7 @@ const encryption = require('./encryption')
 const decryption = require('./decryption')
 const reeencryption = require('./reeencryption')
 const rearrangment = require('./rearrange')
+const Buffer = require('buffer/').Buffer
 
 const acc = document.getElementsByClassName('accordion')
 let i
@@ -38,6 +39,77 @@ async function keyfile () {
   return result
 }
 
+async function encr () {
+  const c4ghtext = []
+  const file = document.getElementById('input')
+  const file2 = document.getElementById('input2')
+  const file3 = document.getElementById('input3')
+  const password = document.getElementById('psw2').value
+  const blocks = document.getElementById('block2').value
+  const edit = document.getElementById('editlist').value
+  let block = null | []
+  if (blocks === '') {
+    block = null
+  } else if (blocks.includes(',')) {
+    block = []
+    const b = blocks.split(',')
+    for (let i = 0; i < b.length; i++) {
+      block.push(Number(b[i]))
+    }
+  } else {
+    block = blocks
+  }
+  let editlist = []
+  let ed = []
+  if (edit.includes(';')) {
+    const step = edit.split(';')
+    for (let i = 0; i < step.length; i++) {
+      editlist = step[i].split(',')
+      for (let j = 0; j < editlist.length; j++) {
+        if (j === 0) {
+          ed.push([Number(editlist[j])])
+        } else {
+          ed[i].push(Number(editlist[j]))
+        }
+      }
+    }
+  } else if (edit === '') {
+    ed = null
+  } else {
+    editlist = edit.split(',')
+    for (let i = 0; i < editlist.length; i++) {
+      ed.push(Number(editlist[i]))
+    }
+  }
+  const seckeyFile = await file.files[0].text()
+  const pubkeyFile = await file2.files[0].text()
+  const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile], password)
+  const header = await encryption.encHead(keys[0], [keys[1]], ed)
+  c4ghtext.push(header[0])
+  // console.log(header[0])
+  const chunksize = 65536
+  let counter = 0
+  let offset = 0
+  while (offset < file3.files[0].size) {
+    counter++
+    const chunkfile = await file3.files[0].slice(offset, offset + chunksize)
+    const chunk = await chunkfile.arrayBuffer()
+    const encryptedtext = await encryption.encryption(header, new Uint8Array(chunk), counter, block)
+    // const encoder = new TextEncoder()
+    if (encryptedtext) {
+      c4ghtext.push(encryptedtext)
+      // console.log(encryptedtext)
+      // console.log(encoder.encode(encryptedtext))
+    }
+
+    offset += chunksize
+  }
+  console.log('all done')
+  const buffered = Buffer.concat(c4ghtext)
+  const text = new Uint8Array(buffered)
+  return text
+}
+
 // Download secret
 document.getElementById('btn').addEventListener('click', async function () {
   const keys = await keyfile()
@@ -51,6 +123,16 @@ document.getElementById('btn').addEventListener('click', async function () {
 document.getElementById('btn2').addEventListener('click', async function () {
   const keys = await keyfile()
   const text = keys[1]
+  const filename = 'public_keyfile'
+
+  download(filename, text)
+}, false)
+
+// Download c4gh file
+document.getElementById('btn3').addEventListener('click', async function () {
+  const enc = await encr()
+  const encoder = new TextEncoder()
+  const text = encoder.encode(enc)
   const filename = 'public_keyfile'
 
   download(filename, text)
