@@ -130,17 +130,14 @@ document.getElementById('btn2').addEventListener('click', async function () {
 }, false)
 
 // Download c4gh file
-/*
 document.getElementById('but').addEventListener('click', async function () {
-  /*
   const enc = await encr()
   const encoder = new TextEncoder()
-  const text = encoder.encode(enc) 
-  const text = 'enctest'
+  const text = encoder.encode(enc)
   const filename = 'public_keyfile'
 
   download(filename, text)
-}, false) */
+}, false)
 
 function download (file, text) {
   // creating an invisible element
@@ -156,12 +153,12 @@ function download (file, text) {
   document.body.removeChild(element)
 }
 // Encryption
+/*
 document.getElementById('button').onclick = function () { myFunction() }
 
 function myFunction () {
-  /*
   const fileInput = document.getElementById('input')
-  const seckeyFile2 = await fileInput.files[0].text() */
+  const seckeyFile2 = await fileInput.files[0].text()
   const file = document.getElementById('input')
   const file2 = document.getElementById('input2')
   const file3 = document.getElementById('input3')
@@ -234,7 +231,7 @@ document.getElementById('button2').onclick = function () { Decryption() }
 function Decryption () {
   /*
   const fileInput = document.getElementById('input')
-  const seckeyFile2 = await fileInput.files[0].text() */
+  const seckeyFile2 = await fileInput.files[0].text()
   const file = document.getElementById('input4')
   console.log(file)
   const file2 = document.getElementById('input5')
