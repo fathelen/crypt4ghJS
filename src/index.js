@@ -37,17 +37,7 @@ document.getElementById('button').onclick = function () { myFunction() }
 
 function myFunction () {
   const fileInput = document.getElementById('input')
-  console.log(fileInput)
-  console.log(fileInput.files instanceof FileList)
-  for (const file of fileInput.files) {
-    console.log(file.name) // prints file name
-    const fileDate = new Date(file.lastModified)
-    console.log(fileDate.toLocaleDateString()) // prints legible date
-    console.log(
-      file.size < 1000 ? file.size : Math.round(file.size / 1000) + 'KB'
-    )
-    console.log(file.type) // prints MIME type
-  }
+  console.log(fileInput.files[0])
   /*
   const file = document.getElementById('input')
   console.log(file)
