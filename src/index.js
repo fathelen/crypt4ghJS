@@ -109,7 +109,7 @@ async function encr () {
 }
 
 async function decr () {
-  const decText = ''
+  let decText = ''
   const file = document.getElementById('input4')
   const file2 = document.getElementById('input5')
   const password = document.getElementById('psw3').value
@@ -128,7 +128,7 @@ async function decr () {
     const plaintext = await decryption.decrypption(header, new Uint8Array(chunk), counter)
     const decoder = new TextDecoder()
     if (plaintext) {
-      decText.concat(decoder.decode(plaintext))
+      decText += decoder.decode(plaintext)
     }
     offset += chunksize
   }
