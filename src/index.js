@@ -36,7 +36,7 @@ button.addEventListener('click', async function (event) {
 document.getElementById('button').onclick = function () { myFunction() }
 
 function myFunction () {
-  const file = document.getElementById('input')
+  const file = document.getElementById('input').file
   console.log(file)
   const file2 = document.getElementById('input2')
   const file3 = document.getElementById('input3')
