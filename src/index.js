@@ -113,11 +113,13 @@ function Decryption () {
   const fileInput = document.getElementById('input')
   const seckeyFile2 = await fileInput.files[0].text() */
   const file = document.getElementById('input4')
+  console.log(file)
   const file2 = document.getElementById('input5')
-  const password = document.getElementById('psw3').value;
+  console.log(file2)
+  const password = document.getElementById('psw3').value
+  console.log(password);
   (async () => {
     const seckeyFile = await file.files[0].text()
-    console.log(seckeyFile)
     const keys = await keyfiles.encryption_keyfiles([seckeyFile], password)
     const headerChunk = await file2.files[0].slice(0, 1000)
     const chunkHeader = await headerChunk.arrayBuffer()
