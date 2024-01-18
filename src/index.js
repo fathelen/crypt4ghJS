@@ -47,6 +47,7 @@ async function encr () {
   const password = document.getElementById('psw2').value
   const blocks = document.getElementById('block2').value
   const edit = document.getElementById('editlist').value
+  console.log('hjS')
   let block = null | []
   if (blocks === '') {
     block = null
@@ -130,6 +131,7 @@ document.getElementById('btn2').addEventListener('click', async function () {
 
 // Download c4gh file
 document.getElementById('btn3').addEventListener('click', async function () {
+  console.log('hier')
   const enc = await encr()
   const encoder = new TextEncoder()
   const text = encoder.encode(enc)
