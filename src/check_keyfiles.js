@@ -57,24 +57,28 @@ exports.encryption_keyfiles = async (keys, password = '') => {
  * @returns => secret key (Uint8array 32 bytes)
  */
 async function secret (keyContent, seckey, password) {
+  console.log(keyContent, password)
   try {
     if (helperfunction.equal(keyContent.subarray(0, 7), magicBytestring)) {
+      console.log('1')
+      console.log(keyContent.subarray(9, 15), '   ', kdfNoneBytestring, '   ', kdfScript)
       if (helperfunction.equal(keyContent.subarray(9, 13), kdfNoneBytestring)) {
         if (helperfunction.equal(keyContent.subarray(15, 19), chiperNoneBytestring)) {
           seckey = keyContent.subarray(21)
           return seckey
         }
-      } else if (helperfunction.equal(keyContent.subarray(9, 15), kdfScript)) {
-        const kdfoptions = keyContent.subarray(17, 37)
+      } else if (helperfunction.equal(keyContent.subarray(7, 13), kdfScript)) {
+        console.log('2')
+        const kdfoptions = keyContent.subarray(13, 33)
         const salt = kdfoptions.subarray(4)
-        if (helperfunction.equal(keyContent.subarray(39, 56), chiperChacha)) {
+        if (helperfunction.equal(keyContent.subarray(33, 50), chiperChacha)) {
           const N = 16384; const r = 8; const p = 1
           const dklen = 32
           const keyPrmoise = scrypt.scrypt(helperfunction.string2byte(password), salt, N, r, p, dklen)
           const key = keyPrmoise.then(async function (result) {
             const sharedkey = result
-            const nonce = keyContent.subarray(58, 70)
-            const encData = keyContent.subarray(70)
+            const nonce = keyContent.subarray(50, 62)
+            const encData = keyContent.subarray(62)
             const encKey = sodium.crypto_aead_chacha20poly1305_ietf_decrypt(null, encData, null, nonce, sharedkey)
             return encKey
           })

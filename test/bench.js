@@ -8,9 +8,12 @@ const ts = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAEbm9uZQAEbm9uZQAgrp
 const tp = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nfQCgFp/dPaDOELnzrgEEQUeOmOlMj9M/dTP7bIiuxyw=\n-----END CRYPT4GH PUBLIC KEY-----\n'
 const pubkeyPass = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nvHrVpBpFLpX/OquK2Ze4Mfzb8aVrn05XmTgT4ymVwzE=\n-----END CRYPT4GH PUBLIC KEY-----\n'
 const seckeyPass = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAGc2NyeXB0ABQAAAAAMHZyZm0wb3JrM2E5d2QyeQARY2hhY2hhMjBfcG9seTEzMDUAPHUyY2lhbDQ1dWZydxzqFWikrPHQc6dKqWySS59BoMAe1L0FRmBXnwPd80N4fJBJS5f+vnmlA+JZ8qCpow==\n-----END CRYPT4GH PRIVATE KEY-----\n'
-
+const ptest = '-----BEGIN CRYPT4GH PUBLIC KEY-----\n90T1+QTiwrlOYvuYcVbFpZeqw/eWHumXwBRL3hxoaRw=\n-----END CRYPT4GH PUBLIC KEY-----\n'
+const stest = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MXNjcnlwdAAAAADc4nwZGZnPgSuPSjRuH/UuY2hhY2hhMjBfcG9seTEzMDVKNThdbHNIERj1/uVgRuQ+Kfku5YZwT2iXBN0YiY6iJUDfufK/a+jvKoCgiekxN/oAvjoL+5vY12fjG0s=\n-----END CRYPT4GH PRIVATE KEY-----\n'
 async function encryption (input, output, edit, blocks) {
-  const keys = await index.keyfiles.encryption_keyfiles([ts, tp, pubkeyPass])
+  const keys = await index.keyfiles.encryption_keyfiles([stest, ptest], 'abc')
+  console.log(keys)
+  /*
   const header = await index.encryption.encHead(keys[0], [keys[1], keys[2]], edit)
     console.log(header[0])
     fs.writeFile(output, header[0], (err) => {
@@ -33,10 +36,10 @@ async function encryption (input, output, edit, blocks) {
               })
             }
           })
-  }
+  } */
 }
 
-// encryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.txt', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_multi_multiedit.c4gh', [[0, 2], [0, 3]])
+encryption('/home/fabienne/Projects/test.txt', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/keytest.c4gh')
 
 async function decryption (input, output, wantedblocks) {
   const keys = await index.keyfiles.encryption_keyfiles([ts])
@@ -68,7 +71,7 @@ async function decryption (input, output, wantedblocks) {
     })
 }
 
-decryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/c4gh_file(5)', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/downloadTest.txt')
+// decryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/c4gh_file(5)', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/downloadTest.txt')
 
 async function generateKeys (password) {
    const keys = await index.keygen.keygen(password)
