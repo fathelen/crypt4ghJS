@@ -132,9 +132,8 @@ document.getElementById('btn2').addEventListener('click', async function () {
 // Download c4gh file
 document.getElementById('but').addEventListener('click', async function () {
   const enc = await encr()
-  const text = enc
   const filename = 'c4gh_file'
-  download(filename, text)
+  saveByteArray([enc], filename)
 }, false)
 
 function download (file, text) {
@@ -142,8 +141,7 @@ function download (file, text) {
 
   const element = document.createElement('a')
   element.setAttribute('href',
-    // 'data:text/plain;charset=utf-8, ' +
-    'data:application/octet-stream, ' +
+    'data:text/plain;charset=utf-8, ' +
         encodeURIComponent(text))
   element.setAttribute('download', file)
   document.body.appendChild(element)
@@ -151,6 +149,22 @@ function download (file, text) {
 
   document.body.removeChild(element)
 }
+
+const saveByteArray = (function () {
+  const a = document.createElement('a')
+  document.body.appendChild(a)
+  a.style = 'display: none'
+  return function (data, name) {
+    const blob = new Blob(data, { type: 'octet/stream' })
+    const url = window.URL.createObjectURL(blob)
+    a.href = url
+    a.download = name
+    a.click()
+    window.URL.revokeObjectURL(url)
+  }
+}())
+
+
 // Encryption
 /*
 document.getElementById('button').onclick = function () { myFunction() }
