@@ -33,6 +33,12 @@ button.addEventListener('click', async function (event) {
 })
 
 // Encryption
+document.getElementById('button').addEventListener('click', myFunction)
+
+function myFunction () {
+  document.getElementById('button').innerHTML = 'YOU CLICKED ME!'
+}
+/*
 const encr = document.getElementById('button')
 encr.addEventListener('click', async function (event) {
   const file = document.getElementById('input')
