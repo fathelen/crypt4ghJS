@@ -32,10 +32,17 @@ button.addEventListener('click', async function (event) {
   console.log(result)
 })
 
+async function keyfile () {
+  const password = await document.getElementById('psw').value
+  const result = await keygen.keygen(password)
+  return result
+}
+
 // Download
-document.getElementById('btn').addEventListener('click', function () {
-  const text = 'abc'
-  const filename = 'GFG.txt'
+document.getElementById('btn').addEventListener('click', async function () {
+  const keys = await keyfile()
+  const text = keys[0]
+  const filename = 'secret_keyfile'
 
   download(filename, text)
 }, false)
