@@ -33,9 +33,15 @@ button.addEventListener('click', async function (event) {
 })
 
 // Encryption
-document.getElementById('submit2').addEventListener('click', myFunction)
+
+document.getElementById('demo').addEventListener('click', myFunction)
 
 function myFunction () {
+  document.getElementById('demo').innerHTML = 'YOU CLICKED ME!'
+}
+
+const encr = document.getElementById('submit2')
+encr.addEventListener('click', async function (event) {
   const file = document.getElementById('input')
   const file2 = document.getElementById('input2')
   const file3 = document.getElementById('input3')
@@ -72,7 +78,7 @@ function myFunction () {
     }
     console.log('all done')
   })()
-}
+})
 
 /*
 // Decryption
