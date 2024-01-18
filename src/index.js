@@ -88,7 +88,6 @@ async function encr () {
   const header = await encryption.encHead(keys[0], [keys[1]], ed)
   c4ghtext.push(header[0]
   )
-  // console.log(header[0])
   const chunksize = 65536
   let counter = 0
   let offset = 0
@@ -99,8 +98,6 @@ async function encr () {
     const encryptedtext = await encryption.encryption(header, new Uint8Array(chunk), counter, block)
     if (encryptedtext) {
       c4ghtext.push(encryptedtext)
-      // console.log(encryptedtext)
-      // console.log(encoder.encode(encryptedtext))
     }
 
     offset += chunksize
@@ -111,6 +108,35 @@ async function encr () {
   return text
 }
 
+async function decr () {
+  const decText = []
+  const file = document.getElementById('input4')
+  const file2 = document.getElementById('input5')
+  const password = document.getElementById('psw3').value
+  const seckeyFile = await file.files[0].text()
+  const keys = await keyfiles.encryption_keyfiles([seckeyFile], password)
+  const headerChunk = await file2.files[0].slice(0, 1000)
+  const chunkHeader = await headerChunk.arrayBuffer()
+  const header = await decryption.header_deconstruction(new Uint8Array(chunkHeader), keys[0])
+  const chunksize = 65564
+  let counter = 0
+  let offset = header[4]
+  while (offset < file2.files[0].size) {
+    counter++
+    const chunkfile = await file2.files[0].slice(offset, offset + chunksize)
+    const chunk = await chunkfile.arrayBuffer()
+    const plaintext = await decryption.decrypption(header, new Uint8Array(chunk), counter)
+    const decoder = new TextDecoder()
+    if (plaintext) {
+      decText.push(decoder.decode(plaintext))
+    }
+    offset += chunksize
+  }
+  console.log('all done')
+  const buffered = Buffer.concat(decText)
+  const text = new Uint8Array(buffered)
+  return text
+}
 // Download secret
 document.getElementById('btn').addEventListener('click', async function () {
   const keys = await keyfile()
@@ -134,6 +160,13 @@ document.getElementById('but').addEventListener('click', async function () {
   const enc = await encr()
   const filename = 'c4gh_file'
   saveByteArray([enc], filename)
+}, false)
+
+// Download decrypted file
+document.getElementById('but2').addEventListener('click', async function () {
+  const dec = await decr()
+  const filename = 'decrypted_file'
+  download(filename, dec)
 }, false)
 
 function download (file, text) {
@@ -163,7 +196,6 @@ const saveByteArray = (function () {
     window.URL.revokeObjectURL(url)
   }
 }())
-
 
 // Encryption
 /*
