@@ -38,7 +38,7 @@ async function keyfile () {
   const result = await keygen.keygen(password)
   return result
 }
-
+/*
 async function encr () {
   const c4ghtext = []
   const file = document.getElementById('input')
@@ -108,7 +108,7 @@ async function encr () {
   const buffered = Buffer.concat(c4ghtext)
   const text = new Uint8Array(buffered)
   return text
-}
+} */
 
 // Download secret
 document.getElementById('btn').addEventListener('click', async function () {
@@ -127,7 +127,7 @@ document.getElementById('btn2').addEventListener('click', async function () {
 
   download(filename, text)
 }, false)
-
+/*
 // Download c4gh file
 document.getElementById('but').addEventListener('click', async function () {
   const enc = await encr()
@@ -136,7 +136,7 @@ document.getElementById('but').addEventListener('click', async function () {
   const filename = 'c4gh_file'
 
   download(filename, text)
-}, false)
+}, false) */
 
 function download (file, text) {
   // creating an invisible element
