@@ -45,7 +45,7 @@ function myFunction () {
   const ed = null;
 
   (async () => {
-    const seckeyFile = await file[0].text()
+    const seckeyFile = await file.text()
     console.log(seckeyFile)
     const pubkeyFile = await file2.text()
     const block = null
