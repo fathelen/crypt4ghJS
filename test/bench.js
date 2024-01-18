@@ -12,6 +12,7 @@ const seckeyPass = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAGc2NyeXB0AB
 async function encryption (input, output, edit, blocks) {
   const keys = await index.keyfiles.encryption_keyfiles([ts, tp, pubkeyPass])
   const header = await index.encryption.encHead(keys[0], [keys[1], keys[2]], edit)
+    console.log(header[0])
     fs.writeFile(output, header[0], (err) => {
       if (err) {
         console.log(err)
@@ -35,7 +36,7 @@ async function encryption (input, output, edit, blocks) {
   }
 }
 
-// encryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.txt', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_multi_multiedit.c4gh', [[0, 2], [0, 3]])
+encryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.txt', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_multi_multiedit.c4gh', [[0, 2], [0, 3]])
 
 async function decryption (input, output, wantedblocks) {
   const keys = await index.keyfiles.encryption_keyfiles([ts])
@@ -67,7 +68,7 @@ async function decryption (input, output, wantedblocks) {
     })
 }
 
-decryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_rearr_multiedit.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/Re_abcd_rearredit_multi1.txt')
+// decryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_rearr_multiedit.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/Re_abcd_rearredit_multi1.txt')
 
 async function generateKeys (password) {
    const keys = await index.keygen.keygen(password)

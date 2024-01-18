@@ -132,8 +132,8 @@ document.getElementById('btn2').addEventListener('click', async function () {
 // Download c4gh file
 document.getElementById('but').addEventListener('click', async function () {
   const enc = await encr()
-  console.log(enc)
-  const text = enc
+  console.log(enc.toString())
+  const text = enc.toString()
   const filename = 'c4gh_file'
 
   // download(filename, text)
