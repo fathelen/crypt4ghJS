@@ -135,7 +135,7 @@ document.getElementById('but').addEventListener('click', async function () {
   const text = enc
   const filename = 'c4gh_file'
 
-  download(filename, text)
+  download2(filename, text)
 }, false)
 
 function download (file, text) {
@@ -145,6 +145,17 @@ function download (file, text) {
   element.setAttribute('href',
     'data:text/plain;charset=utf-8, ' +
         encodeURIComponent(text))
+  element.setAttribute('download', file)
+  document.body.appendChild(element)
+  element.click()
+
+  document.body.removeChild(element)
+}
+
+function download2 (file, text) {
+  // creating an invisible element
+
+  const element = document.createElement('a')
   element.setAttribute('download', file)
   document.body.appendChild(element)
   element.click()
