@@ -37,8 +37,11 @@ document.getElementById('button').onclick = function () { myFunction() }
 
 function myFunction () {
   const file = document.getElementById('input')
+  console.log(file)
   const file2 = document.getElementById('input2')
+  console.log(file2)
   const file3 = document.getElementById('input3')
+  console.log(file3)
   const password = document.getElementById('psw2').value
   const blocks = document.getElementById('block2').value
   const edit = document.getElementById('editlist').value
