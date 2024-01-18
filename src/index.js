@@ -134,8 +134,7 @@ async function decr () {
   }
   console.log('all done')
   const buffered = Buffer.concat(decText)
-  const text = new Uint8Array(buffered)
-  return text
+  return buffered
 }
 // Download secret
 document.getElementById('btn').addEventListener('click', async function () {
