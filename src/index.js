@@ -36,17 +36,10 @@ button.addEventListener('click', async function (event) {
 document.getElementById('button').onclick = function () { myFunction() }
 
 function myFunction () {
-  const fileInput = document.getElementById('input')
-  console.log(fileInput.files[0]);
-  (async () => {
-    const seckeyFile = await fileInput.files[0].value
-    console.log(seckeyFile)
-    const seckeyFile2 = await fileInput.files[0].text()
-    console.log(seckeyFile2)
-  })()
   /*
+  const fileInput = document.getElementById('input')
+  const seckeyFile2 = await fileInput.files[0].text() */
   const file = document.getElementById('input')
-  console.log(file)
   const file2 = document.getElementById('input2')
   const file3 = document.getElementById('input3')
   const password = document.getElementById('psw2').value
@@ -55,8 +48,8 @@ function myFunction () {
   const ed = null;
 
   (async () => {
-    const seckeyFile = await file.text()
-    const pubkeyFile = await file2.text()
+    const seckeyFile = await file.files[0].text()
+    const pubkeyFile = await file2.files[0].text()
     const block = null
     const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile], password)
     const header = await encryption.encHead(keys[0], [keys[1], keys[2]], ed)
@@ -64,9 +57,9 @@ function myFunction () {
     const chunksize = 65536
     let counter = 0
     let offset = 0
-    while (offset < file3.size) {
+    while (offset < file3.files[0].size) {
       counter++
-      const chunkfile = await file3.slice(offset, offset + chunksize)
+      const chunkfile = await file3.files[0].slice(offset, offset + chunksize)
       const chunk = await chunkfile.arrayBuffer()
       const encryptedtext = await encryption.encryption(header, new Uint8Array(chunk), counter, block)
       const encoder = new TextEncoder()
@@ -77,7 +70,7 @@ function myFunction () {
       offset += chunksize
     }
     console.log('all done')
-  })() */
+  })()
 }
 /*
 const encr = document.getElementById('button')
