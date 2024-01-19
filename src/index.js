@@ -145,10 +145,10 @@ async function decr () {
 document.getElementById('btn').addEventListener('click', async function () {
   const keys = await keyfile()
   const text = keys[0]
-  const filename = 'secret_keyfile'
+  const filename = 'secret_keyfile.sec'
   download(filename, text)
   const text2 = keys[1]
-  const filename2 = 'public_keyfile'
+  const filename2 = 'public_keyfile.pub'
 
   download(filename2, text2)
 }, false)
@@ -156,7 +156,7 @@ document.getElementById('btn').addEventListener('click', async function () {
 // Download c4gh file
 document.getElementById('but').addEventListener('click', async function () {
   const enc = await encr()
-  const filename = 'c4gh_file'
+  const filename = 'c4gh_file.c4gh'
   saveByteArray([enc], filename)
 }, false)
 
