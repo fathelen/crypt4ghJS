@@ -135,22 +135,17 @@ async function decr () {
   console.log('all done')
   return decText
 }
-// Download secret
+// Download keyfiles
 document.getElementById('btn').addEventListener('click', async function () {
   const keys = await keyfile()
   const text = keys[0]
   const filename = 'secret_keyfile'
-
   download(filename, text)
-}, false)
+  const keys2 = await keyfile()
+  const text2 = keys2[1]
+  const filename2 = 'public_keyfile'
 
-// Download public
-document.getElementById('btn2').addEventListener('click', async function () {
-  const keys = await keyfile()
-  const text = keys[1]
-  const filename = 'public_keyfile'
-
-  download(filename, text)
+  download(filename2, text2)
 }, false)
 
 // Download c4gh file
