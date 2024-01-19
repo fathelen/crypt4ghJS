@@ -141,8 +141,7 @@ document.getElementById('btn').addEventListener('click', async function () {
   const text = keys[0]
   const filename = 'secret_keyfile'
   download(filename, text)
-  const keys2 = await keyfile()
-  const text2 = keys2[1]
+  const text2 = keys[1]
   const filename2 = 'public_keyfile'
 
   download(filename2, text2)
