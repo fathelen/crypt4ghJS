@@ -36,9 +36,11 @@ button.addEventListener('click', async function (event) {
 
 async function keyfile () {
   let password = await document.getElementById('psw').value
+  console.log(password)
   if (password === '') {
     password = null
   }
+  console.log(password)
   const result = await keygen.keygen(password)
   return result
 }
@@ -51,9 +53,11 @@ async function encr () {
   let password = document.getElementById('psw2').value
   const blocks = document.getElementById('block2').value
   const edit = document.getElementById('editlist').value
+  console.log(password)
   if (password === '') {
     password = null
   }
+  console.log(password)
   let block = null | []
   if (blocks === '') {
     block = null
