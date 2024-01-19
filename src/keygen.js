@@ -75,7 +75,7 @@ exports.create_seckey = async function (seckey, passphrase) {
         })
         a = await key
       } else {
-        const decNonce = Buffer.concat([magicBytestring, kdfNoneBestring, chiperNoneBytestring, seckey])
+        const decNonce = Buffer.concat([magicBytestring, new Uint8Array([0, 4]), kdfNoneBestring, new Uint8Array([0, 4]), chiperNoneBytestring, new Uint8Array([0, 32]), seckey])
         const x = new Uint8Array(decNonce)
         const b64 = btoa(String.fromCharCode.apply(null, x))
         a = '-----BEGIN CRYPT4GH PRIVATE KEY-----\n' + b64 + '\n-----END CRYPT4GH PRIVATE KEY-----\n'
