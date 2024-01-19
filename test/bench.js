@@ -70,7 +70,7 @@ async function decryption (input, output, wantedblocks) {
     })
 }
 
-decryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/keytest.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/downloadTest.txt')
+// decryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/keytest.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/downloadTest.txt')
 
 async function generateKeys (password) {
    const keys = await index.keygen.keygen(password)
@@ -78,7 +78,7 @@ async function generateKeys (password) {
    console.log(keys[1])
 }
 
-// generateKeys('abc')
+generateKeys('abc')
 
 // Reencryption
 async function reencryption (input, output) {
