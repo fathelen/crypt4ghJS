@@ -48,9 +48,12 @@ async function encr () {
   const file = document.getElementById('input')
   const file2 = document.getElementById('input2')
   const file3 = document.getElementById('input3')
-  const password = document.getElementById('psw2').value
+  let password = document.getElementById('psw2').value
   const blocks = document.getElementById('block2').value
   const edit = document.getElementById('editlist').value
+  if (password === '') {
+    password = null
+  }
   let block = null | []
   if (blocks === '') {
     block = null
