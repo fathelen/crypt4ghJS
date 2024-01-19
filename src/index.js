@@ -35,7 +35,10 @@ button.addEventListener('click', async function (event) {
 }) */
 
 async function keyfile () {
-  const password = await document.getElementById('psw').value
+  let password = await document.getElementById('psw').value
+  if (password === '') {
+    password = null
+  }
   const result = await keygen.keygen(password)
   return result
 }

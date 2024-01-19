@@ -78,7 +78,7 @@ async function generateKeys (password) {
    console.log(keys[1])
 }
 
-generateKeys('abc')
+generateKeys()
 
 // Reencryption
 async function reencryption (input, output) {
