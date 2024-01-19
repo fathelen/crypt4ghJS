@@ -35,12 +35,7 @@ button.addEventListener('click', async function (event) {
 }) */
 
 async function keyfile () {
-  let password = await document.getElementById('psw').value
-  console.log(password)
-  if (password === '') {
-    password = undefined
-  }
-  console.log(password)
+  const password = await document.getElementById('psw').value
   const result = await keygen.keygen(password)
   return result
 }
@@ -50,14 +45,9 @@ async function encr () {
   const file = document.getElementById('input')
   const file2 = document.getElementById('input2')
   const file3 = document.getElementById('input3')
-  let password = document.getElementById('psw2').value
+  const password = document.getElementById('psw2').value
   const blocks = document.getElementById('block2').value
   const edit = document.getElementById('editlist').value
-  console.log(password)
-  if (password === '') {
-    password = undefined
-  }
-  console.log(password)
   let block = null | []
   if (blocks === '') {
     block = null
@@ -95,6 +85,7 @@ async function encr () {
   const seckeyFile = await file.files[0].text()
   const pubkeyFile = await file2.files[0].text()
   const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile], password)
+  console.log(keys)
   const header = await encryption.encHead(keys[0], [keys[1]], ed)
   c4ghtext.push(header[0]
   )

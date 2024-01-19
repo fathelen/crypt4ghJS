@@ -25,6 +25,7 @@ exports.encHead = async function (seckey, pubkey, edit) {
   if (edit) {
     header = await enc.encHeaderEdit(seckey, pubkey, edit)
   } else {
+    console.log('kein edit')
     header = await enc.encHeader(seckey, pubkey)
   }
   return header
