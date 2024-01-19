@@ -66,7 +66,7 @@ exports.create_seckey = async function (seckey, passphrase) {
         const key = keyPrmoise.then(function (result) {
           const nonce = sodium.randombytes_buf(12)
           const decData = sodium.crypto_aead_chacha20poly1305_ietf_encrypt(seckey, null, null, nonce, result)
-          const decNonce = Buffer.concat([magicBytestring, kdfScript, saltround, chiperChacha, nonce, decData])
+          const decNonce = Buffer.concat([magicBytestring, new Uint8Array([0, 6]), kdfScript, new Uint8Array([0, 20]), saltround, new Uint8Array([0, 17]), chiperChacha, new Uint8Array([0, 12, decData.length]), nonce, decData])
           const x = new Uint8Array(decNonce)
           const b64 = btoa(String.fromCharCode.apply(null, x))
           return '-----BEGIN CRYPT4GH PRIVATE KEY-----\n' + b64 + '\n-----END CRYPT4GH PRIVATE KEY-----\n'
