@@ -8,8 +8,8 @@ const ts = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAEbm9uZQAEbm9uZQAgrp
 const tp = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nfQCgFp/dPaDOELnzrgEEQUeOmOlMj9M/dTP7bIiuxyw=\n-----END CRYPT4GH PUBLIC KEY-----\n'
 const pubkeyPass = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nvHrVpBpFLpX/OquK2Ze4Mfzb8aVrn05XmTgT4ymVwzE=\n-----END CRYPT4GH PUBLIC KEY-----\n'
 const seckeyPass = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAGc2NyeXB0ABQAAAAAMHZyZm0wb3JrM2E5d2QyeQARY2hhY2hhMjBfcG9seTEzMDUAPHUyY2lhbDQ1dWZydxzqFWikrPHQc6dKqWySS59BoMAe1L0FRmBXnwPd80N4fJBJS5f+vnmlA+JZ8qCpow==\n-----END CRYPT4GH PRIVATE KEY-----\n'
-const ptest = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nAozH5ft0qQBI6IzAR7cJSyxacb5cPlqN4rdKuIHXNTw=\n-----END CRYPT4GH PUBLIC KEY-----\n'
-const stest = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAGc2NyeXB0ABQAAAAAGNO5Q2qvQehiIaDM/Exf/AARY2hhY2hhMjBfcG9seTEzMDUAPI+RyZxEA8zizrVsw6uDjM3XK3E5BFqU/3iuxo+YiiwTlU/1w2HpFSJYpbofJx/q7aFzaoFKzjgYauvw1A==\n-----END CRYPT4GH PRIVATE KEY-----\n'
+const ptest = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nhaM5UQ2iXSZRC+beBXh7DyuX7etxYQzg+gLR+lgk/ks=\n-----END CRYPT4GH PUBLIC KEY-----\n'
+const stest = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAGc2NyeXB0ABQAAAAAG+Gyv+gX8w+0aP50TT1DDQARY2hhY2hhMjBfcG9seTEzMDUAPFZj2Ycd3IubziTLDzJnFjzdgpvL1dG3CP3tp/gBMt5txE9/uiGY/CFSM9pO8WpkFDkGRQ0Y95cC+R28Kw==\n-----END CRYPT4GH PRIVATE KEY-----\n'
 async function encryption (input, output, edit, blocks) {
   const keys = await index.keyfiles.encryption_keyfiles([stest, ptest], 'abc')
   const header = await index.encryption.encHead(keys[0], [keys[1]], edit)
