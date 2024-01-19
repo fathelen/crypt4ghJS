@@ -8,10 +8,12 @@ const ts = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAEbm9uZQAEbm9uZQAgrp
 const tp = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nfQCgFp/dPaDOELnzrgEEQUeOmOlMj9M/dTP7bIiuxyw=\n-----END CRYPT4GH PUBLIC KEY-----\n'
 const pubkeyPass = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nvHrVpBpFLpX/OquK2Ze4Mfzb8aVrn05XmTgT4ymVwzE=\n-----END CRYPT4GH PUBLIC KEY-----\n'
 const seckeyPass = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAGc2NyeXB0ABQAAAAAMHZyZm0wb3JrM2E5d2QyeQARY2hhY2hhMjBfcG9seTEzMDUAPHUyY2lhbDQ1dWZydxzqFWikrPHQc6dKqWySS59BoMAe1L0FRmBXnwPd80N4fJBJS5f+vnmlA+JZ8qCpow==\n-----END CRYPT4GH PRIVATE KEY-----\n'
-const ptest = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nhaM5UQ2iXSZRC+beBXh7DyuX7etxYQzg+gLR+lgk/ks=\n-----END CRYPT4GH PUBLIC KEY-----\n'
-const stest = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAGc2NyeXB0ABQAAAAAG+Gyv+gX8w+0aP50TT1DDQARY2hhY2hhMjBfcG9seTEzMDUAPFZj2Ycd3IubziTLDzJnFjzdgpvL1dG3CP3tp/gBMt5txE9/uiGY/CFSM9pO8WpkFDkGRQ0Y95cC+R28Kw==\n-----END CRYPT4GH PRIVATE KEY-----\n'
+const ptest = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nN63bgz4c9GZaadtWjYGAlGMvFTHGSyVZO/Setcb7KGE=\n-----END CRYPT4GH PUBLIC KEY-----\n'
+const stest = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAGc2NyeXB0ABQAAAAAYoz9LwYFw4LUzvWleuruQwARY2hhY2hhMjBfcG9seTEzMDUAPJ7bIhilIbds1B8Mx7ItNJ6jwlmXv/6nFnE3zeQVaHDoGZ3b0lKQcVMrE9SKneSdOhKjlZxqzDcdztde8w==\n-----END CRYPT4GH PRIVATE KEY-----\n'
+const ts2 = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAGc2NyeXB0ABQAAAAAErnfoX48n1p21KYPJF39qwARY2hhY2hhMjBfcG9seTEzMDUAPB2VckJsR/5iz35Zg5VO2VRkdIStoFIL0681lrdKlpn80dA7bH+vRcQc1+LVT4vptEt7EC5eXltE07uNhA==\n-----END CRYPT4GH PRIVATE KEY-----\n'
+const tp2 = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nKK2of4G9P49mpUE1PVDia+hTSQ8VWJNXxkSG4m6OiUc=\n-----END CRYPT4GH PUBLIC KEY-----\n'
 async function encryption (input, output, edit, blocks) {
-  const keys = await index.keyfiles.encryption_keyfiles([stest, ptest], 'abc')
+  const keys = await index.keyfiles.encryption_keyfiles([ts2, tp2], 'abc')
   const header = await index.encryption.encHead(keys[0], [keys[1]], edit)
     fs.writeFile(output, header[0], (err) => {
       if (err) {
@@ -36,10 +38,10 @@ async function encryption (input, output, edit, blocks) {
   }
 }
 
-encryption('/home/fabienne/Projects/test.txt', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/keytest.c4gh')
+// encryption('/home/fabienne/Projects/test.txt', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/keytest.c4gh')
 
 async function decryption (input, output, wantedblocks) {
-  const keys = await index.keyfiles.encryption_keyfiles([ts])
+  const keys = await index.keyfiles.encryption_keyfiles([ts2], 'abc')
   const readStream = fs.createReadStream(input, { end: 1000 })
   readStream
     .on('data', async function (d) {
@@ -68,7 +70,7 @@ async function decryption (input, output, wantedblocks) {
     })
 }
 
-// decryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/c4gh_file(5)', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/downloadTest.txt')
+decryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/keytest.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/downloadTest.txt')
 
 async function generateKeys (password) {
    const keys = await index.keygen.keygen(password)
