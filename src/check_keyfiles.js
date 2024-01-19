@@ -57,7 +57,6 @@ exports.encryption_keyfiles = async (keys, password = '') => {
  * @returns => secret key (Uint8array 32 bytes)
  */
 async function secret (keyContent, seckey, password) {
-  console.log(keyContent, password)
   try {
     if (helperfunction.equal(keyContent.subarray(0, 7), magicBytestring)) {
       if (helperfunction.equal(keyContent.subarray(9, 13), kdfNoneBytestring)) {
