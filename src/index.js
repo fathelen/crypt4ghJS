@@ -38,7 +38,7 @@ async function keyfile () {
   let password = await document.getElementById('psw').value
   console.log(password)
   if (password === '') {
-    password = null
+    password = undefined
   }
   console.log(password)
   const result = await keygen.keygen(password)
@@ -55,7 +55,7 @@ async function encr () {
   const edit = document.getElementById('editlist').value
   console.log(password)
   if (password === '') {
-    password = null
+    password = undefined
   }
   console.log(password)
   let block = null | []
@@ -122,7 +122,12 @@ async function decr () {
   let decText = ''
   const file = document.getElementById('input4')
   const file2 = document.getElementById('input5')
-  const password = document.getElementById('psw3').value
+  let password = document.getElementById('psw3').value
+  console.log(password)
+  if (password === '') {
+    password = undefined
+  }
+  console.log(password)
   const seckeyFile = await file.files[0].text()
   const keys = await keyfiles.encryption_keyfiles([seckeyFile], password)
   const headerChunk = await file2.files[0].slice(0, 1000)
