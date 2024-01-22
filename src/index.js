@@ -144,10 +144,10 @@ async function decr () {
 // Download keyfiles
 document.getElementById('btn').addEventListener('click', async function () {
   const keys = await keyfile()
-  const text = keys[0]
+  const text = [keys[0]]
   const filename = 'secret_keyfile.sec'
   download(filename, text)
-  const text2 = keys[1]
+  const text2 = [keys[1]]
   const filename2 = 'public_keyfile.pub'
 
   download(filename2, text2)
@@ -171,6 +171,22 @@ function download (file, text) {
   // creating an invisible element
 
   const element = document.createElement('a')
+  for (let i = 0; i < text.length; i++) {
+    element.setAttribute('href',
+      'data:text/plain;charset=utf-8,' +
+        encodeURIComponent(text[i]))
+    element.setAttribute('download', file)
+    document.body.appendChild(element)
+    element.click()
+  }
+  document.body.removeChild(element)
+}
+
+/*
+function download (file, text) {
+  // creating an invisible element
+
+  const element = document.createElement('a')
   element.setAttribute('href',
     'data:text/plain;charset=utf-8,' +
         encodeURIComponent(text))
@@ -179,7 +195,7 @@ function download (file, text) {
   element.click()
 
   document.body.removeChild(element)
-}
+} */
 
 const saveByteArray = (function () {
   const a = document.createElement('a')
