@@ -173,8 +173,11 @@ document.getElementById('but2').addEventListener('click', async function () {
   }
   const dec = decr()
   */
-  for (const chunk of dec) {
-    console.log('chunk: ', await chunk)
+  let next
+  while (!(next = await dec.next()).done) {
+    const job = next.value
+    console.log(job)
+    // ...
   }
   /*
     element.setAttribute('href',
