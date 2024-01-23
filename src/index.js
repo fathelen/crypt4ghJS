@@ -170,7 +170,8 @@ document.getElementById('but2').addEventListener('click', async function () {
     const t = next.value
     console.log('t: ', t)
   } */
-  for (const chunk of decr) {
+  const dec = decr()
+  for (const chunk of dec) {
     console.log('chunk: ', chunk)
     /*
     element.setAttribute('href',
