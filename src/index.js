@@ -85,7 +85,6 @@ async function encr () {
   const seckeyFile = await file.files[0].text()
   const pubkeyFile = await file2.files[0].text()
   const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile], password)
-  console.log(keys)
   const header = await encryption.encHead(keys[0], [keys[1]], ed)
   c4ghtext.push(header[0]
   )
@@ -114,11 +113,9 @@ async function * decr () {
   const file = document.getElementById('input4')
   const file2 = document.getElementById('input5')
   let password = document.getElementById('psw3').value
-  console.log(password)
   if (password === '') {
     password = undefined
   }
-  console.log(password)
   const seckeyFile = await file.files[0].text()
   const keys = await keyfiles.encryption_keyfiles([seckeyFile], password)
   const headerChunk = await file2.files[0].slice(0, 1000)
@@ -166,19 +163,26 @@ document.getElementById('but2').addEventListener('click', async function () {
   const dec = decr()
   const text = await dec
   const filename = 'decrypted_file'
-  const element = document.createElement('a')
+  // const element = document.createElement('a')
+  let next
+  while (!(next = text.next()).done) {
+    const t = next.value
+    console.log('t: ', t)
+  }
   for (const chunk of text) {
+    console.log('chunk: ', chunk)
+    /*
     element.setAttribute('href',
       'data:text/plain;charset=utf-8,' +
-        encodeURIComponent(chunk))
+        encodeURIComponent(chunk)) */
   }
-
+  /*
   element.setAttribute('download', filename)
   document.body.appendChild(element)
   element.click()
 
   document.body.removeChild(element)
-  // download(filename, dec)
+  // download(filename, dec) */
 }, false)
 
 function download (file, text) {
