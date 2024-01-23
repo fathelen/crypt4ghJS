@@ -109,7 +109,7 @@ async function encr () {
   return text
 }
 
-async function decr () {
+async function * decr () {
   let decText = ''
   const file = document.getElementById('input4')
   const file2 = document.getElementById('input5')
@@ -135,11 +135,12 @@ async function decr () {
     const decoder = new TextDecoder()
     if (plaintext) {
       decText += decoder.decode(plaintext)
+      yield decText
     }
     offset += chunksize
   }
   console.log('all done')
-  return decText
+  // return decText
 }
 // Download keyfiles
 document.getElementById('btn').addEventListener('click', async function () {
@@ -162,23 +163,34 @@ document.getElementById('but').addEventListener('click', async function () {
 
 // Download decrypted file
 document.getElementById('but2').addEventListener('click', async function () {
-  const dec = await decr()
+  const dec = decr()
+  const text = await dec
   const filename = 'decrypted_file'
-  download(filename, dec)
+  const element = document.createElement('a')
+  for (const chunk of text) {
+    element.setAttribute('href',
+      'data:text/plain;charset=utf-8,' +
+        encodeURIComponent(chunk))
+  }
+
+  element.setAttribute('download', filename)
+  document.body.appendChild(element)
+  element.click()
+
+  document.body.removeChild(element)
+  // download(filename, dec)
 }, false)
 
 function download (file, text) {
   // creating an invisible element
 
   const element = document.createElement('a')
-  for (let i = 0; i < text.length; i++) {
-    element.setAttribute('href',
-      'data:text/plain;charset=utf-8,' +
+  element.setAttribute('href',
+    'data:text/plain;charset=utf-8,' +
         encodeURIComponent(text[i]))
-    element.setAttribute('download', file)
-    document.body.appendChild(element)
-    element.click()
-  }
+  element.setAttribute('download', file)
+  document.body.appendChild(element)
+  element.click()
   document.body.removeChild(element)
 }
 
