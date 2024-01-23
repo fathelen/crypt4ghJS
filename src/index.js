@@ -145,10 +145,10 @@ async function * decr () {
 // Download keyfiles
 document.getElementById('btn').addEventListener('click', async function () {
   const keys = await keyfile()
-  const text = [keys[0]]
+  const text = keys[0]
   const filename = 'secret_keyfile.sec'
   download(filename, text)
-  const text2 = [keys[1]]
+  const text2 = keys[1]
   const filename2 = 'public_keyfile.pub'
 
   download(filename2, text2)
