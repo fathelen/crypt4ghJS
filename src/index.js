@@ -161,7 +161,7 @@ document.getElementById('but').addEventListener('click', async function () {
 // Download decrypted file
 document.getElementById('but2').addEventListener('click', async function () {
   const dec = decr()
-  const text = dec.next()
+  const text = await dec.next()
   console.log(text)
   // const filename = 'decrypted_file'
   // const element = document.createElement('a')
