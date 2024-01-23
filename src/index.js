@@ -155,7 +155,7 @@ document.getElementById('btn').addEventListener('click', async function () {
 document.getElementById('but').addEventListener('click', async function () {
   const enc = await encr()
   const filename = 'c4gh_file.c4gh'
-  saveByteArray(enc, filename)
+  saveByteArray([enc], filename)
 }, false)
 
 // Download decrypted file
