@@ -160,8 +160,9 @@ document.getElementById('but').addEventListener('click', async function () {
 
 // Download decrypted file
 document.getElementById('but2').addEventListener('click', async function () {
-  // const dec = decr()
-  // const text = await dec
+  const dec = decr()
+  const text = dec.next()
+  console.log(text)
   // const filename = 'decrypted_file'
   // const element = document.createElement('a')
   /*
@@ -169,14 +170,14 @@ document.getElementById('but2').addEventListener('click', async function () {
   while (!(next = text.next()).done) {
     const t = next.value
     console.log('t: ', t)
-  } */
+  }
   const dec = decr()
   for (const chunk of dec) {
     console.log('chunk: ', chunk)
     /*
     element.setAttribute('href',
       'data:text/plain;charset=utf-8,' +
-        encodeURIComponent(chunk)) */
+        encodeURIComponent(chunk))
   }
   /*
   element.setAttribute('download', filename)
