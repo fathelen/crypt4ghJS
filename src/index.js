@@ -167,7 +167,7 @@ document.getElementById('but').addEventListener('click', async function () {
     const chunk = next.value
     const buf = new Blob([chunk], { type: 'octet/stream' })
     console.log('chunk: ', chunk)
-    console.log('arraybuffer: ', buf.arrayBuffer)
+    console.log('arraybuffer: ', await buf.arrayBuffer())
     /*
     if (buf.arrayBuffer) {
       element.setAttribute('href', buf.arrayBuffer)
