@@ -40,8 +40,8 @@ async function keyfile () {
   return result
 }
 
-async function * encr () {
-  // const c4ghtext = []
+async function encr () {
+  const c4ghtext = []
   const file = document.getElementById('input')
   const file2 = document.getElementById('input2')
   const file3 = document.getElementById('input3')
@@ -86,8 +86,8 @@ async function * encr () {
   const pubkeyFile = await file2.files[0].text()
   const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile], password)
   const header = await encryption.encHead(keys[0], [keys[1]], ed)
-  yield header[0]
-  // c4ghtext.push(header[0])
+  // yield header[0]
+  c4ghtext.push(header[0])
   const chunksize = 65536
   let counter = 0
   let offset = 0
@@ -97,17 +97,16 @@ async function * encr () {
     const chunk = await chunkfile.arrayBuffer()
     const encryptedtext = await encryption.encryption(header, new Uint8Array(chunk), counter, block)
     if (encryptedtext) {
-      yield encryptedtext
-      // c4ghtext.push(encryptedtext)
+      // yield encryptedtext
+      c4ghtext.push(encryptedtext)
     }
 
     offset += chunksize
   }
   console.log('all done')
-  /*
   const buffered = Buffer.concat(c4ghtext)
   const text = new Uint8Array(buffered)
-  return text */
+  return text
 }
 
 async function * decr () {
@@ -155,20 +154,9 @@ document.getElementById('btn').addEventListener('click', async function () {
 
 // Download c4gh file
 document.getElementById('but').addEventListener('click', async function () {
-  const enc = encr()
+  const enc = await encr()
   const filename = 'c4gh_file.c4gh'
-  const element = document.createElement('a')
-  let next
-  while (!(next = await enc.next()).done) {
-    const chunk = next.value
-    element.setAttribute('href',
-      'application/octet-stream' + [chunk])
-  }
-  element.setAttribute('download', filename)
-  document.body.appendChild(element)
-  element.click()
-  document.body.removeChild(element)
-  // saveByteArray([enc], filename)
+  saveByteArray([enc], filename)
 }, false)
 
 // Download decrypted file
