@@ -171,6 +171,7 @@ document.getElementById('but').addEventListener('click', async function () {
   element.setAttribute('download', filename)
   document.body.appendChild(element)
   element.click()
+  element.download = filename
 
   document.body.removeChild(element)
   /*
