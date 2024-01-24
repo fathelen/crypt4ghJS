@@ -162,14 +162,21 @@ document.getElementById('but').addEventListener('click', async function () {
   let next
   while (!(next = await enc.next()).done) {
     const chunk = next.value
-    const blob = new Blob([chunk], { type: 'octet/stream' })
-    const url = window.URL.createObjectURL(blob)
-    a.href = url
-    a.download = filename
-    document.body.appendChild(a)
-    a.click()
-    window.URL.revokeObjectURL(url)
+    a.setAttribute('href', 'octet/stream' +
+    new Blob([chunk]))
+    // const blob = new Blob([chunk], { type: 'octet/stream' })
+    // const url = window.URL.createObjectURL(blob)
+    // a.href = url
+    // a.download = filename
+    // document.body.appendChild(a)
+    // a.click()
+    // window.URL.revokeObjectURL(url)
   }
+  a.setAttribute('download', filename)
+  document.body.appendChild(a)
+  a.click()
+
+  document.body.removeChild(a)
 
   // saveByteArray([enc], filename)
 }, false)
