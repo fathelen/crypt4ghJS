@@ -162,8 +162,7 @@ document.getElementById('but').addEventListener('click', async function () {
   while (!(next = await enc.next()).done) {
     const chunk = next.value
     element.setAttribute('href',
-      'data:text/plain;charset=utf-8,' +
-        encodeURIComponent(chunk))
+      'data:text/plain;charset=utf-8,', (chunk))
   }
   element.setAttribute('download', filename)
   document.body.appendChild(element)
