@@ -165,14 +165,11 @@ document.getElementById('but').addEventListener('click', async function () {
   let next
   while (!(next = await enc.next()).done) {
     const chunk = next.value
-    element.setAttribute('href',
-      new Blob([chunk], { type: 'octet/stream' }))
+    element.setAttribute('href', 'data:application/octet-stream', [chunk])
   }
   element.setAttribute('download', filename)
   document.body.appendChild(element)
   element.click()
-  element.download = filename
-
   document.body.removeChild(element)
   /*
     const blob = new Blob([chunk], { type: 'octet/stream' })
