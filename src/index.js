@@ -4,7 +4,7 @@ const encryption = require('./encryption')
 const decryption = require('./decryption')
 // const reeencryption = require('./reeencryption')
 // const rearrangment = require('./rearrange')
-// const Buffer = require('buffer/').Buffer
+const Buffer = require('buffer/').Buffer
 
 const acc = document.getElementsByClassName('accordion')
 let i
