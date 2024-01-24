@@ -166,16 +166,18 @@ document.getElementById('but').addEventListener('click', async function () {
   while (!(next = await enc.next()).done) {
     const chunk = next.value
     const buf = new Blob([chunk], { type: 'octet/stream' })
-    console.log(buf)
+    console.log('chunk: ', chunk)
+    console.log('arraybuffer: ', buf.arrayBuffer)
+    /*
     if (buf.arrayBuffer) {
       element.setAttribute('href', buf.arrayBuffer)
-    }
+    } */
   }
+  /*
   element.setAttribute('download', filename)
   document.body.appendChild(element)
   element.click()
   document.body.removeChild(element)
-  /*
     const blob = new Blob([chunk], { type: 'octet/stream' })
     const url = window.URL.createObjectURL(blob)
     a.href = url
