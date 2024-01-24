@@ -165,7 +165,10 @@ document.getElementById('but').addEventListener('click', async function () {
   let next
   while (!(next = await enc.next()).done) {
     const chunk = next.value
-    element.setAttribute('href', new Blob([chunk], { type: 'octet/stream' }))
+    const buf = new Blob([chunk], { type: 'octet/stream' })
+    if (buf.arrayBuffer) {
+      element.setAttribute('href', buf.arrayBuffer)
+    }
   }
   element.setAttribute('download', filename)
   document.body.appendChild(element)
