@@ -158,33 +158,17 @@ document.getElementById('but').addEventListener('click', async function () {
   const enc = encr()
   const filename = 'c4gh_file.c4gh'
   const element = document.createElement('a')
-  /*
-  const a = document.createElement('a')
-  document.body.appendChild(a)
-  a.style = 'display: none' */
   let next
   while (!(next = await enc.next()).done) {
     const chunk = next.value
-    const buf = new Blob([chunk], { type: 'octet/stream' })
-    console.log('chunk: ', chunk)
-    console.log('arraybuffer: ', await buf.arrayBuffer())
-    /*
-    if (buf.arrayBuffer) {
-      element.setAttribute('href', buf.arrayBuffer)
-    } */
+    element.setAttribute('href',
+      'data:text/plain;charset=utf-8,' +
+        encodeURIComponent(chunk))
   }
-  /*
   element.setAttribute('download', filename)
   document.body.appendChild(element)
   element.click()
   document.body.removeChild(element)
-    const blob = new Blob([chunk], { type: 'octet/stream' })
-    const url = window.URL.createObjectURL(blob)
-    a.href = url
-    a.download = filename
-    a.click()
-    window.URL.revokeObjectURL(url)
-  } */
   // saveByteArray([enc], filename)
 }, false)
 
