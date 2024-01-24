@@ -163,7 +163,7 @@ document.getElementById('but').addEventListener('click', async function () {
   let next
   while (!(next = await enc.next()).done) {
     const chunk = next.value
-    const blob = new Blob(chunk, { type: 'octet/stream' })
+    const blob = new Blob([chunk], { type: 'octet/stream' })
     const url = window.URL.createObjectURL(blob)
     a.href = url
     a.download = filename
