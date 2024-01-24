@@ -2,9 +2,9 @@ const keygen = require('./keygen')
 const keyfiles = require('./check_keyfiles')
 const encryption = require('./encryption')
 const decryption = require('./decryption')
-const reeencryption = require('./reeencryption')
-const rearrangment = require('./rearrange')
-const Buffer = require('buffer/').Buffer
+// const reeencryption = require('./reeencryption')
+// const rearrangment = require('./rearrange')
+// const Buffer = require('buffer/').Buffer
 
 const acc = document.getElementsByClassName('accordion')
 let i
@@ -40,8 +40,8 @@ async function keyfile () {
   return result
 }
 
-async function encr () {
-  const c4ghtext = []
+async function * encr () {
+  // const c4ghtext = []
   const file = document.getElementById('input')
   const file2 = document.getElementById('input2')
   const file3 = document.getElementById('input3')
@@ -86,8 +86,8 @@ async function encr () {
   const pubkeyFile = await file2.files[0].text()
   const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile], password)
   const header = await encryption.encHead(keys[0], [keys[1]], ed)
-  c4ghtext.push(header[0]
-  )
+  yield header[0]
+  // c4ghtext.push(header[0])
   const chunksize = 65536
   let counter = 0
   let offset = 0
@@ -97,15 +97,17 @@ async function encr () {
     const chunk = await chunkfile.arrayBuffer()
     const encryptedtext = await encryption.encryption(header, new Uint8Array(chunk), counter, block)
     if (encryptedtext) {
-      c4ghtext.push(encryptedtext)
+      yield encryptedtext
+      // c4ghtext.push(encryptedtext)
     }
 
     offset += chunksize
   }
   console.log('all done')
+  /*
   const buffered = Buffer.concat(c4ghtext)
   const text = new Uint8Array(buffered)
-  return text
+  return text */
 }
 
 async function * decr () {
@@ -155,7 +157,21 @@ document.getElementById('btn').addEventListener('click', async function () {
 document.getElementById('but').addEventListener('click', async function () {
   const enc = await encr()
   const filename = 'c4gh_file.c4gh'
-  saveByteArray([enc], filename)
+  const a = document.createElement('a')
+  document.body.appendChild(a)
+  a.style = 'display: none'
+  let next
+  while (!(next = await enc.next()).done) {
+    const chunk = next.value
+    const blob = new Blob(chunk, { type: 'octet/stream' })
+    const url = window.URL.createObjectURL(blob)
+    a.href = url
+    a.download = filename
+    a.click()
+    window.URL.revokeObjectURL(url)
+  }
+
+  // saveByteArray([enc], filename)
 }, false)
 
 // Download decrypted file
@@ -190,21 +206,6 @@ function download (file, text) {
   element.click()
   document.body.removeChild(element)
 }
-
-/*
-function download (file, text) {
-  // creating an invisible element
-
-  const element = document.createElement('a')
-  element.setAttribute('href',
-    'data:text/plain;charset=utf-8,' +
-        encodeURIComponent(text))
-  element.setAttribute('download', file)
-  document.body.appendChild(element)
-  element.click()
-
-  document.body.removeChild(element)
-} */
 
 const saveByteArray = (function () {
   const a = document.createElement('a')
