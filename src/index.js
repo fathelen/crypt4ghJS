@@ -158,7 +158,6 @@ document.getElementById('but').addEventListener('click', async function () {
   const enc = await encr()
   const filename = 'c4gh_file.c4gh'
   const a = document.createElement('a')
-  document.body.appendChild(a)
   a.style = 'display: none'
   let next
   while (!(next = await enc.next()).done) {
@@ -167,6 +166,7 @@ document.getElementById('but').addEventListener('click', async function () {
     const url = window.URL.createObjectURL(blob)
     a.href = url
     a.download = filename
+    document.body.appendChild(a)
     a.click()
     window.URL.revokeObjectURL(url)
   }
