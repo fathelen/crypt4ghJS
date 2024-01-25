@@ -138,9 +138,10 @@ document.getElementById('btn').addEventListener('click', async function () {
   const text = keys[0]
   const filename = 'secret_keyfile.sec'
   download(filename, text)
+  const keyPreview = document.getElementById('filecontents')
+  keyPreview.innerText += keys
   const text2 = keys[1]
   const filename2 = 'public_keyfile.pub'
-
   download(filename2, text2)
 }, false)
 
