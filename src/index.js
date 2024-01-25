@@ -134,6 +134,9 @@ async function * decr () {
 }
 // Download keyfiles
 document.getElementById('btn').addEventListener('click', async function () {
+  const popup = document.getElementById('myPopup')
+  popup.innerText('Currently calculating keys')
+  popup.classList.toggle('show')
   const keys = await keyfile()
   const text = keys[0]
   const filename = 'secret_keyfile.sec'
