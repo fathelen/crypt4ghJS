@@ -31,7 +31,7 @@ async function keyfile () {
   const result = await keygen.keygen(password)
   return result
 }
-/*
+
 async function encr () {
   const c4ghtext = []
   const file = document.getElementById('input')
@@ -100,7 +100,7 @@ async function encr () {
   const text = new Uint8Array(buffered)
   return text
 }
-*/
+
 async function * decr () {
   let decText = ''
   const file = document.getElementById('input4')
@@ -131,7 +131,7 @@ async function * decr () {
   }
   console.log('all done')
   // return decText
-} 
+}
 // Download keyfiles
 document.getElementById('btn').addEventListener('click', async function () {
   const keys = await keyfile()
