@@ -40,7 +40,17 @@
         border: double;
         overflow-y: scroll;
         height: 400px;
-    }
+        }
+        #enccontents {
+        border: double;
+        overflow-y: scroll;
+        height: 400px;
+        }
+        #deccontents {
+        border: double;
+        overflow-y: scroll;
+        height: 400px;
+        }
       
     </style>
     <head>
@@ -121,6 +131,10 @@
             <input type="button" id="but" value="Download c4gh file" />
             <br />
             <br />
+            <div>Encryption Preview</div>
+            <div id="enccontents"></div>
+            <br />
+            <br />
         </div>
         <button class="accordion">3. Step: decrypt your data </button>
         <div class="panel">
@@ -146,6 +160,10 @@
             <br />
             <br />
             <input type="button" id="but2" value="Download decrypted file" />
+            <div>Decryption Preview</div>
+            <div id="deccontents"></div>
+            <br />
+            <br />
         </div>
         <script src="./dist/main.js"> </script>
       </body>

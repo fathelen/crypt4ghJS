@@ -150,6 +150,8 @@ document.getElementById('but').addEventListener('click', async function () {
   const enc = await encr()
   const filename = 'c4gh_file.c4gh'
   saveByteArray([enc], filename)
+  const keyPreview = document.getElementById('enccontents')
+  keyPreview.innerText += enc.subarray(0, 500)
 }, false)
 
 // Download decrypted file
@@ -158,8 +160,14 @@ document.getElementById('but2').addEventListener('click', async function () {
   const filename = 'decrypted_file'
   const element = document.createElement('a')
   let next
+  let index = 0
   while (!(next = await dec.next()).done) {
     const chunk = next.value
+    if (index === 0) {
+      const keyPreview = document.getElementById('deccontents')
+      keyPreview.innerText += chunk.substring(0, 500)
+    }
+    index++
     element.setAttribute('href',
       'data:text/plain;charset=utf-8,' +
         encodeURIComponent(chunk))
