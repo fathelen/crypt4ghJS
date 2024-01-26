@@ -40,7 +40,7 @@ async function encr () {
   const password = document.getElementById('psw2').value
   const blocks = document.getElementById('block2').value
   const edit = document.getElementById('editlist').value
-  const enteredText = document.getElementById('w3review').value
+  const enteredText = await document.getElementById('w3review').value
   console.log(enteredText)
   let block = null | []
   if (blocks === '') {
@@ -88,7 +88,9 @@ async function encr () {
   if (enteredText !== '') {
     while (offset < enteredText.length) {
       counter++
+      console.log('1')
       const chunkfile = await enteredText.slice(offset, offset + chunksize)
+      console.log(chunkfile)
       const chunk = await chunkfile.arrayBuffer()
       const encryptedtext = await encryption.encryption(header, new Uint8Array(chunk), counter, block)
       if (encryptedtext) {
