@@ -175,7 +175,11 @@ document.getElementById('btn').addEventListener('click', async function () {
 // Download c4gh file
 document.getElementById('but').addEventListener('click', async function () {
   const enc = await encr()
-  const filename = 'c4gh_file.c4gh'
+  let filename = 'c4gh_file.c4gh'
+  const c4ghName = await document.getElementById('c4ghname').value
+  if (c4ghName !== '') {
+    filename = c4ghName
+  }
   saveByteArray([enc], filename)
   const keyPreview = document.getElementById('enccontents')
   keyPreview.innerText += enc.subarray(0, 500)
@@ -184,7 +188,11 @@ document.getElementById('but').addEventListener('click', async function () {
 // Download decrypted file
 document.getElementById('but2').addEventListener('click', async function () {
   const dec = decr()
-  const filename = 'decrypted_file'
+  let filename = 'decrypted_file'
+  const decName = await document.getElementById('decname').value
+  if (decName !== '') {
+    filename = decName
+  }
   const element = document.createElement('a')
   let next
   let index = 0

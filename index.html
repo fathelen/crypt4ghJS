@@ -82,12 +82,12 @@
             <input type="password" id="psw" name="psw" required> 
             <br />
             <br />
-            <label for="secname"> Enter name for seckey file: </label>
-            <textarea id="secname" name="secname" rows="2" cols="50"></textarea>
+            <label for="secname"> Enter name for seckey file (optional): </label>
+            <textarea id="secname" name="secname" rows="1" cols="25"></textarea>
             <br />
             <br />
-            <label for="pubname"> Enter name for pubkey file: </label>
-            <textarea id="pubname" name="pubname" rows="2" cols="50"></textarea>
+            <label for="pubname"> Enter name for pubkey file (optinal): </label>
+            <textarea id="pubname" name="pubname" rows="1" cols="25"></textarea>
             <br />
             <br />
             <input type="button" id="btn" value="Download key files" onclick="confirm('Start generating keyfiles')" />
@@ -144,6 +144,10 @@
             <input type="password" id="psw2" name="psw2">
             <br />
             <br />
+            <label for="c4ghname"> Enter name for c4gh file (optinal): </label>
+            <textarea id="c4ghname" name="c4ghname" rows="1" cols="25"></textarea>
+            <br />
+            <br />
             <input type="button" id="but" value="Download c4gh file" onclick="confirm('Start generating c4gh file')" />
             <br />
             <br />
@@ -173,6 +177,10 @@
             <br />
             <label for="psw3">Password (optional)</label>
             <input type="password" id="psw3" name="psw3" required>
+            <br />
+            <br />
+            <label for="decname"> Enter name for decrypted file (optinal): </label>
+            <textarea id="decname" name="decname" rows="1" cols="25"></textarea>
             <br />
             <br />
             <input type="button" id="but2" value="Download decrypted file" onclick="confirm('Start generating decryption')"/>
