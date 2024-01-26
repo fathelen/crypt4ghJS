@@ -154,12 +154,21 @@ async function * decr () {
 document.getElementById('btn').addEventListener('click', async function () {
   const keys = await keyfile()
   const text = keys[0]
-  const filename = 'secret_keyfile.sec'
+  const secName = await document.getElementById('secname').value
+  let filename = 'secret_keyfile.sec'
+  if (secName !== '') {
+    filename = secName
+  }
   download(filename, text)
   const keyPreview = document.getElementById('filecontents')
   keyPreview.innerText += keys
   const text2 = keys[1]
+  const pubName = await document.getElementById('pubname').value
   const filename2 = 'public_keyfile.pub'
+  if (pubName !== '') {
+    filename = secName
+  }
+
   download(filename2, text2)
 }, false)
 
