@@ -91,8 +91,7 @@ async function encr () {
       console.log('1')
       const chunkfile = await enteredText.slice(offset, offset + chunksize)
       console.log(chunkfile)
-      const chunk = await chunkfile.arrayBuffer()
-      const encryptedtext = await encryption.encryption(header, new Uint8Array(chunk), counter, block)
+      const encryptedtext = await encryption.encryption(header, Uint8Array.from(chunkfile), counter, block)
       if (encryptedtext) {
       // yield encryptedtext
         c4ghtext.push(encryptedtext)
