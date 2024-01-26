@@ -85,17 +85,32 @@ async function encr () {
   const chunksize = 65536
   let counter = 0
   let offset = 0
-  while (offset < file3.files[0].size) {
-    counter++
-    const chunkfile = await file3.files[0].slice(offset, offset + chunksize)
-    const chunk = await chunkfile.arrayBuffer()
-    const encryptedtext = await encryption.encryption(header, new Uint8Array(chunk), counter, block)
-    if (encryptedtext) {
+  if (enteredText !== '') {
+    while (offset < enteredText.length) {
+      counter++
+      const chunkfile = await enteredText.slice(offset, offset + chunksize)
+      const chunk = await chunkfile.arrayBuffer()
+      const encryptedtext = await encryption.encryption(header, new Uint8Array(chunk), counter, block)
+      if (encryptedtext) {
       // yield encryptedtext
-      c4ghtext.push(encryptedtext)
-    }
+        c4ghtext.push(encryptedtext)
+      }
 
-    offset += chunksize
+      offset += chunksize
+    }
+  } else {
+    while (offset < file3.files[0].size) {
+      counter++
+      const chunkfile = await file3.files[0].slice(offset, offset + chunksize)
+      const chunk = await chunkfile.arrayBuffer()
+      const encryptedtext = await encryption.encryption(header, new Uint8Array(chunk), counter, block)
+      if (encryptedtext) {
+      // yield encryptedtext
+        c4ghtext.push(encryptedtext)
+      }
+
+      offset += chunksize
+    }
   }
   console.log('all done')
   const buffered = Buffer.concat(c4ghtext)
