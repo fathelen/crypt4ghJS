@@ -166,7 +166,7 @@ document.getElementById('btn').addEventListener('click', async function () {
   const pubName = await document.getElementById('pubname').value
   let filename2 = 'public_keyfile.pub'
   if (pubName !== '') {
-    filename2 = secName
+    filename2 = pubName
   }
 
   download(filename2, text2)
