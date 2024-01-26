@@ -40,6 +40,8 @@ async function encr () {
   const password = document.getElementById('psw2').value
   const blocks = document.getElementById('block2').value
   const edit = document.getElementById('editlist').value
+  const enteredText = document.getElementById('w3review').value
+  console.log(enteredText)
   let block = null | []
   if (blocks === '') {
     block = null
