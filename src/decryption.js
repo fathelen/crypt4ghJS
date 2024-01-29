@@ -53,7 +53,6 @@ exports.header_deconstruction = async function (header, seckeys) {
     let editlist = new Uint8Array()
     const headerPackets = dec.parse(header)
     const decryptedPackets = await dec.decrypt_header(headerPackets[0], seckeys)
-    console.log(decryptedPackets)
     const partitionedPackages = partitionPackets(decryptedPackets[0])
     const sessionKey = parseEncPacket(partitionedPackages[0][0])
     if (partitionedPackages[1].length > 0) {
