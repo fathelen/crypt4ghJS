@@ -11,3 +11,7 @@ Crypt4GH-JS has been implemented in JavaScript and is therefore applicable to al
 
 ## Examples
 
+## Crypt4GH Specification 
+
+referring to: [crypt4GH specification](http://samtools.github.io/hts-specs/crypt4gh.pdf)
+
