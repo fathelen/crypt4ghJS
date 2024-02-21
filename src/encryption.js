@@ -3,7 +3,10 @@ const x25519 = require('@stablelib/x25519')
 const Blake2b = require('@stablelib/blake2b')
 const enc = require('./encryption')
 const _sodium = require('libsodium-wrappers')
-const Buffer = require('buffer/').Buffer
+// const Buffer = require('buffer/').Buffer
+// const chacha20poly1305 = require('@noble/ciphers/chacha')
+// const utf8ToBytes = require('@noble/ciphers/utils')
+// const randomBytes = require('@noble/ciphers/webcrypto')
 
 const PacketTypeDataEnc = new Uint32Array([0])
 const PacketTypeEditList = new Uint32Array([1])
@@ -72,6 +75,12 @@ exports.encHeaderEdit = async function (secretkey, publicKeys, editlist) {
 }
 
 exports.pureEncryption = async function (chunk, key) {
+  /*
+  const nonce = _sodium.randombytes_buf(12) // randomBytes.randomBytes(12)
+  const chacha = chacha20poly1305.chacha20poly1305(key, nonce)
+  // const data = utf8ToBytes.utf8ToBytes(chunk)
+  const ciphertext = chacha.encrypt(chunk)
+  return ciphertext */
   let x = new Uint8Array()
   await (async () => {
     await _sodium.ready

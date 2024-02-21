@@ -20,6 +20,7 @@
   "author": "Fabienne Thelen",
   "license": "MIT",
   "dependencies": {
+    "@noble/ciphers": "^0.4.1",
     "@stablelib/blake2b": "^1.0.1",
     "@stablelib/chacha20poly1305": "^1.0.1",
     "@stablelib/x25519": "^1.0.3",

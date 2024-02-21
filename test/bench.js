@@ -1,8 +1,10 @@
 /* eslint-disable indent */
 /* eslint-disable eol-last */
 /* eslint no-undef: */
+const { Console } = require('console')
 const index = require('crypt4gh_js')
 const fs = require('fs')
+const { Worker } = require('worker_threads')
 
 const ts = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAEbm9uZQAEbm9uZQAgrpd+v2ZGymbextTp5nMt298h1yEFBigB+bS+1WJT/lM=\n-----END CRYPT4GH PRIVATE KEY-----\n'
 const tp = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nfQCgFp/dPaDOELnzrgEEQUeOmOlMj9M/dTP7bIiuxyw=\n-----END CRYPT4GH PUBLIC KEY-----\n'
@@ -12,33 +14,67 @@ const ptest = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nN63bgz4c9GZaadtWjYGAlGMvFTHG
 const stest = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAGc2NyeXB0ABQAAAAAYoz9LwYFw4LUzvWleuruQwARY2hhY2hhMjBfcG9seTEzMDUAPJ7bIhilIbds1B8Mx7ItNJ6jwlmXv/6nFnE3zeQVaHDoGZ3b0lKQcVMrE9SKneSdOhKjlZxqzDcdztde8w==\n-----END CRYPT4GH PRIVATE KEY-----\n'
 const ts2 = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAGc2NyeXB0ABQAAAAAErnfoX48n1p21KYPJF39qwARY2hhY2hhMjBfcG9seTEzMDUAPB2VckJsR/5iz35Zg5VO2VRkdIStoFIL0681lrdKlpn80dA7bH+vRcQc1+LVT4vptEt7EC5eXltE07uNhA==\n-----END CRYPT4GH PRIVATE KEY-----\n'
 const tp2 = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nKK2of4G9P49mpUE1PVDia+hTSQ8VWJNXxkSG4m6OiUc=\n-----END CRYPT4GH PUBLIC KEY-----\n'
-async function encryption (input, output, edit, blocks) {
-  const keys = await index.keyfiles.encryption_keyfiles([ts2, tp2], 'abc')
+/*
+async function paralle () {
+  const keys = await index.keyfiles.encryption_keyfiles([ts, tp])
+  const edit = null
   const header = await index.encryption.encHead(keys[0], [keys[1]], edit)
-    fs.writeFile(output, header[0], (err) => {
-      if (err) {
-        console.log(err)
-      }
-    })
+  const writeStream = fs.createWriteStream('testData/abcd.c4gh')
+  writeStream.write(header[0])
+  if (header[1]) {
+    let counter = 0
+    const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/test4gb.c4gh')
+    readStream
+      .on('data', async function (d) {
+        const worker = new Worker(
+         __dirname + '/encrypt-worker.js',
+         {
+            workerData: {
+              d, counter, header, keys
+          }
+      })
+        counter++
+        worker.on('message', msg => {
+
+        })
+      })
+  }
+}
+
+paralle()
+*/
+async function encryption (input, output, edit, blocks) {
+  const keys = await index.keyfiles.encryption_keyfiles([ts, tp])
+  const header = await index.encryption.encHead(keys[0], [keys[1]], edit)
+  process.stdout.write(header[0])
+  // const writeStream = fs.createWriteStream(output)
+  // writeStream.write(header[0])
    if (header[1]) {
     let counter = 0
-      const readStream = fs.createReadStream(input)
-        readStream
-          .on('data', async function (d) {
-            counter++
-            const text = await index.encryption.encryption(header, d, counter, blocks)
-            if (text) {
-              fs.appendFile(output, text, (err) => {
-                if (err) {
-                  console.log(err)
-                }
-              })
+    const readStream = fs.createReadStream(input)
+      readStream
+        .on('data', async function (d) {
+          counter++
+          const text = await index.encryption.encryption(header, d, counter, blocks)
+          if (text) {
+            process.stdout.write(text)
+            // writeStream.write(text)
             }
+          })
+          .on('end', (d) => {
+           // writeStream.end()
+            // breakPoint()
           })
   }
 }
 
-// encryption('/home/fabienne/Projects/test.txt', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/keytest.c4gh')
+function breakPoint () {
+  console.log('asdf')
+}
+
+for (let i = 0; i < 5; i++) {
+  encryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/4gb')
+}
 
 async function decryption (input, output, wantedblocks) {
   const keys = await index.keyfiles.encryption_keyfiles([ts2], 'abc')
@@ -69,7 +105,6 @@ async function decryption (input, output, wantedblocks) {
       readStream.destroy()
     })
 }
-
 // decryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/keytest.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/downloadTest.txt')
 
 async function generateKeys (password) {
@@ -78,7 +113,7 @@ async function generateKeys (password) {
    console.log(keys[1])
 }
 
-generateKeys()
+// generateKeys()
 
 // Reencryption
 async function reencryption (input, output) {
