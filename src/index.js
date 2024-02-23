@@ -31,6 +31,7 @@ for (i = 0; i < acc.length; i++) {
 async function keyfile () {
   const password = await document.getElementById('psw').value
   const result = await crypt4GHJS.keygen.keygen(password)
+  console.log(result)
   return result
 }
 

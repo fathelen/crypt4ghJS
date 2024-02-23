@@ -24,9 +24,11 @@ const chiperChacha = helperfunction.string2byte('chacha20_poly1305')
  */
 export async function keygen (pasphrase) {
   try {
+    console.log('hallo')
     const keys = generateKeyPair.generateKeyPair()
     const pubkeyFile = createPubkey(keys.publicKey)
     const seckeyFile = await createSeckey(keys.secretKey, pasphrase)
+    console.log([seckeyFile, pubkeyFile])
     return [seckeyFile, pubkeyFile]
   } catch (e) {
     console.trace('Key generation not possible.')
