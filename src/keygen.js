@@ -59,24 +59,34 @@ export function createPubkey (pubkey) {
  */
 export async function createSeckey (seckey, passphrase) {
   try {
+    console.log('a')
     let a = ''
     await (async () => {
+      console.log('b')
       await _sodium.ready
       const sodium = _sodium
+      console.log('c')
       if (passphrase) {
         if (passphrase.replace(/\s+/g, '') === '') {
           console.log('hier gelanded')
           throw new Error('Password can not be empty string')
         }
+        console.log('d')
         const salt = sodium.randombytes_buf(16)
+        console.log('e')
         const saltround = new Uint8Array(4 + salt.length)
+        console.log('f')
         saltround.set([0, 0, 0, 0])
         saltround.set(salt, 4)
         const N = 16384; const r = 8; const p = 1
         const dklen = 32
+        console.log('g')
         const keyPrmoise = scrypt.scrypt(helperfunction.string2byte(passphrase), salt, N, r, p, dklen)
+        console.log('h')
         const key = keyPrmoise.then(function (result) {
+          console.log('i')
           const nonce = sodium.randombytes_buf(12)
+          console.log('j')
           const decData = sodium.crypto_aead_chacha20poly1305_ietf_encrypt(seckey, null, null, nonce, result)
           console.log('bis hier')
           const decNonce = Buffer.concat([magicBytestring, new Uint8Array([0, 6]), kdfScript, new Uint8Array([0, 20]), saltround, new Uint8Array([0, 17]), chiperChacha, new Uint8Array([0, 12 + decData.length]), nonce, decData])
