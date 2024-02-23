@@ -1,5 +1,6 @@
 
 import * as crypt4GHJS from 'crypt4gh_js'
+import { Buffer } from 'buffer'
 // const keygen = require('./keygen')
 // const keyfiles = require('./check_keyfiles')
 // const encryption = require('./encryption')

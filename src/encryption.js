@@ -2,6 +2,7 @@ import * as helperfunction from './helper functions.js'
 import * as x25519 from '@stablelib/x25519'
 import * as Blake2b from '@stablelib/blake2b'
 import _sodium from 'libsodium-wrappers'
+import { Buffer } from 'buffer'
 /*
 const helperfunction = require('./helper functions')
 const x25519 = require('@stablelib/x25519')
