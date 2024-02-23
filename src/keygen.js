@@ -26,7 +26,9 @@ export async function keygen (pasphrase) {
   try {
     console.log('hallo')
     const keys = generateKeyPair.generateKeyPair()
+    console.log('1: ', keys)
     const pubkeyFile = createPubkey(keys.publicKey)
+    console.log('2: ', pubkeyFile)
     const seckeyFile = await createSeckey(keys.secretKey, pasphrase)
     console.log([seckeyFile, pubkeyFile])
     return [seckeyFile, pubkeyFile]
