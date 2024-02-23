@@ -32,7 +32,6 @@ for (i = 0; i < acc.length; i++) {
 async function keyfile () {
   const password = await document.getElementById('psw').value
   const result = await crypt4GHJS.keygen.keygen(password)
-  console.log(result)
   return result
 }
 
@@ -82,7 +81,7 @@ async function encr () {
   const seckeyFile = await file.files[0].text()
   const pubkeyFile = await file2.files[0].text()
   const keys = await crypt4GHJS.keyfiles.encryptionKeyfiles([seckeyFile, pubkeyFile], password)
-  const header = await encryption.encHead(keys[0], [keys[1]], ed)
+  const header = await crypt4GHJS.encryption.encHead(keys[0], [keys[1]], ed)
   // yield header[0]
   c4ghtext.push(header[0])
   const chunksize = 65536
