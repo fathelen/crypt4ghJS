@@ -1,17 +1,20 @@
+import * as enc from './encryption.js'
+import * as dec from './decryption.js'
+/*
 const enc = require('./encryption')
 const dec = require('./decryption')
-const rea = require('./rearrange')
+const rea = require('./rearrange') */
 
 const SEGMENT_SIZE = 65536
 const PacketTypeDataEnc = '0000'
 const PacketTypeEditList = '1000'
 
-exports.rearrange = async function (infile, seckey, pubkey, editlist) {
+export async function rearrange (infile, seckey, pubkey, editlist) {
   try {
     const fullEnc = []
     const header = await infile.subarray(0, 10000)
     const headerPackets = dec.parse(header)
-    const decryptedPackets = dec.decrypt_header(headerPackets[0], seckey)
+    const decryptedPackets = dec.decryptHeader(headerPackets[0], seckey)
     const rearranged = rearrangement(decryptedPackets, editlist, headerPackets, pubkey, seckey, fullEnc, infile)
     return rearranged
   } catch (e) {
@@ -19,12 +22,12 @@ exports.rearrange = async function (infile, seckey, pubkey, editlist) {
   }
 }
 
-exports.streamRearrange = async function (header, seckey, pubkey, editlist) {
+export async function streamRearrange (header, seckey, pubkey, editlist) {
   const headerPackets = dec.parse(header)
-  const decryptedPackets = await dec.decrypt_header(headerPackets[0], seckey)
+  const decryptedPackets = await dec.decryptHeader(headerPackets[0], seckey)
   const sessionk = decryptedPackets[0][0].subarray(8)
   const newEditPacket = await headerRearrange(decryptedPackets[0], editlist, headerPackets[1].length, pubkey, seckey, sessionk)
-  return [newEditPacket[0], headerPackets[2]]
+  return [newEditPacket, headerPackets[2]]
 }
 
 async function headerRearrange (decPackets, editlist, inputlänge, pubkeys, seckey, key) {
@@ -33,7 +36,7 @@ async function headerRearrange (decPackets, editlist, inputlänge, pubkeys, seck
     const partitionPacket = partitionPackets(decPackets)
     // no editlist in old header
     if (partitionPacket[1].length === 0) {
-      const encHeader = await enc.encryption_edit(editlist, encryptionMethod, key, pubkeys, seckey)
+      const encHeader = await enc.encryptionEdit(editlist, encryptionMethod, key, pubkeys, seckey)
       return encHeader
     } else {
       const oldEdit = partitionPacket[1][0]
@@ -98,7 +101,7 @@ function calculaLastEditNew (inputlänge, editlist) {
   }
 }
 
-exports.parts = function (edits) {
+export function parts (edits) {
   try {
     let position = BigInt(0)
     const allowed = []
@@ -194,8 +197,8 @@ async function rearrHeaderMultiEdits (editlist, big64Oldedit, inputlänge, b, ou
       editlist[i] = calculaLastEditNew(inputlänge, editlist[i])
     }
     // Berechnung, bereiche der beiden editlisten
-    const allowed = rea.parts(b)
-    const newEdit = rea.parts(editlist[i])
+    const allowed = parts(b)
+    const newEdit = parts(editlist[i])
     // Berechne, ob Bereiche ineinander passen
     const checked = checkParts(allowed, newEdit)
     if (checked.length === newEdit.length) {
@@ -210,7 +213,7 @@ async function rearrHeaderMultiEdits (editlist, big64Oldedit, inputlänge, b, ou
     }
   }
   if (!outOfRange.includes(1)) {
-    const s = await enc.encryption_edit(editlist, encryptionMethod, key, pubkeys, seckey)
+    const s = await enc.encryptionEdit(editlist, encryptionMethod, key, pubkeys, seckey)
     return [s]
   }
 }
@@ -228,8 +231,8 @@ async function rearrHeaderEdit (big64Oldedit, inputlänge, b, editlist, decPacke
     editlist = calculaLastEditNew(inputlänge, editlist)
   }
   // Berechnung, bereiche der beiden editlisten
-  const allowed = rea.parts(b)
-  const newEdit = rea.parts(editlist)
+  const allowed = parts(b)
+  const newEdit = parts(editlist)
   // Berechne, ob Bereiche ineinander passen
   const checked = checkParts(allowed, newEdit)
   let unallowedEdit
@@ -243,8 +246,8 @@ async function rearrHeaderEdit (big64Oldedit, inputlänge, b, editlist, decPacke
       }
     }
     if (unallowedEdit === 0) {
-      const newEditPacket = enc.make_packet_edit_list(editlist)
-      const encr = await enc.header_encrypt([decPackets[0], newEditPacket], seckey, pubkeys)
+      const newEditPacket = enc.makePacketEditList(editlist)
+      const encr = await enc.headerEncrypt([decPackets[0], newEditPacket], seckey, pubkeys)
       const serializedData = enc.serialize(encr[0], encr[1], encr[2], encr[3])
       return [serializedData, 1]
     }

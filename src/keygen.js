@@ -1,9 +1,13 @@
-const helperfunction = require('./helper functions.js')
-const generateKeyPair = require('@stablelib/x25519')
-const scrypt = require('scrypt-js')
-const keygen = require('./keygen.js')
-const _sodium = require('libsodium-wrappers')
-const Buffer = require('buffer/').Buffer
+import * as helperfunction from './helper functions.js'
+import * as generateKeyPair from '@stablelib/x25519'
+import scrypt from 'scrypt-js'
+import _sodium from 'libsodium-wrappers'
+// const helperfunction = require('./helper functions.js')
+// const generateKeyPair = require('@stablelib/x25519')
+// const scrypt = require('scrypt-js')
+// const keygen = require('./keygen.js')
+// const _sodium = require('libsodium-wrappers')
+// const Buffer = require('buffer/').Buffer
 
 const magicBytestring = helperfunction.string2byte('c4gh-v1')
 // without passphrase
@@ -18,11 +22,11 @@ const chiperChacha = helperfunction.string2byte('chacha20_poly1305')
  * @param {*} pasphrase => optional parameter, password (string)
  * @returns => List of secret key content and public key content
  */
-exports.keygen = async function (pasphrase) {
+export async function keygen (pasphrase) {
   try {
     const keys = generateKeyPair.generateKeyPair()
-    const pubkeyFile = keygen.create_pubkey(keys.publicKey)
-    const seckeyFile = await keygen.create_seckey(keys.secretKey, pasphrase)
+    const pubkeyFile = createPubkey(keys.publicKey)
+    const seckeyFile = await createSeckey(keys.secretKey, pasphrase)
     return [seckeyFile, pubkeyFile]
   } catch (e) {
     console.trace('Key generation not possible.')
@@ -34,7 +38,7 @@ exports.keygen = async function (pasphrase) {
  * @param {*} pubkey => public key (Uint8array of length 32)
  * @returns => pubkey content as string
  */
-exports.create_pubkey = function (pubkey) {
+export function createPubkey (pubkey) {
   try {
     const b64 = btoa(String.fromCharCode.apply(null, pubkey))
     return '-----BEGIN CRYPT4GH PUBLIC KEY-----\n' + b64 + '\n-----END CRYPT4GH PUBLIC KEY-----\n'
@@ -49,13 +53,16 @@ exports.create_pubkey = function (pubkey) {
  * @param {*} passphrase => optional parameter, string to encrypt secret key
  * @returns => seckey content as string
  */
-exports.create_seckey = async function (seckey, passphrase) {
+export async function createSeckey (seckey, passphrase) {
   try {
     let a = ''
     await (async () => {
       await _sodium.ready
       const sodium = _sodium
       if (passphrase) {
+        if (passphrase.replace(/\s+/g, '') === '') {
+          throw new Error('Password can not be empty string')
+        }
         const salt = sodium.randombytes_buf(16)
         const saltround = new Uint8Array(4 + salt.length)
         saltround.set([0, 0, 0, 0])
@@ -82,5 +89,6 @@ exports.create_seckey = async function (seckey, passphrase) {
     return a
   } catch (e) {
     console.trace('Secret key generation not possible.')
+    throw new Error('Password can not be empty string')
   }
 }

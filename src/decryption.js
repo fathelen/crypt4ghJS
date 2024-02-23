@@ -1,32 +1,37 @@
-const helperfunction = require('./helper functions')
+import * as helperfunction from './helper functions.js'
+import * as x25519 from '@stablelib/x25519'
+import * as Blake2b from '@stablelib/blake2b'
+import _sodium from 'libsodium-wrappers'
+// const helperfunction = require('./helper functions')
+/*
 const x25519 = require('@stablelib/x25519')
 const Blake2b = require('@stablelib/blake2b')
 const dec = require('./decryption')
-const _sodium = require('libsodium-wrappers')
+const _sodium = require('libsodium-wrappers') */
 
-exports.SEGMENT_SIZE = 65536
+export const SEGMENT_SIZE = 65536
 const PacketTypeDataEnc = '0000'
 const PacketTypeEditList = '1000'
 const encryptionMethod = '0000' // only (xchacha20poly1305)
 const magicBytestring = helperfunction.string2byte('crypt4gh')
 
-exports.decrypption = async function (headerInfo, text, counter, wantedblocks) {
+export async function decrypption (headerInfo, text, counter, wantedblocks) {
   if (headerInfo[5][0] && Array.from(headerInfo[5][0].keys()).includes(counter)) {
-    const plaintext = await dec.pureDecryption(Uint8Array.from(text), headerInfo[0])
-    const aplliedEdit = dec.applyEditlist(headerInfo[5][0].get(counter), plaintext)
+    const plaintext = await pureDecryption(Uint8Array.from(text), headerInfo[0])
+    const aplliedEdit = applyEditlist(headerInfo[5][0].get(counter), plaintext)
     return aplliedEdit
   } else if (wantedblocks && !headerInfo[5][0]) {
     if (wantedblocks.includes(counter)) {
-      const plaintext = await dec.pureDecryption(Uint8Array.from(text), headerInfo[0])
+      const plaintext = await pureDecryption(Uint8Array.from(text), headerInfo[0])
       return plaintext
     }
   } else if (!wantedblocks && !headerInfo[5][0]) {
-    const plaintext = await dec.pureDecryption(Uint8Array.from(text), headerInfo[0])
+    const plaintext = await pureDecryption(Uint8Array.from(text), headerInfo[0])
     return plaintext
   }
 }
 
-exports.pureDecryption = async function (d, key) {
+export async function pureDecryption (d, key) {
   let encData = new Uint8Array()
   await (async () => {
     await _sodium.ready
@@ -38,7 +43,7 @@ exports.pureDecryption = async function (d, key) {
   return encData
 }
 
-exports.pureEdit = function (d) {
+export function pureEdit (d) {
   const edits = calculateEditlist(d)
   return edits
 }
@@ -48,15 +53,15 @@ exports.pureEdit = function (d) {
  * @param {*} seckeys => secret key to decrypt header packet
  * @returns => List containing the sessionkey, nonce, body, editlist and position bodystart
  */
-exports.header_deconstruction = async function (header, seckeys) {
+export async function headerDeconstruction (header, seckeys) {
   try {
     let editlist = new Uint8Array()
-    const headerPackets = dec.parse(header)
-    const decryptedPackets = await dec.decrypt_header(headerPackets[0], seckeys)
+    const headerPackets = parse(header)
+    const decryptedPackets = await decryptHeader(headerPackets[0], seckeys)
     const partitionedPackages = partitionPackets(decryptedPackets[0])
     const sessionKey = parseEncPacket(partitionedPackages[0][0])
     if (partitionedPackages[1].length > 0) {
-      editlist = dec.pureEdit([sessionKey, decryptedPackets[2], headerPackets[1], partitionedPackages[1], headerPackets[2]])
+      editlist = pureEdit([sessionKey, decryptedPackets[2], headerPackets[1], partitionedPackages[1], headerPackets[2]])
     }
     return [sessionKey, decryptedPackets[2], headerPackets[1], partitionedPackages[1], headerPackets[2], editlist]
   } catch (e) {
@@ -69,7 +74,7 @@ exports.header_deconstruction = async function (header, seckeys) {
  * @param {*} header => start of the file containing the header packages
  * @returns => List containing the list of header packages, body and position bodystart
  */
-exports.parse = function (header) {
+export function parse (header) {
   try {
     // checken magic number
     const magicHeaderDecryption = new TextDecoder().decode(header.subarray(0, 8))
@@ -82,7 +87,7 @@ exports.parse = function (header) {
     const numPakets = new Uint32Array(new Uint8Array(header.subarray(12, 16)))
     if (numPakets[0] === 0) console.trace('No packages!')
     // extract packets -- returns list of packets
-    const extracted = dec.extract_packets(numPakets[0], header)
+    const extracted = extractPackets(numPakets[0], header)
     return [extracted[0], extracted[1], extracted[2]]
   } catch (e) {
     console.trace('header parsing not possible.')
@@ -95,7 +100,7 @@ exports.parse = function (header) {
  * @param {*} header => start of the file containing the header packages
  * @returns  => List containing the list of header packages, body and position bodystart
  */
-exports.extract_packets = function (packetNum, header) {
+export function extractPackets (packetNum, header) {
   const listHeaderPackages = []
   let position = 0
   try {
@@ -131,7 +136,7 @@ exports.extract_packets = function (packetNum, header) {
  * @param {*} seckeys => seckey to decode a header package
  * @returns => List containing the decrypted package, the undecrypted packages and the nonce
  */
-exports.decrypt_header = async function (headerPackets, seckeys) {
+export async function decryptHeader (headerPackets, seckeys) {
   seckeys = [seckeys]
   const decryptedPackets = []
   const undecryptablePackets = []
@@ -218,7 +223,7 @@ function parseEncPacket (packet) {
  * @param {*} decryptedText => already decrypted input data
  * @returns => decrypted data edited according to the editlist
  */
-exports.applyEditlist = function (edlist, decryptedText) {
+export function applyEditlist (edlist, decryptedText) {
   try {
     const editedData = []
     let pos = BigInt(0)

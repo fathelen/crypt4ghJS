@@ -1,10 +1,12 @@
-const keygen = require('./keygen')
-const keyfiles = require('./check_keyfiles')
-const encryption = require('./encryption')
-const decryption = require('./decryption')
+
+import * as crypt4GHJS from 'crypt4gh_js'
+// const keygen = require('./keygen')
+// const keyfiles = require('./check_keyfiles')
+// const encryption = require('./encryption')
+// const decryption = require('./decryption')
 // const reeencryption = require('./reeencryption')
 // const rearrangment = require('./rearrange')
-const Buffer = require('buffer/').Buffer
+// const Buffer = require('buffer/').Buffer
 
 const acc = document.getElementsByClassName('accordion')
 let i
@@ -28,7 +30,7 @@ for (i = 0; i < acc.length; i++) {
 // KeyGen
 async function keyfile () {
   const password = await document.getElementById('psw').value
-  const result = await keygen.keygen(password)
+  const result = await crypt4GHJS.keygen.keygen(password)
   return result
 }
 
@@ -77,7 +79,7 @@ async function encr () {
   }
   const seckeyFile = await file.files[0].text()
   const pubkeyFile = await file2.files[0].text()
-  const keys = await keyfiles.encryption_keyfiles([seckeyFile, pubkeyFile], password)
+  const keys = await crypt4GHJS.keyfiles.encryptionKeyfiles([seckeyFile, pubkeyFile], password)
   const header = await encryption.encHead(keys[0], [keys[1]], ed)
   // yield header[0]
   c4ghtext.push(header[0])
@@ -88,7 +90,7 @@ async function encr () {
     while (offset < enteredText.length) {
       counter++
       const chunkfile = await enteredText.slice(offset, offset + chunksize)
-      const encryptedtext = await encryption.encryption(header, Uint8Array.from(chunkfile.split('').map(x => x.charCodeAt())), counter, block)
+      const encryptedtext = await crypt4GHJS.encryption.encryption(header, Uint8Array.from(chunkfile.split('').map(x => x.charCodeAt())), counter, block)
       if (encryptedtext) {
       // yield encryptedtext
         c4ghtext.push(encryptedtext)
@@ -101,7 +103,7 @@ async function encr () {
       counter++
       const chunkfile = await file3.files[0].slice(offset, offset + chunksize)
       const chunk = await chunkfile.arrayBuffer()
-      const encryptedtext = await encryption.encryption(header, new Uint8Array(chunk), counter, block)
+      const encryptedtext = await crypt4GHJS.encryption.encryption(header, new Uint8Array(chunk), counter, block)
       if (encryptedtext) {
       // yield encryptedtext
         c4ghtext.push(encryptedtext)
@@ -125,10 +127,10 @@ async function * decr () {
     password = undefined
   }
   const seckeyFile = await file.files[0].text()
-  const keys = await keyfiles.encryption_keyfiles([seckeyFile], password)
+  const keys = await crypt4GHJS.keyfiles.encryptionKeyfiles([seckeyFile], password)
   const headerChunk = await file2.files[0].slice(0, 1000)
   const chunkHeader = await headerChunk.arrayBuffer()
-  const header = await decryption.header_deconstruction(new Uint8Array(chunkHeader), keys[0])
+  const header = await crypt4GHJS.decryption.headerDeconstruction(new Uint8Array(chunkHeader), keys[0])
   const chunksize = 65564
   let counter = 0
   let offset = header[4]
@@ -136,7 +138,7 @@ async function * decr () {
     counter++
     const chunkfile = await file2.files[0].slice(offset, offset + chunksize)
     const chunk = await chunkfile.arrayBuffer()
-    const plaintext = await decryption.decrypption(header, new Uint8Array(chunk), counter)
+    const plaintext = await crypt4GHJS.decryption.decrypption(header, new Uint8Array(chunk), counter)
     const decoder = new TextDecoder()
     if (plaintext) {
       decText += decoder.decode(plaintext)

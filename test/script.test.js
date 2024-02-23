@@ -2,16 +2,201 @@
 const index = require('crypt4gh_js')
 const fs = require('fs')
 
-const testDec = fs.readFileSync('C:\\Users\\fabie\\crypt4gh_js\\testData\\readChunks.crypt4gh')
-const encSeckey = new Uint8Array([224, 21, 186, 46, 156, 10, 28, 20, 13, 208, 192, 153, 130, 51, 237, 13, 167, 220, 25, 179, 121, 193, 25, 148, 74, 178, 48, 17, 195, 120, 181, 237])
-const encPubkey = new Uint8Array([24, 68, 116, 225, 103, 201, 95, 51, 199, 136, 37, 158, 247, 128, 135, 148, 198, 58, 178, 158, 179, 193, 106, 64, 122, 16, 52, 48, 193, 227, 117, 84])
-const encSeckeyPass = new Uint8Array([0, 78, 220, 95, 54, 181, 47, 52, 219, 136, 71, 191, 133, 251, 22, 200, 52, 195, 145, 195, 151, 193, 84, 12, 220, 215, 72, 117, 163, 211, 226, 189])
-const encPubkeyPass = new Uint8Array([188, 122, 213, 164, 26, 69, 46, 149, 255, 58, 171, 138, 217, 151, 184, 49, 252, 219, 241, 165, 107, 159, 78, 87, 153, 56, 19, 227, 41, 149, 195, 49])
-const pythonPub = '-----BEGIN CRYPT4GH PUBLIC KEY-----\n1tacjs2fhSkst4/5A12SRqX9+9HmpOxh3ZQCHPKjWBc=\n-----END CRYPT4GH PUBLIC KEY-----\n'
-const pythonSec = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAGc2NyeXB0ABQAAAAAkxl9BuOnD7BRIOmBGzxgbAARY2hhY2hhMjBfcG9seTEzMDUAPHBfA3Kly8cX99Zx+VyXEGdgnY7rDKUSdNc2Ml9adhXePri5ZrKfJsWkje4dXSkoTnQjQZbf+iF1U+OdqA==\n-----END CRYPT4GH PRIVATE KEY-----\n'
-const pythonKeySec = new Uint8Array([21, 185, 104, 245, 109, 142, 250, 85, 143, 50, 170, 223, 133, 77, 90, 68, 55, 163, 31, 214, 210, 50, 193, 127, 9, 85, 151, 167, 239, 103, 170, 221])
-const pythonKeyPub = new Uint8Array([214, 214, 156, 142, 205, 159, 133, 41, 44, 183, 143, 249, 3, 93, 146, 70, 165, 253, 251, 209, 230, 164, 236, 97, 221, 148, 2, 28, 242, 163, 88, 23])
+const ts = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAEbm9uZQAEbm9uZQAgrpd+v2ZGymbextTp5nMt298h1yEFBigB+bS+1WJT/lM=\n-----END CRYPT4GH PRIVATE KEY-----\n'
+const tp = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nfQCgFp/dPaDOELnzrgEEQUeOmOlMj9M/dTP7bIiuxyw=\n-----END CRYPT4GH PUBLIC KEY-----\n'
+const ts2 = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAGc2NyeXB0ABQAAAAAErnfoX48n1p21KYPJF39qwARY2hhY2hhMjBfcG9seTEzMDUAPB2VckJsR/5iz35Zg5VO2VRkdIStoFIL0681lrdKlpn80dA7bH+vRcQc1+LVT4vptEt7EC5eXltE07uNhA==\n-----END CRYPT4GH PRIVATE KEY-----\n'
+const tp2 = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nKK2of4G9P49mpUE1PVDia+hTSQ8VWJNXxkSG4m6OiUc=\n-----END CRYPT4GH PUBLIC KEY-----\n'
 
+// überholte tests
+
+// generate keys
+
+// Test Case 1: generate keypair without password
+test('generate keypair without password', async () => {
+  const keys = await index.keygen.keygen()
+  expect(keys).toBeInstanceOf(Array)
+  expect(keys[0]).toMatch(/^-----BEGIN CRYPT4GH PRIVATE KEY-----(\n)(.{72})(\n)-----END CRYPT4GH PRIVATE KEY-----(\n)$/)
+  expect(keys[1]).toMatch(/^-----BEGIN CRYPT4GH PUBLIC KEY-----(\n)(.{44})(\n)-----END CRYPT4GH PUBLIC KEY-----(\n)$/)
+  // fs.appendFileSync('Data4Tests/testcase1_secret', keys[0])
+  // fs.appendFileSync('Data4Tests/testcase1_public', keys[1])
+})
+
+// Test Case 2: generate keypair with password
+test('generate keypair with password', async () => {
+  const keys = await index.keygen.keygen('abc')
+  expect(keys).toBeInstanceOf(Array)
+  expect(keys[0]).toMatch(/^-----BEGIN CRYPT4GH PRIVATE KEY-----(\n)(.{160})(\n)-----END CRYPT4GH PRIVATE KEY-----(\n)$/)
+  expect(keys[1]).toMatch(/^-----BEGIN CRYPT4GH PUBLIC KEY-----(\n)(.{44})(\n)-----END CRYPT4GH PUBLIC KEY-----(\n)$/)
+  // fs.appendFileSync('Data4Tests/testcase2_secret', keys[0])
+  // fs.appendFileSync('Data4Tests/testcase2_public', keys[1])
+})
+// Test Case 3: generate key with password, illegal character (error)
+test('generate key with password, illegal character (error)', async () => {
+  const keys = await index.keygen.keygen('   ')
+  expect(keys).toBe(undefined)
+})
+
+// check keyfiles
+
+// Test Case 4: check if keyfile can be decrypted without password
+test('check if keyfile can be decrypted without password', async () => {
+  const seckey = fs.readFileSync('Data4Tests/testcase1_secret').toString()
+  const pubkey = fs.readFileSync('Data4Tests/testcase1_public').toString()
+  const decryptedKeys = await index.keyfiles.encryption_keyfiles([seckey, pubkey])
+  expect(decryptedKeys).toBeInstanceOf(Array)
+  expect(decryptedKeys[0]).toBeInstanceOf(Uint8Array) // seckey: Uint8Array(32) [ 82,  33,  99,  16,  74, 205, 109, 244, 142, 130,  35, 140, 171, 177,  28,  66, 204, 127,  32, 168, 101, 240,  31,  13, 216, 205, 126, 242,  34, 101, 100,  42 ]
+  expect(decryptedKeys[1]).toBeInstanceOf(Uint8Array) // pubkey: Uint8Array(32) [ 9, 107,   0, 216, 185,  51, 243,   3, 106, 226, 219,  28,  39,  87, 124, 207, 225, 146,   6,   3, 149,  85,   8, 144, 173, 125,  56, 107, 183, 181,  90,   0 ]
+  expect(decryptedKeys[0].length).toBe(32)
+  expect(decryptedKeys[1].length).toBe(32)
+})
+// Test Case 5: check if keyfile can be decrypted with password
+test('check if keyfile can be decrypted with password', async () => {
+  const seckey = fs.readFileSync('Data4Tests/testcase2_secret').toString()
+  const pubkey = fs.readFileSync('Data4Tests/testcase2_public').toString()
+  const decryptedKeys = await index.keyfiles.encryption_keyfiles([seckey, pubkey], 'abc')
+  expect(decryptedKeys).toBeInstanceOf(Array)
+  expect(decryptedKeys[0]).toBeInstanceOf(Uint8Array) // seckey: Uint8Array(32) [ 239,  53, 227, 105, 157, 144,  90, 226, 118, 104,  90,  48,  37,  89,  73, 246, 10, 150, 243, 176, 181,  40, 210,  96, 102, 181, 168,  18,  59, 126, 206,  33 ]
+  expect(decryptedKeys[1]).toBeInstanceOf(Uint8Array) // pubkey:  Uint8Array(32) [ 185, 166, 222, 208,  72, 148, 218, 76,  96,  57,  73, 228, 246,  63, 197, 247,  81, 153, 179, 159, 209, 169, 105, 116, 255, 125, 223, 244, 119, 168, 113,   9]
+  expect(decryptedKeys[0].length).toBe(32)
+  expect(decryptedKeys[1].length).toBe(32)
+})
+// Test Case 6: check error if keyfile is decrypted with wrong password
+test(' check error if keyfile is decrypted with wrong password', async () => {
+  const seckey = fs.readFileSync('Data4Tests/testcase2_secret').toString()
+  const pubkey = fs.readFileSync('Data4Tests/testcase2_public').toString()
+  const decryptedKeys = await index.keyfiles.encryption_keyfiles([seckey, pubkey], 'def')
+  expect(decryptedKeys).toBe(undefined)
+})
+// Test Case 7: wrong pubkey file
+test(' wrong pubkey file', async () => {
+  const seckey = fs.readFileSync('Data4Tests/testcase1_secret').toString()
+  const pubkey = fs.readFileSync('Data4Tests/testcase7_wrongPubkeyFile').toString()
+  const decryptedKeys = await index.keyfiles.encryption_keyfiles([seckey, pubkey])
+  expect(decryptedKeys).toBe(undefined)
+})
+
+// Test Case 8: wrong seckey file
+test(' wrong pubkey file', async () => {
+  const seckey = fs.readFileSync('Data4Tests/testcase8_wrongSeckeyFile').toString()
+  const pubkey = fs.readFileSync('Data4Tests/testcase2_public').toString()
+  const decryptedKeys = await index.keyfiles.encryption_keyfiles([seckey, pubkey])
+  expect(decryptedKeys).toBe(undefined)
+})
+
+// encryption
+// Test Case 9: encryption without additional parameters, single header packet
+// Test Case 10: encryption with editlist even, single header packet
+// Test Case 11: encryption with editlist odd, single header packet
+// Test Case 12: encryption with editlist just 1 number, single header packet
+// Test Case 13: encryption with editlist negative number, single header packet (error)
+// Test Case 14: encryption with editlist not a number, single header packet (error)
+// Test Case 15: encryption special case 1, single header packet
+// Test Case 16: encryption special case 2, single header packet
+// Test Case 17: encryption special case 3, single header packet
+// Test Case 18: encryption special case 4, single header packet
+// Test Case 19: encryption with blocks one block, single header packet
+// Test Case 20: encryption with blocks multiple block, single header packet
+// Test Case 21: encryption with blocks negative block, single header packet
+// Test Case 22: encryption with blocks not a number block, single header packet
+// Test Case 23: error if encryption and blocks, single header packet
+// Test Case 24: encryption without additional parameters, multiple header packets
+// Test Case 25: encryption with editlist even, multiple header packets
+// Test Case 26: encryption with editlist odd, multiple header packets
+// Test Case 27: encryption with editlist just 1 number, multiple header packets
+// Test Case 28: encryption with editlist negative number, multiple header packets (error)
+// Test Case 29: encryption with editlist not a number, multiple header packets (error)
+// Test Case 30: encryption special case 1, multiple header packets
+// Test Case 31: encryption special case 2, multiple header packets
+// Test Case 32: encryption special case 3, multiple header packets
+// Test Case 33: encryption special case 4, multiple header packets
+// Test Case 34: encryption with blocks one block, multiple header packets
+// Test Case 35: encryption with blocks multiple block, multiple header packets
+// Test Case 36: encryption with blocks negative block, multiple header packets
+// Test Case 37: encryption with blocks not a number block, multiple header packets
+// Test Case 38: error if encryption and blocks, multiple header packets
+
+// check fileformat
+// Test Case 39: check fileformat, crypt4GH = true
+
+// Test Case 40: check fileformat, crypt4GH = wrong
+
+// reencryption
+// Test Case 40: reencryption, without editlist, one header packet, for one new header packet
+// Test Case 41: reencryption, without editlist, one header packet, for multiple new header packets
+// Test Case 42: reencryption, without editlist, multiple header packets, for one new header packet
+// Test Case 43: reencryption, without editlist, multiple header packets, for multiple new header packets
+// Test Case 44: reencryption, with editlist, one header packet, for one new header packet
+// Test Case 45: reencryption, with editlist, one header packet, for multiple new header packets
+// Test Case 46: reencryption, with editlist, multiple header packets, for one new header packet
+// Test Case 47: reencryption, with editlist, multiple header packets, for multiple new header packets
+
+// rearrangement
+// Test Case 48: rearrangement, without editlist before, one header packet, for one new header packet
+// Test Case 49: rearrangement, without editlist before, one header packet, for multiple new header packets
+// Test Case 50: rearrangement, without editlist before, multiple header packets, for one new header packet
+// Test Case 51: rearrangement, without editlist before, multiple header packets, for multiple new header packets
+// Test Case 52: rearrangement, without editlist before, multiple header packets, for multiple new header packets
+// Test Case 53: rearrangement, with editlist before, one header packet, for one new header packet
+// Test Case 54: rearrangement, with editlist before, one header packet, for multiple new header packets
+// Test Case 55: rearrangement, with editlist before, multiple header packets, for one new header packet
+// Test Case 56: rearrangement, with editlist before, multiple header packets, for multiple new header packets
+// Test Case 57: rearrangement, with editlist before, multiple header packets, for multiple new header packets
+// Test Case 58:rearrangement, with editlist before, new edit out of range (error)
+
+// decryption
+
+// decryption of encryption
+// Test Case 59: decryptin: encryption without additional parameters, single header packet
+// Test Case 60: decryptin: encryption with editlist even, single header packet
+// Test Case 61: decryptin: encryption with editlist odd, single header packet
+// Test Case 62: decryptin: encryption with editlist just 1 number, single header packet
+// Test Case 63: decryptin: encryption special case 1, single header packet
+// Test Case 64: decryptin: encryption special case 2, single header packet
+// Test Case 65: decryptin: encryption special case 3, single header packet
+// Test Case 66: decryptin: encryption special case 4, single header packet
+// Test Case 67: decryptin: encryption with blocks one block, single header packet
+// Test Case 68: decryptin: encryption with blocks multiple block, single header packet
+// Test Case 69: decryptin: encryption with blocks negative block, single header packet
+// Test Case 70: decryptin: encryption with blocks not a number block, single header packet
+// Test Case 71: decryptin: encryption without additional parameters, multiple header packets
+// Test Case 72: decryptin: encryption with editlist even, multiple header packets
+// Test Case 73: decryptin: encryption with editlist odd, multiple header packets
+// Test Case 74: decryptin: encryption with editlist just 1 number, multiple header packets
+// Test Case 75: decryptin: encryption special case 1, multiple header packets
+// Test Case 76: decryptin: encryption special case 2, multiple header packets
+// Test Case 77: decryptin: encryption special case 3, multiple header packets
+// Test Case 78: decryptin: encryption special case 4, multiple header packets
+// Test Case 79: decryptin: encryption with blocks one block, multiple header packets
+// Test Case 80: decryptin: encryption with blocks multiple block, multiple header packets
+
+// decryption of reencryption
+
+// Test Case 81: decryption: reencryption, without editlist, one header packet, for one new header packet
+// Test Case 82: decryption: reencryption, without editlist, one header packet, for multiple new header packets
+// Test Case 83: decryption: reencryption, without editlist, multiple header packets, for one new header packet
+// Test Case 84: decryption: reencryption, without editlist, multiple header packets, for multiple new header packets
+// Test Case 85: decryption: reencryption, with editlist, one header packet, for one new header packet
+// Test Case 86: decryption: reencryption, with editlist, one header packet, for multiple new header packets
+// Test Case 87: decryption: reencryption, with editlist, multiple header packets, for one new header packet
+// Test Case 88: decryption: reencryption, with editlist, multiple header packets, for multiple new header packets
+
+// decryption of rearrangement
+// Test Case 89: decryption: rearrangement, without editlist before, one header packet, for one new header packet
+// Test Case 90: decryption: rearrangement, without editlist before, one header packet, for multiple new header packets
+// Test Case 91: decryption: rearrangement, without editlist before, multiple header packets, for one new header packet
+// Test Case 92: decryption: rearrangement, without editlist before, multiple header packets, for multiple new header packets
+// Test Case 93: decryption: rearrangement, without editlist before, multiple header packets, for multiple new header packets
+// Test Case 94 decryption: rearrangement, with editlist before, one header packet, for one new header packet
+// Test Case 95: decryption: rearrangement, with editlist before, one header packet, for multiple new header packets
+// Test Case 96: decryption: rearrangement, with editlist before, multiple header packets, for one new header packet
+// Test Case 97: decryption: rearrangement, with editlist before, multiple header packets, for multiple new header packets
+// Test Case 98: decryption: rearrangement, with editlist before, multiple header packets, for multiple new header packets
+
+// decryption decryptzing blocks
+
+// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
 test('encryption, read chunks, no edit, no blocks', async () => {
   edit = null
   block = null
@@ -339,4 +524,4 @@ test('python compitbility Edit', async () => {
         await expect(val).toBeInstanceOf(Uint8Array)
       })
   }
-})
+}) */

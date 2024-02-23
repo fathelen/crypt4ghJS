@@ -1,6 +1,9 @@
-const helperfunction = require('./helper functions')
-const scrypt = require('scrypt-js')
-const sodium = require('libsodium-wrappers')
+import * as helperfunction from './helper functions.js'
+import scrypt from 'scrypt-js'
+import sodium from 'libsodium-wrappers'
+// const helperfunction = require('./helper functions')
+// const scrypt = require('scrypt-js')
+// const sodium = require('libsodium-wrappers')
 
 const magicBytestring = helperfunction.string2byte('c4gh-v1')
 const kdfNoneBytestring = helperfunction.string2byte('none')
@@ -20,7 +23,7 @@ const pubkeyEnd = '-----END CRYPT4GH PUBLIC KEY-----'
  *                         secret keys
  * @returns => list of 32byte keys, starting with the seckret key, pubkeys second
  */
-exports.encryption_keyfiles = async (keys, password = '') => {
+export async function encryptionKeyfiles (keys, password = '') {
   const solvedKeys = []
   try {
     for (let i = 0; i < keys.length; i++) {
@@ -42,6 +45,7 @@ exports.encryption_keyfiles = async (keys, password = '') => {
         solvedKeys.push(pubkey)
       } else {
         console.trace('Not a crypt4gh keyfile!')
+        throw new Error('Wrong File Format')
       }
     }
     return solvedKeys
@@ -76,6 +80,9 @@ async function secret (keyContent, seckey, password) {
             const nonce = keyContent.subarray(58, 70)
             const encData = keyContent.subarray(70)
             const encKey = sodium.crypto_aead_chacha20poly1305_ietf_decrypt(null, encData, null, nonce, sharedkey)
+            if (encKey === undefined) {
+              throw new Error('wrong password')
+            }
             return encKey
           })
           return await key
@@ -86,5 +93,6 @@ async function secret (keyContent, seckey, password) {
     }
   } catch (e) {
     console.trace(e)
+    throw new Error('Problem while key decryption')
   }
 }

@@ -1,8 +1,13 @@
+import * as helperfunction from './helper functions.js'
+import * as x25519 from '@stablelib/x25519'
+import * as Blake2b from '@stablelib/blake2b'
+import _sodium from 'libsodium-wrappers'
+/*
 const helperfunction = require('./helper functions')
 const x25519 = require('@stablelib/x25519')
 const Blake2b = require('@stablelib/blake2b')
 const enc = require('./encryption')
-const _sodium = require('libsodium-wrappers')
+const _sodium = require('libsodium-wrappers') */
 // const Buffer = require('buffer/').Buffer
 // const chacha20poly1305 = require('@noble/ciphers/chacha')
 // const utf8ToBytes = require('@noble/ciphers/utils')
@@ -12,28 +17,28 @@ const PacketTypeDataEnc = new Uint32Array([0])
 const PacketTypeEditList = new Uint32Array([1])
 const magicBytestring = helperfunction.string2byte('crypt4gh')
 
-exports.encryption = async function (headerInfo, text, counter, blocks) {
+export async function encryption (headerInfo, text, counter, blocks) {
   let encText = new Uint8Array()
   if (blocks && blocks.includes(counter)) {
-    encText = await enc.pureEncryption(text, headerInfo[1])
+    encText = await pureEncryption(text, headerInfo[1])
     return encText
   } else if (!blocks) {
-    encText = await enc.pureEncryption(text, headerInfo[1])
+    encText = await pureEncryption(text, headerInfo[1])
     return encText
   }
 }
 
-exports.encHead = async function (seckey, pubkey, edit) {
+export async function encHead (seckey, pubkey, edit) {
   let header = new Uint8Array()
   if (edit) {
-    header = await enc.encHeaderEdit(seckey, pubkey, edit)
+    header = await encHeaderEdit(seckey, pubkey, edit)
   } else {
-    header = await enc.encHeader(seckey, pubkey)
+    header = await encHeader(seckey, pubkey)
   }
   return header
 }
 
-exports.encHeader = async function (secretkey, publicKeys) {
+export async function encHeader (secretkey, publicKeys) {
   let serializedData = []
   let sessionKey = new Uint8Array(32)
   try {
@@ -43,10 +48,10 @@ exports.encHeader = async function (secretkey, publicKeys) {
       const encryptionMethod = new Uint32Array([0])
       sessionKey = sodium.randombytes_buf(32)
       const typeArray = []
-      const encPacketDataContent = enc.make_packet_data_enc(encryptionMethod, sessionKey)
+      const encPacketDataContent = makePacketDataEnc(encryptionMethod, sessionKey)
       typeArray.push(encPacketDataContent)
-      const headerPackets = await enc.header_encrypt(typeArray, secretkey, publicKeys)
-      serializedData = enc.serialize(headerPackets[0], headerPackets[1], headerPackets[2], headerPackets[3])
+      const headerPackets = await headerEncrypt(typeArray, secretkey, publicKeys)
+      serializedData = serialize(headerPackets[0], headerPackets[1], headerPackets[2], headerPackets[3])
     })()
   } catch (e) {
     console.trace(e)
@@ -56,7 +61,7 @@ exports.encHeader = async function (secretkey, publicKeys) {
   return [serializedData, sessionKey]
 }
 
-exports.encHeaderEdit = async function (secretkey, publicKeys, editlist) {
+export async function encHeaderEdit (secretkey, publicKeys, editlist) {
   try {
     let serializedData = new Uint8Array()
     let sessionKey = new Uint8Array()
@@ -66,7 +71,7 @@ exports.encHeaderEdit = async function (secretkey, publicKeys, editlist) {
       const sodium = _sodium
       const encryptionMethod = new Uint32Array([0])
       sessionKey = sodium.randombytes_buf(32)
-      serializedData = await enc.encryption_edit(editlist, encryptionMethod, sessionKey, publicKeys, secretkey)
+      serializedData = await encryptionEdit(editlist, encryptionMethod, sessionKey, publicKeys, secretkey)
     })()
     return [serializedData, sessionKey]
   } catch (e) {
@@ -74,7 +79,7 @@ exports.encHeaderEdit = async function (secretkey, publicKeys, editlist) {
   }
 }
 
-exports.pureEncryption = async function (chunk, key) {
+export async function pureEncryption (chunk, key) {
   /*
   const nonce = _sodium.randombytes_buf(12) // randomBytes.randomBytes(12)
   const chacha = chacha20poly1305.chacha20poly1305(key, nonce)
@@ -99,7 +104,7 @@ exports.pureEncryption = async function (chunk, key) {
  * @param {*} sessionKey => key to decrypt the input data
  * @returns encryption package as Uint8array
  */
-exports.make_packet_data_enc = function (encryptionMethode, sessionKey) {
+function makePacketDataEnc (encryptionMethode, sessionKey) {
   try {
     const uint8EncMethod = new Uint8Array(encryptionMethode.buffer)
     const uint8TypeData = new Uint8Array(PacketTypeDataEnc.buffer)
@@ -120,7 +125,7 @@ exports.make_packet_data_enc = function (encryptionMethode, sessionKey) {
  * @param {*} pubkeys => List of public keys of the persons getting access to the data
  * @returns => List of encryption method, public key of the uploading person, nonce, encrypted headerpackages and sharedkey for decryption
  */
-exports.header_encrypt = async function (headerContent, seckey, pubkeys) {
+export async function headerEncrypt (headerContent, seckey, pubkeys) {
   try {
     let encrMethod
     let ke
@@ -171,7 +176,7 @@ exports.header_encrypt = async function (headerContent, seckey, pubkeys) {
  * @param {*} packets => List of encrypted header packages
  * @returns => Uint8array containing the complete crypt4gh format header
  */
-exports.serialize = function (methode, wPubkey, nonce, packets) {
+export function serialize (methode, wPubkey, nonce, packets) {
   try {
     if (Array.isArray(packets[0])) {
       packets = [].concat(...packets)
@@ -227,23 +232,23 @@ exports.serialize = function (methode, wPubkey, nonce, packets) {
  * @param {*} type_array => contains the encryption package and the edit package
  * @returns => Uint8array containing the complete crypt4gh format header
  */
-exports.encryption_edit = async function (editList, encryptionMethod, sessionKey, publicKeys, secretkey) {
+export async function encryptionEdit (editList, encryptionMethod, sessionKey, publicKeys, secretkey) {
   try {
     const typeArray = []
     if (Array.isArray(editList[0]) === true) {
-      const editPackets = enc.make_packet_edit_lists(editList)
-      const encPacketDataContent = enc.make_packet_data_enc(encryptionMethod, sessionKey)
+      const editPackets = makePacketEditLists(editList)
+      const encPacketDataContent = makePacketDataEnc(encryptionMethod, sessionKey)
       if (editPackets.length === publicKeys.length) {
-        const headerPackets = await enc.header_encrypt_multi_edit(editPackets, encPacketDataContent, secretkey, publicKeys)
-        const serializedData = enc.serialize(headerPackets[0], headerPackets[1], headerPackets[2], headerPackets[3])
+        const headerPackets = await headerEncryptMultiEdit(editPackets, encPacketDataContent, secretkey, publicKeys)
+        const serializedData = serialize(headerPackets[0], headerPackets[1], headerPackets[2], headerPackets[3])
         return serializedData
       }
     } else {
-      const editPacket = enc.make_packet_edit_list(editList)
-      const encPacketDataContent = enc.make_packet_data_enc(encryptionMethod, sessionKey)
+      const editPacket = makePacketEditList(editList)
+      const encPacketDataContent = makePacketDataEnc(encryptionMethod, sessionKey)
       typeArray.push(encPacketDataContent, editPacket)
-      const headerPackets = await enc.header_encrypt(typeArray, secretkey, publicKeys)
-      const serializedData = enc.serialize(headerPackets[0], headerPackets[1], headerPackets[2], headerPackets[3])
+      const headerPackets = await headerEncrypt(typeArray, secretkey, publicKeys)
+      const serializedData = serialize(headerPackets[0], headerPackets[1], headerPackets[2], headerPackets[3])
       return serializedData
     }
   } catch (e) {
@@ -256,7 +261,7 @@ exports.encryption_edit = async function (editList, encryptionMethod, sessionKey
  * @param {*} editList  => given edit list
  * @returns edit package (Uint8array)
  */
-exports.make_packet_edit_list = function (editList) {
+export function makePacketEditList (editList) {
   try {
     const bigEdits = []
     for (let i = 0; i < editList.length; i++) {
@@ -282,7 +287,7 @@ exports.make_packet_edit_list = function (editList) {
  * @param {*} editList => two dimensional array containing all given edit lists
  * @returns => edit packages (Array of Uint8arrays)
  */
-exports.make_packet_edit_lists = function (editList) {
+export function makePacketEditLists (editList) {
   try {
     const allEdits = []
     for (let i = 0; i < editList.length; i++) {
@@ -315,7 +320,7 @@ exports.make_packet_edit_lists = function (editList) {
  * @param {*} pubkeys => List of public keys of the persons getting access to the data
  * @returns  List of encryption method, public key of the uploading person, nonce, encrypted headerpackages and sharedkey for decryption
  */
-exports.header_encrypt_multi_edit = async function (editLists, encryptionPaket, seckey, pubkeys) {
+export async function headerEncryptMultiEdit (editLists, encryptionPaket, seckey, pubkeys) {
   try {
     let headerContent = []
     let x = new Uint8Array()
@@ -360,3 +365,5 @@ exports.header_encrypt_multi_edit = async function (editLists, encryptionPaket, 
     console.trace('Header for encryption with mulitple edit lists could not be computed.')
   }
 }
+
+export default { encryption, encHead, encHeader, encHeaderEdit, pureEncryption, headerEncrypt, serialize, encryptionEdit, makePacketEditList, makePacketEditLists, headerEncryptMultiEdit }
