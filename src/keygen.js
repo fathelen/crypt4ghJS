@@ -30,7 +30,7 @@ export async function keygen (pasphrase) {
     const pubkeyFile = createPubkey(keys.publicKey)
     console.log('2: ', pubkeyFile)
     const seckeyFile = await createSeckey(keys.secretKey, pasphrase)
-    console.log([seckeyFile, pubkeyFile])
+    console.log('3: ', seckeyFile)
     return [seckeyFile, pubkeyFile]
   } catch (e) {
     console.trace('Key generation not possible.')
@@ -65,6 +65,7 @@ export async function createSeckey (seckey, passphrase) {
       const sodium = _sodium
       if (passphrase) {
         if (passphrase.replace(/\s+/g, '') === '') {
+          console.log('hier gelanded')
           throw new Error('Password can not be empty string')
         }
         const salt = sodium.randombytes_buf(16)
@@ -77,9 +78,11 @@ export async function createSeckey (seckey, passphrase) {
         const key = keyPrmoise.then(function (result) {
           const nonce = sodium.randombytes_buf(12)
           const decData = sodium.crypto_aead_chacha20poly1305_ietf_encrypt(seckey, null, null, nonce, result)
+          console.log('bis hier')
           const decNonce = Buffer.concat([magicBytestring, new Uint8Array([0, 6]), kdfScript, new Uint8Array([0, 20]), saltround, new Uint8Array([0, 17]), chiperChacha, new Uint8Array([0, 12 + decData.length]), nonce, decData])
           const x = new Uint8Array(decNonce)
           const b64 = btoa(String.fromCharCode.apply(null, x))
+          console.log('3')
           return '-----BEGIN CRYPT4GH PRIVATE KEY-----\n' + b64 + '\n-----END CRYPT4GH PRIVATE KEY-----\n'
         })
         a = await key
