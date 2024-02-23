@@ -1,19 +1,24 @@
 /* eslint no-undef: */
-const index = require('crypt4gh_js')
-const fs = require('fs')
+// const index = require('crypt4gh_js')
+import * as crypt4GHJS from 'crypt4gh_js'
+import * as fs from 'fs'
+
+// const fs = require('fs')
 
 const ts = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAEbm9uZQAEbm9uZQAgrpd+v2ZGymbextTp5nMt298h1yEFBigB+bS+1WJT/lM=\n-----END CRYPT4GH PRIVATE KEY-----\n'
 const tp = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nfQCgFp/dPaDOELnzrgEEQUeOmOlMj9M/dTP7bIiuxyw=\n-----END CRYPT4GH PUBLIC KEY-----\n'
 const ts2 = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAGc2NyeXB0ABQAAAAAErnfoX48n1p21KYPJF39qwARY2hhY2hhMjBfcG9seTEzMDUAPB2VckJsR/5iz35Zg5VO2VRkdIStoFIL0681lrdKlpn80dA7bH+vRcQc1+LVT4vptEt7EC5eXltE07uNhA==\n-----END CRYPT4GH PRIVATE KEY-----\n'
 const tp2 = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nKK2of4G9P49mpUE1PVDia+hTSQ8VWJNXxkSG4m6OiUc=\n-----END CRYPT4GH PUBLIC KEY-----\n'
 
+const seckey = new Uint8Array([82, 33, 99, 16, 74, 205, 109, 244, 142, 130,  35, 140, 171, 177, 28,  66, 204, 127,  32, 168, 101, 240, 31, 13, 216, 205, 126, 242, 34, 101, 100, 42 ])
+const pubkey = new Uint8Array([9, 107, 0, 216, 185, 51, 243, 3, 106, 226, 219, 28, 39, 87, 124, 207, 225, 146, 6, 3, 149, 85, 8, 144, 173, 125, 56, 107, 183, 181, 90, 0 ])
 // überholte tests
 
 // generate keys
 
 // Test Case 1: generate keypair without password
 test('generate keypair without password', async () => {
-  const keys = await index.keygen.keygen()
+  const keys = await crypt4GHJS.keygen.keygen()
   expect(keys).toBeInstanceOf(Array)
   expect(keys[0]).toMatch(/^-----BEGIN CRYPT4GH PRIVATE KEY-----(\n)(.{72})(\n)-----END CRYPT4GH PRIVATE KEY-----(\n)$/)
   expect(keys[1]).toMatch(/^-----BEGIN CRYPT4GH PUBLIC KEY-----(\n)(.{44})(\n)-----END CRYPT4GH PUBLIC KEY-----(\n)$/)
@@ -23,7 +28,7 @@ test('generate keypair without password', async () => {
 
 // Test Case 2: generate keypair with password
 test('generate keypair with password', async () => {
-  const keys = await index.keygen.keygen('abc')
+  const keys = await crypt4GHJS.keygen.keygen('abc')
   expect(keys).toBeInstanceOf(Array)
   expect(keys[0]).toMatch(/^-----BEGIN CRYPT4GH PRIVATE KEY-----(\n)(.{160})(\n)-----END CRYPT4GH PRIVATE KEY-----(\n)$/)
   expect(keys[1]).toMatch(/^-----BEGIN CRYPT4GH PUBLIC KEY-----(\n)(.{44})(\n)-----END CRYPT4GH PUBLIC KEY-----(\n)$/)
@@ -32,7 +37,7 @@ test('generate keypair with password', async () => {
 })
 // Test Case 3: generate key with password, illegal character (error)
 test('generate key with password, illegal character (error)', async () => {
-  const keys = await index.keygen.keygen('   ')
+  const keys = await crypt4GHJS.keygen.keygen('   ')
   expect(keys).toBe(undefined)
 })
 
@@ -42,7 +47,7 @@ test('generate key with password, illegal character (error)', async () => {
 test('check if keyfile can be decrypted without password', async () => {
   const seckey = fs.readFileSync('Data4Tests/testcase1_secret').toString()
   const pubkey = fs.readFileSync('Data4Tests/testcase1_public').toString()
-  const decryptedKeys = await index.keyfiles.encryption_keyfiles([seckey, pubkey])
+  const decryptedKeys = await crypt4GHJS.keyfiles.encryptionKeyfiles([seckey, pubkey])
   expect(decryptedKeys).toBeInstanceOf(Array)
   expect(decryptedKeys[0]).toBeInstanceOf(Uint8Array) // seckey: Uint8Array(32) [ 82,  33,  99,  16,  74, 205, 109, 244, 142, 130,  35, 140, 171, 177,  28,  66, 204, 127,  32, 168, 101, 240,  31,  13, 216, 205, 126, 242,  34, 101, 100,  42 ]
   expect(decryptedKeys[1]).toBeInstanceOf(Uint8Array) // pubkey: Uint8Array(32) [ 9, 107,   0, 216, 185,  51, 243,   3, 106, 226, 219,  28,  39,  87, 124, 207, 225, 146,   6,   3, 149,  85,   8, 144, 173, 125,  56, 107, 183, 181,  90,   0 ]
@@ -53,7 +58,7 @@ test('check if keyfile can be decrypted without password', async () => {
 test('check if keyfile can be decrypted with password', async () => {
   const seckey = fs.readFileSync('Data4Tests/testcase2_secret').toString()
   const pubkey = fs.readFileSync('Data4Tests/testcase2_public').toString()
-  const decryptedKeys = await index.keyfiles.encryption_keyfiles([seckey, pubkey], 'abc')
+  const decryptedKeys = await crypt4GHJS.keyfiles.encryptionKeyfiles([seckey, pubkey], 'abc')
   expect(decryptedKeys).toBeInstanceOf(Array)
   expect(decryptedKeys[0]).toBeInstanceOf(Uint8Array) // seckey: Uint8Array(32) [ 239,  53, 227, 105, 157, 144,  90, 226, 118, 104,  90,  48,  37,  89,  73, 246, 10, 150, 243, 176, 181,  40, 210,  96, 102, 181, 168,  18,  59, 126, 206,  33 ]
   expect(decryptedKeys[1]).toBeInstanceOf(Uint8Array) // pubkey:  Uint8Array(32) [ 185, 166, 222, 208,  72, 148, 218, 76,  96,  57,  73, 228, 246,  63, 197, 247,  81, 153, 179, 159, 209, 169, 105, 116, 255, 125, 223, 244, 119, 168, 113,   9]
@@ -61,30 +66,60 @@ test('check if keyfile can be decrypted with password', async () => {
   expect(decryptedKeys[1].length).toBe(32)
 })
 // Test Case 6: check error if keyfile is decrypted with wrong password
-test(' check error if keyfile is decrypted with wrong password', async () => {
+test('check error if keyfile is decrypted with wrong password', async () => {
   const seckey = fs.readFileSync('Data4Tests/testcase2_secret').toString()
   const pubkey = fs.readFileSync('Data4Tests/testcase2_public').toString()
-  const decryptedKeys = await index.keyfiles.encryption_keyfiles([seckey, pubkey], 'def')
+  const decryptedKeys = await crypt4GHJS.keyfiles.encryptionKeyfiles([seckey, pubkey], 'def')
   expect(decryptedKeys).toBe(undefined)
 })
 // Test Case 7: wrong pubkey file
-test(' wrong pubkey file', async () => {
+test('wrong pubkey file', async () => {
   const seckey = fs.readFileSync('Data4Tests/testcase1_secret').toString()
   const pubkey = fs.readFileSync('Data4Tests/testcase7_wrongPubkeyFile').toString()
-  const decryptedKeys = await index.keyfiles.encryption_keyfiles([seckey, pubkey])
+  const decryptedKeys = await crypt4GHJS.keyfiles.encryptionKeyfiles([seckey, pubkey])
   expect(decryptedKeys).toBe(undefined)
 })
 
 // Test Case 8: wrong seckey file
-test(' wrong pubkey file', async () => {
+test('wrong pubkey file', async () => {
   const seckey = fs.readFileSync('Data4Tests/testcase8_wrongSeckeyFile').toString()
   const pubkey = fs.readFileSync('Data4Tests/testcase2_public').toString()
-  const decryptedKeys = await index.keyfiles.encryption_keyfiles([seckey, pubkey])
+  const decryptedKeys = await crypt4GHJS.keyfiles.encryptionKeyfiles([seckey, pubkey])
   expect(decryptedKeys).toBe(undefined)
 })
 
 // encryption
 // Test Case 9: encryption without additional parameters, single header packet
+test(' encryption without additional parameters, single header packet', async () => {
+  const edit = null
+  const header = await crypt4GHJS.encryption.encHead(seckey, [pubkey], edit)
+  expect(header).toBeInstanceOf(Array)
+  expect(header[0]).toBeInstanceOf(Uint8Array) // header: Uint8Array(124) [99, 114, 121, 112, 116,  52, 103, 104,   1,   0,   0,   0, 1,   0,   0,   0, 108,   0,   0,   0,   0,   0,   0,   0, 9, 107,   0, 216, 185,  51, 243,   3, 106, 226, 219,  28, 39,  87, 124, 207, 225, 146,   6,   3, 149,  85,   8, 144, 173, 125,  56, 107, 183, 181,  90,   0, 226, 193,  29, 216, 179,  89,  47, 223, 251, 210, 155, 179,  31, 179, 119, 234, 231, 100, 250,  96, 220, 110, 121, 173, 121,  91,  17,  37, 179,  55, 157, 133, 204, 128, 215,  79,  64,  34, 165, 250, 109,  70, 104, 248,43,  14, 248, 201, 198, 110, 224, 136, 173, 254,  77, 253, 167, 200,  26, 177, 233, 179,  19, 138, 133,  97, 241, 182]
+  expect(header[1]).toBeInstanceOf(Uint8Array) // sessionkey: Uint8Array(32) [ 82, 213,  64,  93,  11, 220,  42, 126, 210,  28, 255, 128, 228,  55,  98,  16, 191, 110, 190,  66, 212, 194,  34,  34, 132,  93,  73, 234, 163, 101, 169, 105]
+  expect(header[0].length).toBe(124)
+  expect(header[1].length).toBe(32)
+  // const writeStream = fs.createWriteStream('Data4Tests/testcase9.c4gh')
+  /*
+  console.log(header[0])
+  console.log(header[0].subarray(98))
+  console.log(header[1]) */
+  // writeStream.write(header[0])
+   if (header[1]) {
+    let counter = 0
+    const readStream = fs.createReadStream('Data4Tests/abcd.txt')
+      readStream
+        .on('data', async function (d) {
+          counter++
+          const text = await crypt4GHJS.encryption.encryption(header, d, counter, blocks)
+          if (text) {
+            // writeStream.write(text)
+            }
+          })
+          .on('end', (d) => {
+           // writeStream.end()
+          })
+  }
+})
 // Test Case 10: encryption with editlist even, single header packet
 // Test Case 11: encryption with editlist odd, single header packet
 // Test Case 12: encryption with editlist just 1 number, single header packet

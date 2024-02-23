@@ -213,3 +213,5 @@ testData/abcdREA.c4gh
 testData/abcdREA.txt
 testData/pubkey
 testData/seckey
+Data4Tests/abcd.txt
+Data4Tests/testcase9.c4gh
