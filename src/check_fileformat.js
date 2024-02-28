@@ -13,12 +13,16 @@ export async function check (input, seckey) {
   try {
     const header = await input.subarray(0, 1000)
     const headerPackets = dec.parse(header)
-    const decryptedPackets = await dec.decryptHeader(headerPackets[0], seckey)
-    if (decryptedPackets[0].length === 0) {
+    if(headerPackets === undefined){
       return false
-    } else {
-      return true
-    }
+    } else{
+      const decryptedPackets = await dec.decryptHeader(headerPackets[0], seckey)
+      if (decryptedPackets[0].length === 0) {
+        return false
+      } else {
+        return true
+      }
+    } 
   } catch (e) {
     console.trace("File checking wasn't possible!")
   }

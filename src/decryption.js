@@ -79,13 +79,13 @@ export function parse (header) {
     // checken magic number
     const magicHeaderDecryption = new TextDecoder().decode(header.subarray(0, 8))
     const magicHeaderOrignal = new TextDecoder().decode(magicBytestring)
-    if (magicHeaderDecryption !== magicHeaderOrignal) console.trace('Not a crypt4gh file')
+    if (magicHeaderDecryption !== magicHeaderOrignal) return undefined
     // check version number
     const version = new Uint8Array(header.subarray(8, 12))
-    if (version[0] !== 1) console.trace('Only version 1 is accepted')
+    if (version[0] !== 1) return undefined
     // check packet count
     const numPakets = new Uint32Array(new Uint8Array(header.subarray(12, 16)))
-    if (numPakets[0] === 0) console.trace('No packages!')
+    if (numPakets[0] === 0) return undefined
     // extract packets -- returns list of packets
     const extracted = extractPackets(numPakets[0], header)
     return [extracted[0], extracted[1], extracted[2]]

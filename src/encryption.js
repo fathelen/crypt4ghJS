@@ -19,22 +19,30 @@ const PacketTypeEditList = new Uint32Array([1])
 const magicBytestring = helperfunction.string2byte('crypt4gh')
 
 export async function encryption (headerInfo, text, counter, blocks) {
-  let encText = new Uint8Array()
-  if (blocks && blocks.includes(counter)) {
-    encText = await pureEncryption(text, headerInfo[1])
-    return encText
-  } else if (!blocks) {
-    encText = await pureEncryption(text, headerInfo[1])
-    return encText
+  try{
+    let encText = new Uint8Array()
+    if (blocks && blocks.includes(counter) && blocks.some(v => v < 0) === false && !blocks.some(isNaN)) {
+      encText = await pureEncryption(text, headerInfo[1])
+      return encText
+    } else if (!blocks) {
+      encText = await pureEncryption(text, headerInfo[1])
+      return encText
+    }
+  } catch (e) {
+    console.trace(e)
   }
 }
 
-export async function encHead (seckey, pubkey, edit) {
+export async function encHead (seckey, pubkey, edit, block) {
   let header = new Uint8Array()
-  if (edit) {
-    header = await encHeaderEdit(seckey, pubkey, edit)
+  if (edit && !block) {
+      header = await encHeaderEdit(seckey, pubkey, edit)
+  } else if(block && block.some(v => v < 0) === true  || block && block.some(isNaN) || block && edit ){
+    header = undefined
+    console.trace('Invalid block entry')
   } else {
     header = await encHeader(seckey, pubkey)
+
   }
   return header
 }
@@ -64,17 +72,30 @@ export async function encHeader (secretkey, publicKeys) {
 
 export async function encHeaderEdit (secretkey, publicKeys, editlist) {
   try {
-    let serializedData = new Uint8Array()
-    let sessionKey = new Uint8Array()
-    // header part
-    await (async () => {
-      await _sodium.ready
-      const sodium = _sodium
-      const encryptionMethod = new Uint32Array([0])
-      sessionKey = sodium.randombytes_buf(32)
-      serializedData = await encryptionEdit(editlist, encryptionMethod, sessionKey, publicKeys, secretkey)
-    })()
-    return [serializedData, sessionKey]
+    let hasNegative = null
+    let hasNaN = null 
+    if(Array.isArray(editlist[0]) === true) {
+      hasNegative = editlist.some(row => row.some(v => v < 0))
+      hasNaN = !editlist.some(row => row.some(isNaN))
+    } else if(Array.isArray(editlist[0]) === false){
+      hasNegative = editlist.some(v => v < 0)
+      hasNaN = !editlist.some(isNaN)
+    }
+    if (hasNegative === false && hasNaN === true){
+      let serializedData = new Uint8Array()
+      let sessionKey = new Uint8Array()
+      // header part
+      await (async () => {
+        await _sodium.ready
+        const sodium = _sodium
+        const encryptionMethod = new Uint32Array([0])
+        sessionKey = sodium.randombytes_buf(32)
+        serializedData = await encryptionEdit(editlist, encryptionMethod, sessionKey, publicKeys, secretkey)
+      })()
+      if(serializedData !== undefined){
+        return [serializedData, sessionKey]
+      }
+    }
   } catch (e) {
     console.trace('Header Encryption not possible.')
   }
@@ -237,13 +258,17 @@ export async function encryptionEdit (editList, encryptionMethod, sessionKey, pu
   try {
     const typeArray = []
     if (Array.isArray(editList[0]) === true) {
-      const editPackets = makePacketEditLists(editList)
-      const encPacketDataContent = makePacketDataEnc(encryptionMethod, sessionKey)
-      if (editPackets.length === publicKeys.length) {
-        const headerPackets = await headerEncryptMultiEdit(editPackets, encPacketDataContent, secretkey, publicKeys)
-        const serializedData = serialize(headerPackets[0], headerPackets[1], headerPackets[2], headerPackets[3])
-        return serializedData
-      }
+        if(editList.length === publicKeys.length){
+          const editPackets = makePacketEditLists(editList)
+          const encPacketDataContent = makePacketDataEnc(encryptionMethod, sessionKey)
+          if (editPackets.length === publicKeys.length) {
+            const headerPackets = await headerEncryptMultiEdit(editPackets, encPacketDataContent, secretkey, publicKeys)
+            const serializedData = serialize(headerPackets[0], headerPackets[1], headerPackets[2], headerPackets[3])
+            return serializedData
+          }
+        } else {
+          console.trace('Error in editlist length!')
+        }
     } else {
       const editPacket = makePacketEditList(editList)
       const encPacketDataContent = makePacketDataEnc(encryptionMethod, sessionKey)

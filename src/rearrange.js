@@ -27,7 +27,9 @@ export async function streamRearrange (header, seckey, pubkey, editlist) {
   const decryptedPackets = await dec.decryptHeader(headerPackets[0], seckey)
   const sessionk = decryptedPackets[0][0].subarray(8)
   const newEditPacket = await headerRearrange(decryptedPackets[0], editlist, headerPackets[1].length, pubkey, seckey, sessionk)
-  return [newEditPacket, headerPackets[2]]
+  if(newEditPacket !== undefined){
+    return [newEditPacket, headerPackets[2]]
+  }
 }
 
 async function headerRearrange (decPackets, editlist, inputlänge, pubkeys, seckey, key) {
@@ -249,7 +251,7 @@ async function rearrHeaderEdit (big64Oldedit, inputlänge, b, editlist, decPacke
       const newEditPacket = enc.makePacketEditList(editlist)
       const encr = await enc.headerEncrypt([decPackets[0], newEditPacket], seckey, pubkeys)
       const serializedData = enc.serialize(encr[0], encr[1], encr[2], encr[3])
-      return [serializedData, 1]
+      return serializedData
     }
   }
 }
