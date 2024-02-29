@@ -711,7 +711,7 @@ test('encryption with multiple editlist, more editlists than header packets, mul
 
 // Test Case 46: check fileformat, crypt4GH = true
 test('check fileformat, crypt4GH = true', async () => {
-  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase11.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase11.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       let isCrypt4GH = await crypt4GHJS.checkFileformat.check(Uint8Array.from(d), seckey)
@@ -722,7 +722,7 @@ test('check fileformat, crypt4GH = true', async () => {
 
 // Test Case 47: check fileformat, crypt4GH = false
 test('check fileformat, crypt4GH = false', async () => {
-  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/abcd.txt', { end: 1000 })
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/abcd.txt', { end: 10000 })
   readStream
     .on('data', async function (d) {
       let isCrypt4GH = await crypt4GHJS.checkFileformat.check(Uint8Array.from(d), seckey)
@@ -735,15 +735,15 @@ test('check fileformat, crypt4GH = false', async () => {
 
 // Test Case 48: reencryption, without editlist, one header packet, for one new header packet
 test('reencryption, without editlist, one header packet, for one new header packet', async () => {
-  const readStream = fs.createReadStream('Data4Tests/testcase9.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('Data4Tests/testcase9.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       const reencryptHeader = await crypt4GHJS.reeencryption.streamReencryptHeader(Uint8Array.from(d), [pubkeyPass], seckey)
       await expect(reencryptHeader).toBeInstanceOf(Array)
       await expect(reencryptHeader[0]).toBeInstanceOf(Uint8Array)
-      await expect(reencryptHeader[0].length).toBe(448)
+      await expect(reencryptHeader[0].length).toBe(124)
       await expect(reencryptHeader[1]).toBe(124)
-      // fs.appendFileSync('Data4Tests/testcase48.c4gh', reencryptHeader[0])
+      // fs.writeFileSync('Data4Tests/testcase48.c4gh', reencryptHeader[0])
       const readStream2 = fs.createReadStream('Data4Tests/testcase9.c4gh', { start: reencryptHeader[1], highWaterMark: 65564 })
       readStream2
         .on('data', async function (d2) {
@@ -757,13 +757,13 @@ test('reencryption, without editlist, one header packet, for one new header pack
 
 // Test Case 49: reencryption, without editlist, one header packet, for multiple new header packets
 test('reencryption, without editlist, one header packet, for multiple new header packets', async () => {
-  const readStream = fs.createReadStream('Data4Tests/testcase9.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('Data4Tests/testcase9.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       const reencryptHeader = await crypt4GHJS.reeencryption.streamReencryptHeader(Uint8Array.from(d), [pubkeyPass, pubkey], seckey)
       await expect(reencryptHeader).toBeInstanceOf(Array)
       await expect(reencryptHeader[0]).toBeInstanceOf(Uint8Array)
-      await expect(reencryptHeader[0].length).toBe(664)
+      await expect(reencryptHeader[0].length).toBe(232)
       await expect(reencryptHeader[1]).toBe(124)
       // fs.appendFileSync('Data4Tests/testcase49.c4gh', reencryptHeader[0])
       const readStream2 = fs.createReadStream('Data4Tests/testcase9.c4gh', { start: reencryptHeader[1], highWaterMark: 65564 })
@@ -777,13 +777,13 @@ test('reencryption, without editlist, one header packet, for multiple new header
 })
 // Test Case 50: reencryption, without editlist, multiple header packets, for one new header packet
 test('reencryption, without editlist, multiple header packets, for one new header packet', async () => {
-  const readStream = fs.createReadStream('Data4Tests/testcase24.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('Data4Tests/testcase24.c4gh', { end: 100000 })
   readStream
     .on('data', async function (d) {
       const reencryptHeader = await crypt4GHJS.reeencryption.streamReencryptHeader(Uint8Array.from(d), [pubkey], seckeyPass)
       await expect(reencryptHeader).toBeInstanceOf(Array)
       await expect(reencryptHeader[0]).toBeInstanceOf(Uint8Array)
-      await expect(reencryptHeader[0].length).toBe(448)
+      await expect(reencryptHeader[0].length).toBe(124)
       await expect(reencryptHeader[1]).toBe(232)
       // fs.appendFileSync('Data4Tests/testcase50.c4gh', reencryptHeader[0])
       const readStream2 = fs.createReadStream('Data4Tests/testcase24.c4gh', { start: reencryptHeader[1], highWaterMark: 65564 })
@@ -797,13 +797,13 @@ test('reencryption, without editlist, multiple header packets, for one new heade
 })
 // Test Case 51: reencryption, without editlist, multiple header packets, for multiple new header packets
 test('reencryption, without editlist, multiple header packets, for multiple new header packets', async () => {
-  const readStream = fs.createReadStream('Data4Tests/testcase24.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('Data4Tests/testcase24.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       const reencryptHeader = await crypt4GHJS.reeencryption.streamReencryptHeader(Uint8Array.from(d), [pubkey, pubkeyPass], seckeyPass)
       await expect(reencryptHeader).toBeInstanceOf(Array)
       await expect(reencryptHeader[0]).toBeInstanceOf(Uint8Array)
-      await expect(reencryptHeader[0].length).toBe(664)
+      await expect(reencryptHeader[0].length).toBe(232)
       await expect(reencryptHeader[1]).toBe(232)
       // fs.appendFileSync('Data4Tests/testcase51.c4gh', reencryptHeader[0])
       const readStream2 = fs.createReadStream('Data4Tests/testcase24.c4gh', { start: reencryptHeader[1], highWaterMark: 65564 })
@@ -817,13 +817,13 @@ test('reencryption, without editlist, multiple header packets, for multiple new 
 })
 // Test Case 52: reencryption, with editlist, one header packet, for one new header packet
 test('reencryption, with editlist, one header packet, for one new header packet', async () => {
-  const readStream = fs.createReadStream('Data4Tests/testcase10.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('Data4Tests/testcase10.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       const reencryptHeader = await crypt4GHJS.reeencryption.streamReencryptHeader(Uint8Array.from(d), [pubkeyPass], seckey)
       await expect(reencryptHeader).toBeInstanceOf(Array)
       await expect(reencryptHeader[0]).toBeInstanceOf(Uint8Array)
-      await expect(reencryptHeader[0].length).toBe(448)
+      await expect(reencryptHeader[0].length).toBe(232)
       await expect(reencryptHeader[1]).toBe(232)
       // fs.appendFileSync('Data4Tests/testcase52.c4gh', reencryptHeader[0])
       const readStream2 = fs.createReadStream('Data4Tests/testcase10.c4gh', { start: reencryptHeader[1], highWaterMark: 65564 })
@@ -837,13 +837,13 @@ test('reencryption, with editlist, one header packet, for one new header packet'
 })
 // Test Case 53: reencryption, with editlist, one header packet, for multiple new header packets
 test('reencryption, with editlist, one header packet, for multiple new header packets', async () => {
-  const readStream = fs.createReadStream('Data4Tests/testcase10.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('Data4Tests/testcase10.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       const reencryptHeader = await crypt4GHJS.reeencryption.streamReencryptHeader(Uint8Array.from(d), [pubkeyPass, pubkey], seckey)
       await expect(reencryptHeader).toBeInstanceOf(Array)
       await expect(reencryptHeader[0]).toBeInstanceOf(Uint8Array)
-      await expect(reencryptHeader[0].length).toBe(664)
+      await expect(reencryptHeader[0].length).toBe(448)
       await expect(reencryptHeader[1]).toBe(232)
       // fs.appendFileSync('Data4Tests/testcase53.c4gh', reencryptHeader[0])
       const readStream2 = fs.createReadStream('Data4Tests/testcase10.c4gh', { start: reencryptHeader[1], highWaterMark: 65564 })
@@ -857,13 +857,13 @@ test('reencryption, with editlist, one header packet, for multiple new header pa
 })
 // Test Case 54: reencryption, with editlist, multiple header packets, for one new header packet
 test('reencryption, with editlist, multiple header packets, for one new header packet', async () => {
-  const readStream = fs.createReadStream('Data4Tests/testcase25.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('Data4Tests/testcase25.c4gh', { end: 10000})
   readStream
     .on('data', async function (d) {
       const reencryptHeader = await crypt4GHJS.reeencryption.streamReencryptHeader(Uint8Array.from(d), [pubkey], seckeyPass)
       await expect(reencryptHeader).toBeInstanceOf(Array)
       await expect(reencryptHeader[0]).toBeInstanceOf(Uint8Array)
-      await expect(reencryptHeader[0].length).toBe(448)
+      await expect(reencryptHeader[0].length).toBe(232)
       await expect(reencryptHeader[1]).toBe(448)
       // fs.appendFileSync('Data4Tests/testcase54.c4gh', reencryptHeader[0])
       const readStream2 = fs.createReadStream('Data4Tests/testcase25.c4gh', { start: reencryptHeader[1], highWaterMark: 65564 })
@@ -877,13 +877,13 @@ test('reencryption, with editlist, multiple header packets, for one new header p
 })
 // Test Case 55: reencryption, with editlist, multiple header packets, for multiple new header packets
 test('reencryption, with editlist, multiple header packets, for one new header packet', async () => {
-  const readStream = fs.createReadStream('Data4Tests/testcase25.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('Data4Tests/testcase25.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       const reencryptHeader = await crypt4GHJS.reeencryption.streamReencryptHeader(Uint8Array.from(d), [pubkey, pubkeyPass], seckeyPass)
       await expect(reencryptHeader).toBeInstanceOf(Array)
       await expect(reencryptHeader[0]).toBeInstanceOf(Uint8Array)
-      await expect(reencryptHeader[0].length).toBe(664)
+      await expect(reencryptHeader[0].length).toBe(448)
       await expect(reencryptHeader[1]).toBe(448)
       // fs.appendFileSync('Data4Tests/testcase55.c4gh', reencryptHeader[0])
       const readStream2 = fs.createReadStream('Data4Tests/testcase25.c4gh', { start: reencryptHeader[1], highWaterMark: 65564 })
@@ -900,7 +900,7 @@ test('reencryption, with editlist, multiple header packets, for one new header p
 // Test Case 56: rearrangement, without editlist before, one header packet, for one new header packet
 test('rearrangement, without editlist before, one header packet, for one new header packet', async () => {
   const editlist = [0, 5]
-  const readStream = fs.createReadStream('Data4Tests/testcase9.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('Data4Tests/testcase9.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       const rearrangeHeader = await crypt4GHJS.rearrangment.streamRearrange(Uint8Array.from(d), seckey, [pubkeyPass], editlist)
@@ -918,7 +918,7 @@ test('rearrangement, without editlist before, one header packet, for one new hea
 // Test Case 57: rearrangement, without editlist before, one header packet, for multiple new header packets
 test('rearrangement, without editlist before, one header packet, for multiple new header packets', async () => {
   const editlist = [0, 5]
-  const readStream = fs.createReadStream('Data4Tests/testcase9.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('Data4Tests/testcase9.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       const rearrangeHeader = await crypt4GHJS.rearrangment.streamRearrange(Uint8Array.from(d), seckey, [pubkeyPass, pubkey], editlist)
@@ -936,7 +936,7 @@ test('rearrangement, without editlist before, one header packet, for multiple ne
 // Test Case 58: rearrangement, without editlist before, multiple header packets, for one new header packet
 test('rearrangement, without editlist before, one header packet, for multiple new header packets', async () => {
   const editlist = [0, 5]
-  const readStream = fs.createReadStream('Data4Tests/testcase24.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('Data4Tests/testcase24.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       const rearrangeHeader = await crypt4GHJS.rearrangment.streamRearrange(Uint8Array.from(d), seckey, [pubkey], editlist)
@@ -954,7 +954,7 @@ test('rearrangement, without editlist before, one header packet, for multiple ne
 // Test Case 59: rearrangement, without editlist before, multiple header packets, for multiple new header packets
 test('rearrangement, without editlist before, one header packet, for multiple new header packets', async () => {
   const editlist = [0, 5]
-  const readStream = fs.createReadStream('Data4Tests/testcase24.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('Data4Tests/testcase24.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       const rearrangeHeader = await crypt4GHJS.rearrangment.streamRearrange(Uint8Array.from(d), seckey, [pubkey, pubkeyPass], editlist)
@@ -972,7 +972,7 @@ test('rearrangement, without editlist before, one header packet, for multiple ne
 // Test Case 60: rearrangement, with editlist before, one header packet, for one new header packet
 test('rearrangement, with editlist before, one header packet, for one new header packet', async () => {
   const editlist = [0, 5]
-  const readStream = fs.createReadStream('Data4Tests/testcase10.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('Data4Tests/testcase10.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       const rearrangeHeader = await crypt4GHJS.rearrangment.streamRearrange(Uint8Array.from(d), seckey, [pubkeyPass], editlist)
@@ -990,7 +990,7 @@ test('rearrangement, with editlist before, one header packet, for one new header
 // Test Case 61: rearrangement, with editlist before, one header packet, for multiple new header packets
 test('rearrangement, with editlist before, one header packet, for multiple new header packets', async () => {
   const editlist = [0, 5]
-  const readStream = fs.createReadStream('Data4Tests/testcase10.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('Data4Tests/testcase10.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       const rearrangeHeader = await crypt4GHJS.rearrangment.streamRearrange(Uint8Array.from(d), seckey, [pubkeyPass, pubkey], editlist)
@@ -1008,7 +1008,7 @@ test('rearrangement, with editlist before, one header packet, for multiple new h
 // Test Case 62: rearrangement, with editlist before, multiple header packets, for one new header packet
 test('rearrangement, with editlist before, one header packet, for multiple new header packets', async () => {
   const editlist = [0, 5]
-  const readStream = fs.createReadStream('Data4Tests/testcase25.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('Data4Tests/testcase25.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       const rearrangeHeader = await crypt4GHJS.rearrangment.streamRearrange(Uint8Array.from(d), seckeyPass, [pubkey], editlist)
@@ -1026,7 +1026,7 @@ test('rearrangement, with editlist before, one header packet, for multiple new h
 // Test Case 63: rearrangement, with editlist before, multiple header packets, for multiple new header packets
 test('rearrangement, with editlist before, one header packet, for multiple new header packets', async () => {
   const editlist = [0, 5]
-  const readStream = fs.createReadStream('Data4Tests/testcase25.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('Data4Tests/testcase25.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       const rearrangeHeader = await crypt4GHJS.rearrangment.streamRearrange(Uint8Array.from(d), seckeyPass, [pubkey, pubkeyPass], editlist)
@@ -1044,7 +1044,7 @@ test('rearrangement, with editlist before, one header packet, for multiple new h
 // Test Case 64:rearrangement, with editlist before, new edit out of range (error)
 test('rearrangement, with editlist before, one header packet, for multiple new header packets', async () => {
   const editlist = [0, 5]
-  const readStream = fs.createReadStream('Data4Tests/testcase25.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('Data4Tests/testcase25.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       const rearrangeHeader = await crypt4GHJS.rearrangment.streamRearrange(Uint8Array.from(d), seckeyPass, [pubkey], pubkeyPass, editlist)
@@ -1059,7 +1059,7 @@ test('rearrangement, with editlist before, one header packet, for multiple new h
 // Test Case 65: decryptin: encryption without additional parameters, single header packet
 test('decryptin: encryption without additional parameters, single header packet', async () => {
   const wantedblocks = null
-  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase9.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase9.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       let counter = 0
@@ -1082,7 +1082,7 @@ test('decryptin: encryption without additional parameters, single header packet'
 // Test Case 66: decryptin: encryption with editlist even, single header packet
 test('decryptin: encryption with editlist even, single header packet', async () => {
   const wantedblocks = null
-  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase10.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase10.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       let counter = 0
@@ -1107,7 +1107,7 @@ test('decryptin: encryption with editlist even, single header packet', async () 
 // Test Case 67: decryptin: encryption with editlist odd, single header packet
 test('decryptin: encryption with editlist odd, single header packet', async () => {
   const wantedblocks = null
-  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase11.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase11.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       let counter = 0
@@ -1132,7 +1132,7 @@ test('decryptin: encryption with editlist odd, single header packet', async () =
 // Test Case 68: decryptin: encryption with editlist just 1 number, single header packet
 test('decryptin: encryption with editlist odd, single header packet', async () => {
   const wantedblocks = null
-  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase12.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase12.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       let counter = 0
@@ -1161,7 +1161,7 @@ test('decryptin: encryption with editlist odd, single header packet', async () =
 // Test Case 73: decryptin: encryption with blocks one block, single header packet
 test('decryptin: encryption with blocks one block, single header packet', async () => {
   const wantedblocks = null
-  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase19.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase19.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       let counter = 0
@@ -1187,7 +1187,7 @@ test('decryptin: encryption with blocks one block, single header packet', async 
 // Test Case 74: decryptin: encryption with blocks multiple block, single header packet
 test('decryptin: encryption with blocks multiple block, single header packet', async () => {
   const wantedblocks = null
-  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase20.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase20.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       let counter = 0
@@ -1214,7 +1214,7 @@ test('decryptin: encryption with blocks multiple block, single header packet', a
 // Test Case 75: decryptin: encryption without additional parameters, multiple header packets
 test('decryptin: encryption without additional parameters, multiple header packets seckey', async () => {
   const wantedblocks = null
-  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase24.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase24.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       let counter = 0
@@ -1236,7 +1236,7 @@ test('decryptin: encryption without additional parameters, multiple header packe
 
 test('decryptin: encryption without additional parameters, multiple header packets seckeyPass', async () => {
   const wantedblocks = null
-  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase24.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase24.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       let counter = 0
@@ -1259,7 +1259,7 @@ test('decryptin: encryption without additional parameters, multiple header packe
 // Test Case 76: decryptin: encryption with editlist even, multiple header packets
 test('decryptin: encryption with editlist even, multiple header packets, seckey', async () => {
   const wantedblocks = null
-  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase25.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase25.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       let counter = 0
@@ -1285,7 +1285,7 @@ test('decryptin: encryption with editlist even, multiple header packets, seckey'
 
 test('decryptin: encryption with editlist even, multiple header packets seckeyPass', async () => {
   const wantedblocks = null
-  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase25.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase25.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       let counter = 0
@@ -1312,7 +1312,7 @@ test('decryptin: encryption with editlist even, multiple header packets seckeyPa
 // Test Case 77: decryptin: encryption with editlist odd, multiple header packets
 test('decryptin: encryption with editlist odd, multiple header packets, seckey', async () => {
   const wantedblocks = null
-  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase26.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase26.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       let counter = 0
@@ -1338,7 +1338,7 @@ test('decryptin: encryption with editlist odd, multiple header packets, seckey',
 
 test('decryptin: encryption with editlist odd, multiple header packets, seckeyPass', async () => {
   const wantedblocks = null
-  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase26.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase26.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       let counter = 0
@@ -1364,7 +1364,7 @@ test('decryptin: encryption with editlist odd, multiple header packets, seckeyPa
 // Test Case 78: decryptin: encryption with editlist just 1 number, multiple header packets
 test('decryptin: encryption with editlist just 1 number, multiple header packets, seckey', async () => {
   const wantedblocks = null
-  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase27.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase27.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       let counter = 0
@@ -1390,7 +1390,7 @@ test('decryptin: encryption with editlist just 1 number, multiple header packets
 
 test('decryptin: encryption with editlist just 1 number, multiple header packets, seckeyPass', async () => {
   const wantedblocks = null
-  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase27.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase27.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       let counter = 0
@@ -1420,7 +1420,7 @@ test('decryptin: encryption with editlist just 1 number, multiple header packets
 // Test Case 83: decryptin: encryption with blocks one block, multiple header packets
 test('decryptin: encryption with blocks one block, multiple header packets, seckey', async () => {
   const wantedblocks = null
-  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase34.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase34.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       let counter = 0
@@ -1446,7 +1446,7 @@ test('decryptin: encryption with blocks one block, multiple header packets, seck
 
 test('decryptin: encryption with blocks one block, multiple header packets, seckeyPass', async () => {
   const wantedblocks = null
-  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase34.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase34.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       let counter = 0
@@ -1472,7 +1472,7 @@ test('decryptin: encryption with blocks one block, multiple header packets, seck
 // Test Case 84: decryptin: encryption with blocks multiple block, multiple header packets
 test('decryptin: encryption with blocks multiple block, multiple header packets, seckey', async () => {
   const wantedblocks = null
-  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase35.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase35.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       let counter = 0
@@ -1485,7 +1485,7 @@ test('decryptin: encryption with blocks multiple block, multiple header packets,
           counter++
           const plaintext = await crypt4GHJS.decryption.decrypption(val, d2, counter, wantedblocks)
           if(plaintext){
-            fs.appendFileSync('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase84seckey.txt', plaintext)
+            // fs.appendFileSync('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase84seckey.txt', plaintext)
             await expect(plaintext).toBeInstanceOf(Uint8Array)
             const decoder = new TextDecoder()
             await expect(plaintext.length).toBe(65536)
@@ -1498,7 +1498,7 @@ test('decryptin: encryption with blocks multiple block, multiple header packets,
 
 test('decryptin: encryption with blocks multiple block, multiple header packets, seckeyPass', async () => {
   const wantedblocks = null
-  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase35.c4gh', { end: 1000 })
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase35.c4gh', { end: 10000 })
   readStream
     .on('data', async function (d) {
       let counter = 0
@@ -1511,7 +1511,7 @@ test('decryptin: encryption with blocks multiple block, multiple header packets,
           counter++
           const plaintext = await crypt4GHJS.decryption.decrypption(val, d2, counter, wantedblocks)
           if(plaintext){
-            fs.appendFileSync('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase84seckeyPass.txt', plaintext)
+            // fs.appendFileSync('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase84seckeyPass.txt', plaintext)
             await expect(plaintext).toBeInstanceOf(Uint8Array)
             const decoder = new TextDecoder()
             await expect(plaintext.length).toBe(65536)
@@ -1521,28 +1521,343 @@ test('decryptin: encryption with blocks multiple block, multiple header packets,
       readStream.destroy()
     })
 }) 
+
+// Test Case 85: decryptin: encryption with multiple even editlists, multiple header packets
+test('decryptin: encryption with multiple even editlists, multiple header packets, seckey', async () => {
+  const wantedblocks = null
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase39.c4gh', { end: 10000 })
+  readStream
+    .on('data', async function (d) {
+      let counter = 0
+      const val = await crypt4GHJS.decryption.headerDeconstruction(Uint8Array.from(d), seckey)
+      await expect(val).toBeInstanceOf(Array)
+      await expect(val[1]).toBeInstanceOf(Uint8Array)
+      const readStream2 = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase39.c4gh', { start: val[4], highWaterMark: 65564 })
+      readStream2
+        .on('data', async function (d2) {
+          counter++
+          const plaintext = await crypt4GHJS.decryption.decrypption(val, d2, counter, wantedblocks)
+          if(plaintext){
+            fs.appendFileSync('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase85seckey.txt', plaintext)
+            expect(plaintext).toBeInstanceOf(Uint8Array)
+            await expect([10,5]).toContain(plaintext.length)
+            const decoder = new TextDecoder()
+            await expect(decoder.decode(plaintext)).toMatch(/^f(a{9})|(b{5})$/)
+          }
+        })
+      readStream.destroy()
+    })
+}) 
+
+test('decryptin: encryption with multiple even editlists, multiple header packets, seckeyPass', async () => {
+  const wantedblocks = null
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase39.c4gh', { end: 10000 })
+  readStream
+    .on('data', async function (d) {
+      let counter = 0
+      const val = await crypt4GHJS.decryption.headerDeconstruction(Uint8Array.from(d), seckeyPass)
+      await expect(val).toBeInstanceOf(Array)
+      await expect(val[1]).toBeInstanceOf(Uint8Array)
+      const readStream2 = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase39.c4gh', { start: val[4], highWaterMark: 65564 })
+      readStream2
+        .on('data', async function (d2) {
+          counter++
+          const plaintext = await crypt4GHJS.decryption.decrypption(val, d2, counter, wantedblocks)
+          if(plaintext){
+            fs.appendFileSync('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase85seckeyPass.txt', plaintext)
+            expect(plaintext).toBeInstanceOf(Uint8Array)
+            await expect([10,5]).toContain(plaintext.length)
+            const decoder = new TextDecoder()
+            await expect(decoder.decode(plaintext)).toMatch(/^f(a{4})$/)
+          }
+        })
+      readStream.destroy()
+    })
+})
+// Test Case 86: decryptin: encryption with multiple odd editlists, multiple header packets
+test('decryptin: encryption with multiple odd editlists, multiple header packets, seckey', async () => {
+  const wantedblocks = null
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase40.c4gh', { end: 10000 })
+  readStream
+    .on('data', async function (d) {
+      let counter = 0
+      const val = await crypt4GHJS.decryption.headerDeconstruction(Uint8Array.from(d), seckey)
+      await expect(val).toBeInstanceOf(Array)
+      await expect(val[1]).toBeInstanceOf(Uint8Array)
+      const readStream2 = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase40.c4gh', { start: val[4], highWaterMark: 65564 })
+      readStream2
+        .on('data', async function (d2) {
+          counter++
+          const plaintext = await crypt4GHJS.decryption.decrypption(val, d2, counter, wantedblocks)
+          if(plaintext){
+            // fs.appendFileSync('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase86seckey.txt', plaintext)
+            expect(plaintext).toBeInstanceOf(Uint8Array)
+            await expect([15,5]).toContain(plaintext.length)
+            const decoder = new TextDecoder()
+            await expect(decoder.decode(plaintext)).toMatch(/^f(a{4})|ddddf$/)
+          }
+        })
+      readStream.destroy()
+    })
+}) 
+
+test('decryptin: encryption with multiple odd editlists, multiple header packets, seckeyPass', async () => {
+  const wantedblocks = null
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase40.c4gh', { end: 10000 })
+  readStream
+    .on('data', async function (d) {
+      let counter = 0
+      const val = await crypt4GHJS.decryption.headerDeconstruction(Uint8Array.from(d), seckeyPass)
+      await expect(val).toBeInstanceOf(Array)
+      await expect(val[1]).toBeInstanceOf(Uint8Array)
+      const readStream2 = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase40.c4gh', { start: val[4], highWaterMark: 65564 })
+      readStream2
+        .on('data', async function (d2) {
+          counter++
+          const plaintext = await crypt4GHJS.decryption.decrypption(val, d2, counter, wantedblocks)
+          if(plaintext){
+            // fs.appendFileSync('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase86seckeyPass.txt', plaintext)
+            expect(plaintext).toBeInstanceOf(Uint8Array)
+            await expect([15,5]).toContain(plaintext.length)
+            const decoder = new TextDecoder()
+            await expect(decoder.decode(plaintext)).toMatch(/^f(a{14})|ddddf$/)
+          }
+        })
+      readStream.destroy()
+    })
+})
+// Test Case 87: decryptin: encryption with multiple even and odd ,editlists, multiple header packets
+
+test('decryptin: encryption with multiple even and odd editlists, multiple header packets, seckey', async () => {
+  const wantedblocks = null
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase41.c4gh', { end: 10000 })
+  readStream
+    .on('data', async function (d) {
+      let counter = 0
+      const val = await crypt4GHJS.decryption.headerDeconstruction(Uint8Array.from(d), seckey)
+      await expect(val).toBeInstanceOf(Array)
+      await expect(val[1]).toBeInstanceOf(Uint8Array)
+      const readStream2 = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase41.c4gh', { start: val[4], highWaterMark: 65564 })
+      readStream2
+        .on('data', async function (d2) {
+          counter++
+          const plaintext = await crypt4GHJS.decryption.decrypption(val, d2, counter, wantedblocks)
+          if(plaintext){
+            // fs.appendFileSync('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase87seckey.txt', plaintext)
+            expect(plaintext).toBeInstanceOf(Uint8Array)
+            await expect([15,5]).toContain(plaintext.length)
+            const decoder = new TextDecoder()
+            await expect(decoder.decode(plaintext)).toMatch(/^f(a{4})|ddddf$/)
+          }
+        })
+      readStream.destroy()
+    })
+}) 
+
+test('decryptin: encryption with multiple even and odd editlists, multiple header packets, seckeyPass', async () => {
+  const wantedblocks = null
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase41.c4gh', { end: 10000 })
+  readStream
+    .on('data', async function (d) {
+      let counter = 0
+      const val = await crypt4GHJS.decryption.headerDeconstruction(Uint8Array.from(d), seckeyPass)
+      await expect(val).toBeInstanceOf(Array)
+      await expect(val[1]).toBeInstanceOf(Uint8Array)
+      const readStream2 = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase41.c4gh', { start: val[4], highWaterMark: 65564 })
+      readStream2
+        .on('data', async function (d2) {
+          counter++
+          const plaintext = await crypt4GHJS.decryption.decrypption(val, d2, counter, wantedblocks)
+          if(plaintext){
+            // fs.appendFileSync('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase87seckeyPass.txt', plaintext)
+            expect(plaintext).toBeInstanceOf(Uint8Array)
+            await expect([15,10]).toContain(plaintext.length)
+            const decoder = new TextDecoder()
+            await expect(decoder.decode(plaintext)).toMatch(/^f(a{14})|(d{10})$/)
+          }
+        })
+      readStream.destroy()
+    })
+})
 // decryption of reencryption
 
-// Test Case 81: decryption: reencryption, without editlist, one header packet, for one new header packet
-// Test Case 82: decryption: reencryption, without editlist, one header packet, for multiple new header packets
-// Test Case 83: decryption: reencryption, without editlist, multiple header packets, for one new header packet
-// Test Case 84: decryption: reencryption, without editlist, multiple header packets, for multiple new header packets
-// Test Case 85: decryption: reencryption, with editlist, one header packet, for one new header packet
-// Test Case 86: decryption: reencryption, with editlist, one header packet, for multiple new header packets
-// Test Case 87: decryption: reencryption, with editlist, multiple header packets, for one new header packet
-// Test Case 88: decryption: reencryption, with editlist, multiple header packets, for multiple new header packets
+// Test Case 88: decryption: reencryption, without editlist, one header packet, for one new header packet
+test(' decryption: reencryption, without editlist, one header packet, for one new header packet', async () => {
+  const wantedblocks = null
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase48.c4gh', { end: 10000 })
+  readStream
+    .on('data', async function (d) {
+      let counter = 0
+      const val = await crypt4GHJS.decryption.headerDeconstruction(Uint8Array.from(d), seckeyPass)
+      await expect(val).toBeInstanceOf(Array)
+      await expect(val[1]).toBeInstanceOf(Uint8Array)
+      const readStream2 = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase48.c4gh', { start: val[4], highWaterMark: 65564 })
+      readStream2
+        .on('data', async function (d2) {
+          counter++
+          const plaintext = await crypt4GHJS.decryption.decrypption(val, d2, counter, wantedblocks)
+          // fs.appendFileSync('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase88.txt', plaintext)
+          expect(plaintext).toBeInstanceOf(Uint8Array)
+          await expect([65536,65496]).toContain(plaintext.length)
+          const decoder = new TextDecoder()
+        })
+      readStream.destroy()
+    })
+}) 
+// Test Case 89: decryption: reencryption, without editlist, one header packet, for multiple new header packets
+test(' decryption: reencryption, without editlist, one header packet, for multiple new header packets, seckey ', async () => {
+  const wantedblocks = null
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase49.c4gh', { end: 10000 })
+  readStream
+    .on('data', async function (d) {
+      let counter = 0
+      const val = await crypt4GHJS.decryption.headerDeconstruction(Uint8Array.from(d), seckey)
+      await expect(val).toBeInstanceOf(Array)
+      await expect(val[1]).toBeInstanceOf(Uint8Array)
+      const readStream2 = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase49.c4gh', { start: val[4], highWaterMark: 65564 })
+      readStream2
+        .on('data', async function (d2) {
+          counter++
+          const plaintext = await crypt4GHJS.decryption.decrypption(val, d2, counter, wantedblocks)
+          // fs.appendFileSync('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase89seckey.txt', plaintext)
+          expect(plaintext).toBeInstanceOf(Uint8Array)
+          await expect([65536,65496]).toContain(plaintext.length)
+          const decoder = new TextDecoder()
+        })
+      readStream.destroy()
+    })
+}) 
+test(' decryption: reencryption, without editlist, one header packet, for multiple new header packets, seckeyPass', async () => {
+  const wantedblocks = null
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase49.c4gh', { end: 10000 })
+  readStream
+    .on('data', async function (d) {
+      let counter = 0
+      const val = await crypt4GHJS.decryption.headerDeconstruction(Uint8Array.from(d), seckeyPass)
+      await expect(val).toBeInstanceOf(Array)
+      await expect(val[1]).toBeInstanceOf(Uint8Array)
+      const readStream2 = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase49.c4gh', { start: val[4], highWaterMark: 65564 })
+      readStream2
+        .on('data', async function (d2) {
+          counter++
+          const plaintext = await crypt4GHJS.decryption.decrypption(val, d2, counter, wantedblocks)
+          // fs.appendFileSync('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase89seckeyPass.txt', plaintext)
+          expect(plaintext).toBeInstanceOf(Uint8Array)
+          await expect([65536,65496]).toContain(plaintext.length)
+          const decoder = new TextDecoder()
+        })
+      readStream.destroy()
+    })
+}) 
+// Test Case 90: decryption: reencryption, without editlist, multiple header packets, for one new header packet
+test('decryption: reencryption, without editlist, multiple header packets, for one new header packet', async () => {
+  const wantedblocks = null
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase50.c4gh', { end: 10000 })
+  readStream
+    .on('data', async function (d) {
+      let counter = 0
+      const val = await crypt4GHJS.decryption.headerDeconstruction(Uint8Array.from(d), seckey)
+      await expect(val).toBeInstanceOf(Array)
+      await expect(val[1]).toBeInstanceOf(Uint8Array)
+      const readStream2 = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase50.c4gh', { start: val[4], highWaterMark: 65564 })
+      readStream2
+        .on('data', async function (d2) {
+          counter++
+          const plaintext = await crypt4GHJS.decryption.decrypption(val, d2, counter, wantedblocks)
+          // fs.appendFileSync('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase90.txt', plaintext)
+          expect(plaintext).toBeInstanceOf(Uint8Array)
+          await expect([65536,65496]).toContain(plaintext.length)
+          const decoder = new TextDecoder()
+        })
+      readStream.destroy()
+    })
+}) 
+
+// Test Case 91: decryption: reencryption, without editlist, multiple header packets, for multiple new header packets
+test('decryption: reencryption, without editlist, multiple header packets, for multiple new header packets, seckey ', async () => {
+  const wantedblocks = null
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase51.c4gh', { end: 10000 })
+  readStream
+    .on('data', async function (d) {
+      let counter = 0
+      const val = await crypt4GHJS.decryption.headerDeconstruction(Uint8Array.from(d), seckey)
+      await expect(val).toBeInstanceOf(Array)
+      await expect(val[1]).toBeInstanceOf(Uint8Array)
+      const readStream2 = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase51.c4gh', { start: val[4], highWaterMark: 65564 })
+      readStream2
+        .on('data', async function (d2) {
+          counter++
+          const plaintext = await crypt4GHJS.decryption.decrypption(val, d2, counter, wantedblocks)
+          // fs.appendFileSync('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase91seckey.txt', plaintext)
+          expect(plaintext).toBeInstanceOf(Uint8Array)
+          await expect([65536,65496]).toContain(plaintext.length)
+        })
+      readStream.destroy()
+    })
+}) 
+test('decryption: reencryption, without editlist, multiple header packets, for multiple new header packets, seckeyPass', async () => {
+  const wantedblocks = null
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase51.c4gh', { end: 10000 })
+  readStream
+    .on('data', async function (d) {
+      let counter = 0
+      const val = await crypt4GHJS.decryption.headerDeconstruction(Uint8Array.from(d), seckeyPass)
+      await expect(val).toBeInstanceOf(Array)
+      await expect(val[1]).toBeInstanceOf(Uint8Array)
+      const readStream2 = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase51.c4gh', { start: val[4], highWaterMark: 65564 })
+      readStream2
+        .on('data', async function (d2) {
+          counter++
+          const plaintext = await crypt4GHJS.decryption.decrypption(val, d2, counter, wantedblocks)
+          // fs.appendFileSync('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase91seckeyPass.txt', plaintext)
+          expect(plaintext).toBeInstanceOf(Uint8Array)
+          await expect([65536,65496]).toContain(plaintext.length)
+        })
+      readStream.destroy()
+    })
+})
+
+// Test Case 92: decryption: reencryption, with editlist, one header packet, for one new header packet
+test('decryption: reencryption, with editlist, one header packet, for one new header packet', async () => {
+  const wantedblocks = null
+  const readStream = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase52.c4gh', { end: 10000 })
+  readStream
+    .on('data', async function (d) {
+      let counter = 0
+      const val = await crypt4GHJS.decryption.headerDeconstruction(Uint8Array.from(d), seckeyPass)
+      await expect(val).toBeInstanceOf(Array)
+      await expect(val[1]).toBeInstanceOf(Uint8Array)
+      const readStream2 = fs.createReadStream('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase52.c4gh', { start: val[4], highWaterMark: 65564 })
+      readStream2
+        .on('data', async function (d2) {
+          counter++
+          const plaintext = await crypt4GHJS.decryption.decrypption(val, d2, counter, wantedblocks)
+          if(plaintext){
+            fs.appendFileSync('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase92.txt', plaintext)
+            expect(plaintext).toBeInstanceOf(Uint8Array)
+              await expect([5,10]).toContain(plaintext.length)
+              const decoder = new TextDecoder()
+              await expect(decoder.decode(plaintext)).toMatch(/^f(a{9})|(b{5})$/)
+          }
+        })
+      readStream.destroy()
+    })
+})
+// Test Case 93: decryption: reencryption, with editlist, one header packet, for multiple new header packets
+// Test Case 94: decryption: reencryption, with editlist, multiple header packets, for one new header packet
+// Test Case 95: decryption: reencryption, with editlist, multiple header packets, for multiple new header packets
 
 // decryption of rearrangement
-// Test Case 89: decryption: rearrangement, without editlist before, one header packet, for one new header packet
-// Test Case 90: decryption: rearrangement, without editlist before, one header packet, for multiple new header packets
-// Test Case 91: decryption: rearrangement, without editlist before, multiple header packets, for one new header packet
-// Test Case 92: decryption: rearrangement, without editlist before, multiple header packets, for multiple new header packets
-// Test Case 93: decryption: rearrangement, without editlist before, multiple header packets, for multiple new header packets
-// Test Case 94 decryption: rearrangement, with editlist before, one header packet, for one new header packet
-// Test Case 95: decryption: rearrangement, with editlist before, one header packet, for multiple new header packets
-// Test Case 96: decryption: rearrangement, with editlist before, multiple header packets, for one new header packet
-// Test Case 97: decryption: rearrangement, with editlist before, multiple header packets, for multiple new header packets
-// Test Case 98: decryption: rearrangement, with editlist before, multiple header packets, for multiple new header packets
+// Test Case 93: decryption: rearrangement, without editlist before, one header packet, for one new header packet
+// Test Case 94: decryption: rearrangement, without editlist before, one header packet, for multiple new header packets
+// Test Case 95: decryption: rearrangement, without editlist before, multiple header packets, for one new header packet
+// Test Case 96: decryption: rearrangement, without editlist before, multiple header packets, for multiple new header packets
+// Test Case 97: decryption: rearrangement, without editlist before, multiple header packets, for multiple new header packets
+// Test Case 98 decryption: rearrangement, with editlist before, one header packet, for one new header packet
+// Test Case 99: decryption: rearrangement, with editlist before, one header packet, for multiple new header packets
+// Test Case 100: decryption: rearrangement, with editlist before, multiple header packets, for one new header packet
+// Test Case 101: decryption: rearrangement, with editlist before, multiple header packets, for multiple new header packets
+// Test Case 102: decryption: rearrangement, with editlist before, multiple header packets, for multiple new header packets
 
 // decryption decryptzing blocks
 

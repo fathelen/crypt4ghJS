@@ -126,7 +126,7 @@ export async function pureEncryption (chunk, key) {
  * @param {*} sessionKey => key to decrypt the input data
  * @returns encryption package as Uint8array
  */
-function makePacketDataEnc (encryptionMethode, sessionKey) {
+export function makePacketDataEnc (encryptionMethode, sessionKey) {
   try {
     const uint8EncMethod = new Uint8Array(encryptionMethode.buffer)
     const uint8TypeData = new Uint8Array(PacketTypeDataEnc.buffer)

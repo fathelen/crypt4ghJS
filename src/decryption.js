@@ -63,7 +63,7 @@ export async function headerDeconstruction (header, seckeys) {
     if (partitionedPackages[1].length > 0) {
       editlist = pureEdit([sessionKey, decryptedPackets[2], headerPackets[1], partitionedPackages[1], headerPackets[2]])
     }
-    return [sessionKey, decryptedPackets[2], headerPackets[1], partitionedPackages[1], headerPackets[2], editlist]
+    return [sessionKey, decryptedPackets[2], headerPackets[1], partitionedPackages[1], headerPackets[2], editlist, partitionedPackages[1][0]]
   } catch (e) {
     console.trace('header deconstruction not possible.')
   }

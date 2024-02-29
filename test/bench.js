@@ -34,14 +34,12 @@ async function encryption (input, output, edit, blocks) {
           })
   }
 }
-/*
-for (let i = 0; i < 5; i++) {
-  encryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.txt', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.c4gh')
-}
-*/
+
+// encryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.txt', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_edit.c4gh',[0, 5])
+
 async function decryption (input, output, wantedblocks) {
   const keys = await crypt4GHJS.keyfiles.encryptionKeyfiles([ts])
-  const readStream = fs.createReadStream(input, { end: 1000 })
+  const readStream = fs.createReadStream(input, { end: 10000 })
   readStream
     .on('data', async function (d) {
       fs.writeFile(output, '', (err) => {
@@ -69,7 +67,7 @@ async function decryption (input, output, wantedblocks) {
     })
 }
 
-// decryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_RE.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_RE.txt')
+decryption('testData/testEdit.c4gh', 'testData/testEdit.txt')
 
 async function generateKeys (secFile, pubFile, password) {
    const keys = await crypt4GHJS.keygen.keygen(password)
@@ -85,12 +83,12 @@ async function generateKeys (secFile, pubFile, password) {
   })
 }
 
-// generateKeys('testData/seckey', 'testData/pubkey', 'aaa')
+// generateKeys('testData/abcd_editRE.c4gh', 'testData/pubkey', 'aaa')
 
 // Reencryption
 async function reencryption (input, output) {
   const keys = await crypt4GHJS.keyfiles.encryptionKeyfiles([ts, tp])
-  const readStream = fs.createReadStream(input, { end: 1000 })
+  const readStream = fs.createReadStream(input, { end: 10000 })
   readStream
     .on('data', async function (d) {
       const reencryptHeader = await crypt4GHJS.reeencryption.streamReencryptHeader(Uint8Array.from(d), [keys[1]], keys[0])
@@ -109,16 +107,16 @@ async function reencryption (input, output) {
           })
         })
       readStream.destroy()
-    })
+    }) 
 }
 
-// reencryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_RE.c4gh')
+// reencryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_edit.c4gh', 'testData/testEdit.c4gh')
 
 // Rearrangement
 async function rearrangement (input, output) {
   const keys = await crypt4GHJS.keyfiles.encryptionKeyfiles([ts, tp, tp2])
   const editlist = [[0, 1], [0, 2]]
-  const readStream = fs.createReadStream(input, { end: 1000 })
+  const readStream = fs.createReadStream(input, { end: 10000 })
   readStream
     .on('data', async function (d) {
       const rearrangeHeader = await crypt4GHJS.rearrangment.streamRearrange(Uint8Array.from(d), keys[0], [keys[1], keys[2]], editlist)
