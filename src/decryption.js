@@ -16,10 +16,20 @@ const encryptionMethod = '0000' // only (xchacha20poly1305)
 const magicBytestring = helperfunction.string2byte('crypt4gh')
 
 export async function decrypption (headerInfo, text, counter, wantedblocks) {
-  if (headerInfo[5][0] && Array.from(headerInfo[5][0].keys()).includes(counter)) {
+  if (headerInfo[5][0] && headerInfo[5][1] === false && Array.from(headerInfo[5][0].keys()).includes(counter)) {
     const plaintext = await pureDecryption(Uint8Array.from(text), headerInfo[0])
     const aplliedEdit = applyEditlist(headerInfo[5][0].get(counter), plaintext)
     return aplliedEdit
+  } else if (headerInfo[5][0] && headerInfo[5][1] === true) {
+    if(Array.from(headerInfo[5][0].keys()).includes(counter)){
+      const plaintext = await pureDecryption(Uint8Array.from(text), headerInfo[0])
+    const aplliedEdit = applyEditlist(headerInfo[5][0].get(counter), plaintext)
+    return aplliedEdit
+    } else if(counter > Math.max(...headerInfo[5][0].keys())) { 
+      const plaintext = await pureDecryption(Uint8Array.from(text), headerInfo[0])
+      return plaintext
+    }
+
   } else if (wantedblocks && !headerInfo[5][0]) {
     if (wantedblocks.includes(counter)) {
       const plaintext = await pureDecryption(Uint8Array.from(text), headerInfo[0])
