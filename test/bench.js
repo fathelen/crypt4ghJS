@@ -13,7 +13,7 @@ const tp2 = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nKK2of4G9P49mpUE1PVDia+hTSQ8VWJ
 
 async function encryption (input, output, edit, blocks) {
   const keys = await crypt4GHJS.keyfiles.encryptionKeyfiles([ts, tp])
-  const header = await crypt4GHJS.encryption.encHead(keys[0], [keys[1]], edit)
+  const header = await crypt4GHJS.encryption.encHead(keys[0], [keys[1]], edit, blocks)
   // process.stdout.write(header[0])
   const writeStream = fs.createWriteStream(output)
   writeStream.write(header[0])
@@ -35,7 +35,7 @@ async function encryption (input, output, edit, blocks) {
   }
 }
 
-// encryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.txt', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_edit.c4gh',[0, 5])
+encryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.txt', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_edit.c4gh',[0, 5])
 
 const seckeyPass = new Uint8Array([ 239,  53, 227, 105, 157, 144,  90, 226, 118, 104,  90,  48,  37,  89,  73, 246, 10, 150, 243, 176, 181,  40, 210,  96, 102, 181, 168,  18,  59, 126, 206,  33 ])
 
@@ -69,7 +69,7 @@ async function decryption (input, output, wantedblocks) {
     })
 }
 
-decryption('Data4Tests/testcase17.c4gh', 'testData/case3.txt')
+//decryption('Data4Tests/testcase17.c4gh', 'testData/case3.txt')
 
 async function generateKeys (secFile, pubFile, password) {
    const keys = await crypt4GHJS.keygen.keygen(password)

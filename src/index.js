@@ -81,7 +81,7 @@ async function encr () {
   const seckeyFile = await file.files[0].text()
   const pubkeyFile = await file2.files[0].text()
   const keys = await crypt4GHJS.keyfiles.encryptionKeyfiles([seckeyFile, pubkeyFile], password)
-  const header = await crypt4GHJS.encryption.encHead(keys[0], [keys[1]], ed)
+  const header = await crypt4GHJS.encryption.encHead(keys[0], [keys[1]], ed, block)
   // yield header[0]
   c4ghtext.push(header[0])
   const chunksize = 65536
