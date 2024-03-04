@@ -1,24 +1,14 @@
 
 import * as crypt4GHJS from 'crypt4gh_js'
 import { Buffer } from 'buffer'
-// const keygen = require('./keygen')
-// const keyfiles = require('./check_keyfiles')
-// const encryption = require('./encryption')
-// const decryption = require('./decryption')
-// const reeencryption = require('./reeencryption')
-// const rearrangment = require('./rearrange')
-// const Buffer = require('buffer/').Buffer
+
 
 const acc = document.getElementsByClassName('accordion')
 let i
 
 for (i = 0; i < acc.length; i++) {
   acc[i].addEventListener('click', function () {
-    /* Toggle between adding and removing the "active" class,
-    to highlight the button that controls the panel */
     this.classList.toggle('active')
-
-    /* Toggle between hiding and showing the active panel */
     const panel = this.nextElementSibling
     if (panel.style.display === 'block') {
       panel.style.display = 'none'
@@ -82,7 +72,6 @@ async function encr () {
   const pubkeyFile = await file2.files[0].text()
   const keys = await crypt4GHJS.keyfiles.encryptionKeyfiles([seckeyFile, pubkeyFile], password)
   const header = await crypt4GHJS.encryption.encHead(keys[0], [keys[1]], ed, block)
-  // yield header[0]
   c4ghtext.push(header[0])
   const chunksize = 65536
   let counter = 0
@@ -93,7 +82,6 @@ async function encr () {
       const chunkfile = await enteredText.slice(offset, offset + chunksize)
       const encryptedtext = await crypt4GHJS.encryption.encryption(header, Uint8Array.from(chunkfile.split('').map(x => x.charCodeAt())), counter, block)
       if (encryptedtext) {
-      // yield encryptedtext
         c4ghtext.push(encryptedtext)
       }
 
@@ -211,7 +199,6 @@ document.getElementById('but2').addEventListener('click', async function () {
   element.click()
 
   document.body.removeChild(element)
-  // download(filename, dec)
 }, false)
 
 function download (file, text) {
