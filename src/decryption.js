@@ -2,12 +2,6 @@ import * as helperfunction from './helper functions.js'
 import * as x25519 from '@stablelib/x25519'
 import * as Blake2b from '@stablelib/blake2b'
 import _sodium from 'libsodium-wrappers'
-// const helperfunction = require('./helper functions')
-/*
-const x25519 = require('@stablelib/x25519')
-const Blake2b = require('@stablelib/blake2b')
-const dec = require('./decryption')
-const _sodium = require('libsodium-wrappers') */
 
 export const SEGMENT_SIZE = 65536
 const PacketTypeDataEnc = '0000'

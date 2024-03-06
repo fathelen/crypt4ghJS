@@ -199,6 +199,7 @@ document.getElementById('but2').addEventListener('click', async function () {
   element.click()
 
   document.body.removeChild(element)
+
 }, false)
 
 function download (file, text) {

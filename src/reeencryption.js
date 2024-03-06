@@ -2,12 +2,8 @@ import * as x25519 from '@stablelib/x25519'
 import * as enc from './encryption.js'
 import * as dec from './decryption.js'
 import _sodium from 'libsodium-wrappers'
-const PacketTypeEditList = new Uint32Array([1])
-/*
-const x25519 = require('@stablelib/x25519')
-const enc = require('./encryption')
-const dec = require('./decryption') */
 
+const PacketTypeEditList = new Uint32Array([1])
 const SEGMENTSIZE = 65536
 const newKey = x25519.generateKeyPair()
 
@@ -89,17 +85,5 @@ export async function streamReencryptHeader (header, keysPub, keySec) {
     } 
     return [serializedData, decryptedPackets[4]]
   }
-  
-
-
-  /*
-  if(!decryptedPackets[0][1]){
-    const encr = await enc.headerEncrypt(headers, newKey.secretKey, keysPub)
-     serializedData = enc.serialize(encr[0], keysPub[0], encr[2], encr[3])
-    return [serializedData, headerPackets[2]]
-  } else {
-    serializedData = await enc.encHeaderEdit(newKey.secretKey, keysPub, decryptedPackets[0][1])
-    return [serializedData[0], headerPackets[2]] 
-  } */
 }
 

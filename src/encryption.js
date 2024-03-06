@@ -3,16 +3,6 @@ import * as x25519 from '@stablelib/x25519'
 import * as Blake2b from '@stablelib/blake2b'
 import _sodium from 'libsodium-wrappers'
 import { Buffer } from 'buffer'
-/*
-const helperfunction = require('./helper functions')
-const x25519 = require('@stablelib/x25519')
-const Blake2b = require('@stablelib/blake2b')
-const enc = require('./encryption')
-const _sodium = require('libsodium-wrappers') */
-// const Buffer = require('buffer/').Buffer
-// const chacha20poly1305 = require('@noble/ciphers/chacha')
-// const utf8ToBytes = require('@noble/ciphers/utils')
-// const randomBytes = require('@noble/ciphers/webcrypto')
 
 const PacketTypeDataEnc = new Uint32Array([0])
 const PacketTypeEditList = new Uint32Array([1])
@@ -64,7 +54,6 @@ export async function encHeader (secretkey, publicKeys) {
     })()
   } catch (e) {
     console.trace(e)
-    // console.trace('Header Encryption not possible.')
   }
 
   return [serializedData, sessionKey]
@@ -102,12 +91,6 @@ export async function encHeaderEdit (secretkey, publicKeys, editlist) {
 }
 
 export async function pureEncryption (chunk, key) {
-  /*
-  const nonce = _sodium.randombytes_buf(12) // randomBytes.randomBytes(12)
-  const chacha = chacha20poly1305.chacha20poly1305(key, nonce)
-  // const data = utf8ToBytes.utf8ToBytes(chunk)
-  const ciphertext = chacha.encrypt(chunk)
-  return ciphertext */
   let x = new Uint8Array()
   await (async () => {
     await _sodium.ready
@@ -158,7 +141,8 @@ export async function headerEncrypt (headerContent, seckey, pubkeys) {
       await _sodium.ready
       const sodium = _sodium
       initVector = sodium.randombytes_buf(12)
-      const k = x25519.generateKeyPairFromSeed(seckey)
+      // const k = x25519.generateKeyPairFromSeed(seckey)
+      const k = x25519.generateKeyPair()
       const uint8Data = new Uint8Array(PacketTypeDataEnc.buffer)
       let d = 0
       for (let i = 0; i < pubkeys.length; i++) {
@@ -168,7 +152,7 @@ export async function headerEncrypt (headerContent, seckey, pubkeys) {
             encrMethod = [headerContent[j][4], headerContent[j][5], headerContent[j][6], headerContent[j][7]].join('')
             d++
           }
-          const dh = x25519.sharedKey(seckey, pubkeys[i])
+          const dh = x25519.sharedKey(k.secretKey, pubkeys[i])
           const uint8Blake2b = new Uint8Array(dh.length + pubkeys[0].length + pubkeys[i].length)
           uint8Blake2b.set(dh)
           uint8Blake2b.set(pubkeys[i], dh.length)

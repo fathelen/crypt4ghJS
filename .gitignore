@@ -325,3 +325,10 @@ Data4Tests/testcase102.txt
 Data4Tests/testcase103seckey.txt
 Data4Tests/testcase103seckeyPass.txt
 testData/case3.txt
+testData/256kb.c4gh
+testData/128mb.c4gh
+testData/32kb.c4gh
+testData/16mb.c4gh
+testData/4gb.c4gh
+testData/2mb.c4gh
+testData/1gb.c4gh

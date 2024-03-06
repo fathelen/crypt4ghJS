@@ -1,9 +1,5 @@
 import * as enc from './encryption.js'
 import * as dec from './decryption.js'
-/*
-const enc = require('./encryption')
-const dec = require('./decryption')
-const rea = require('./rearrange') */
 
 const SEGMENT_SIZE = 65536
 const PacketTypeDataEnc = '0000'

@@ -1,9 +1,6 @@
 import * as helperfunction from './helper functions.js'
 import scrypt from 'scrypt-js'
 import sodium from 'libsodium-wrappers'
-// const helperfunction = require('./helper functions')
-// const scrypt = require('scrypt-js')
-// const sodium = require('libsodium-wrappers')
 
 const magicBytestring = helperfunction.string2byte('c4gh-v1')
 const kdfNoneBytestring = helperfunction.string2byte('none')

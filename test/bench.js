@@ -2,9 +2,7 @@
 /* eslint-disable eol-last */
 /* eslint no-undef: */
 import * as crypt4GHJS from 'crypt4gh_js'
-// const index = require('crypt4gh_js')
 import * as fs from 'fs'
-// const fs = require('fs')
 
 const ts = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAEbm9uZQAEbm9uZQAgrpd+v2ZGymbextTp5nMt298h1yEFBigB+bS+1WJT/lM=\n-----END CRYPT4GH PRIVATE KEY-----\n'
 const tp = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nfQCgFp/dPaDOELnzrgEEQUeOmOlMj9M/dTP7bIiuxyw=\n-----END CRYPT4GH PUBLIC KEY-----\n'
@@ -30,46 +28,76 @@ async function encryption (input, output, edit, blocks) {
             }
           })
           .on('end', (d) => {
-           writeStream.end()
+            writeStream.end()
+            readStream.destroy()
           })
   }
 }
 
-encryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd.txt', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/abcd_edit.c4gh',[0, 5])
+encryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/32kb','/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/32kb.c4gh' )
 
+async function pureWriting (input, output, edit, blocks) {
+    const readStream = fs.createReadStream(input)
+      readStream
+        .on('data', async function (d) {
+          process.stdout.write(d)
+        })
+        .on('end', (d) => {
+          readStream.destroy()
+         })
+}
+
+// pureWriting('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/16mb')
 const seckeyPass = new Uint8Array([ 239,  53, 227, 105, 157, 144,  90, 226, 118, 104,  90,  48,  37,  89,  73, 246, 10, 150, 243, 176, 181,  40, 210,  96, 102, 181, 168,  18,  59, 126, 206,  33 ])
 
 async function decryption (input, output, wantedblocks) {
-  // const keys = await crypt4GHJS.keyfiles.encryptionKeyfiles([ts])
+  const keys = await crypt4GHJS.keyfiles.encryptionKeyfiles([ts])
   const readStream = fs.createReadStream(input, { end: 10000 })
   readStream
     .on('data', async function (d) {
+      process.stdout.write('')
+      /*
       fs.writeFile(output, '', (err) => {
         if (err) {
           console.log(err)
         }
-      })
+      })*/ 
       let counter = 0
-      const val = await crypt4GHJS.decryption.headerDeconstruction(Uint8Array.from(d), new Uint8Array([ 239,  53, 227, 105, 157, 144,  90, 226, 118, 104,  90,  48,  37,  89,  73, 246, 10, 150, 243, 176, 181,  40, 210,  96, 102, 181, 168,  18,  59, 126, 206,  33 ]))
+      const val = await crypt4GHJS.decryption.headerDeconstruction(Uint8Array.from(d), keys[0])
       const readStream2 = fs.createReadStream(input, { start: val[4], highWaterMark: 65564 })
       readStream2
         .on('data', async function (d2) {
           counter++
           const text = await crypt4GHJS.decryption.decrypption(val, d2, counter, wantedblocks)
           if (text) {
+            process.stdout.write(text)
+            /*
             fs.appendFile(output, text, (err) => {
               if (err) {
                 console.log(err)
               }
-            })
-          }
+            }) */
+          } 
         })
 
       readStream.destroy()
     })
 }
 
-//decryption('Data4Tests/testcase17.c4gh', 'testData/case3.txt')
+// decryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/2mb.c4gh')
+
+async function c4ghWriting (input, output, wantedblocks) {
+  const readStream = fs.createReadStream(input)
+  readStream
+    .on('data', async function (d) {
+      process.stdout.write(d)
+    })
+    .on('end', (d) => {
+      readStream.destroy()
+     })
+}
+
+// c4ghWriting('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/2mb.c4gh')
 
 async function generateKeys (secFile, pubFile, password) {
    const keys = await crypt4GHJS.keygen.keygen(password)

@@ -931,7 +931,6 @@ test('encryption with multiple editlist, more editlists than header packets, mul
   expect(header).toBe(undefined)
 })
 
-
 // check fileformat
 
 // Test Case 46: check fileformat, crypt4GH = true
@@ -2057,7 +2056,7 @@ test('decryptin: encryption with multiple even editlists, multiple header packet
           counter++
           const plaintext = await crypt4GHJS.decryption.decrypption(val, d2, counter, wantedblocks)
           if(plaintext){
-            fs.appendFileSync('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase85seckey.txt', plaintext)
+            // fs.appendFileSync('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase85seckey.txt', plaintext)
             expect(plaintext).toBeInstanceOf(Uint8Array)
             await expect([10,5]).toContain(plaintext.length)
             const decoder = new TextDecoder()
@@ -2083,7 +2082,7 @@ test('decryptin: encryption with multiple even editlists, multiple header packet
           counter++
           const plaintext = await crypt4GHJS.decryption.decrypption(val, d2, counter, wantedblocks)
           if(plaintext){
-            fs.appendFileSync('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase85seckeyPass.txt', plaintext)
+            // fs.appendFileSync('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/Data4Tests/testcase85seckeyPass.txt', plaintext)
             expect(plaintext).toBeInstanceOf(Uint8Array)
             await expect([10,5]).toContain(plaintext.length)
             const decoder = new TextDecoder()

@@ -1,7 +1,5 @@
 import * as dec from './decryption.js'
 
-// const dec = require('./decryption')
-
 /**
  * Function to check whether an already encrypted file is in crypt4gh format or not
  * and whether the person uploading the file, has access to the unencrypted data
