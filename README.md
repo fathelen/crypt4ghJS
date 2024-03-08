@@ -14,7 +14,7 @@ Crypt4GH-JS has been implemented in JavaScript and is therefore applicable to al
 ## Usage 
 crypt4GH-JS can be used to generate keypairs, encrypt data, decrypt data, reencrypt data, rearrange data and to check if a file is on crypt4GH format. 
 
-##### Generate keys 
+#### Generate keys 
 
 ### Encrypt data 
 
