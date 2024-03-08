@@ -9,12 +9,14 @@ const tp = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nfQCgFp/dPaDOELnzrgEEQUeOmOlMj9M
 const ts2 = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAGc2NyeXB0ABQAAAAAErnfoX48n1p21KYPJF39qwARY2hhY2hhMjBfcG9seTEzMDUAPB2VckJsR/5iz35Zg5VO2VRkdIStoFIL0681lrdKlpn80dA7bH+vRcQc1+LVT4vptEt7EC5eXltE07uNhA==\n-----END CRYPT4GH PRIVATE KEY-----\n'
 const tp2 = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nKK2of4G9P49mpUE1PVDia+hTSQ8VWJNXxkSG4m6OiUc=\n-----END CRYPT4GH PUBLIC KEY-----\n'
 
-async function encryption (input, output, edit, blocks) {
-  const keys = await crypt4GHJS.keyfiles.encryptionKeyfiles([ts, tp])
+async function encryption (input, seckeyPath, pubkeyPath, output, edit, blocks) {
+  const seckey = fs.readFileSync(seckeyPath, {encoding: 'utf8'})
+  const pubkey = fs.readFileSync(pubkeyPath, {encoding: 'utf-8'})
+  const keys = await crypt4GHJS.keyfiles.encryptionKeyfiles([seckey, pubkey])
   const header = await crypt4GHJS.encryption.encHead(keys[0], [keys[1]], edit, blocks)
-  // process.stdout.write(header[0])
-  const writeStream = fs.createWriteStream(output)
-  writeStream.write(header[0])
+  process.stdout.write(header[0])
+  // const writeStream = fs.createWriteStream(output)
+  // writeStream.write(header[0])
    if (header[1]) {
     let counter = 0
     const readStream = fs.createReadStream(input)
@@ -23,18 +25,18 @@ async function encryption (input, output, edit, blocks) {
           counter++
           const text = await crypt4GHJS.encryption.encryption(header, d, counter, blocks)
           if (text) {
-            // process.stdout.write(text)
-            writeStream.write(text)
+            process.stdout.write(text)
+            // writeStream.write(text)
             }
           })
           .on('end', (d) => {
-            writeStream.end()
+            // writeStream.end()
             readStream.destroy()
           })
   }
 }
 
-encryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/32kb','/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/32kb.c4gh' )
+// encryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/1gb', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/ts', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/tp' )
 
 async function pureWriting (input, output, edit, blocks) {
     const readStream = fs.createReadStream(input)
@@ -47,11 +49,12 @@ async function pureWriting (input, output, edit, blocks) {
          })
 }
 
-// pureWriting('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/16mb')
+pureWriting('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/4gb')
 const seckeyPass = new Uint8Array([ 239,  53, 227, 105, 157, 144,  90, 226, 118, 104,  90,  48,  37,  89,  73, 246, 10, 150, 243, 176, 181,  40, 210,  96, 102, 181, 168,  18,  59, 126, 206,  33 ])
 
-async function decryption (input, output, wantedblocks) {
-  const keys = await crypt4GHJS.keyfiles.encryptionKeyfiles([ts])
+async function decryption (input, seckeyPath, output, wantedblocks) {
+  const seckey = fs.readFileSync(seckeyPath, {encoding: 'utf8'})
+  const keys = await crypt4GHJS.keyfiles.encryptionKeyfiles([seckey])
   const readStream = fs.createReadStream(input, { end: 10000 })
   readStream
     .on('data', async function (d) {
@@ -84,7 +87,7 @@ async function decryption (input, output, wantedblocks) {
     })
 }
 
-// decryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/2mb.c4gh')
+// decryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/4gb.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/ts')
 
 async function c4ghWriting (input, output, wantedblocks) {
   const readStream = fs.createReadStream(input)
@@ -97,7 +100,7 @@ async function c4ghWriting (input, output, wantedblocks) {
      })
 }
 
-// c4ghWriting('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/2mb.c4gh')
+// c4ghWriting('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/4gb.c4gh')
 
 async function generateKeys (secFile, pubFile, password) {
    const keys = await crypt4GHJS.keygen.keygen(password)
