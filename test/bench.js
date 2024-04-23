@@ -36,7 +36,7 @@ async function encryption (input, seckeyPath, pubkeyPath, output, edit, blocks) 
   }
 }
 
-// encryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/1gb', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/ts', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/tp' )
+encryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/4gb', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/ts', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/tp' )
 
 async function pureWriting (input, output, edit, blocks) {
     const readStream = fs.createReadStream(input)
@@ -49,7 +49,8 @@ async function pureWriting (input, output, edit, blocks) {
          })
 }
 
-pureWriting('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/4gb')
+// pureWriting('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/1gb')
+
 const seckeyPass = new Uint8Array([ 239,  53, 227, 105, 157, 144,  90, 226, 118, 104,  90,  48,  37,  89,  73, 246, 10, 150, 243, 176, 181,  40, 210,  96, 102, 181, 168,  18,  59, 126, 206,  33 ])
 
 async function decryption (input, seckeyPath, output, wantedblocks) {
@@ -87,7 +88,7 @@ async function decryption (input, seckeyPath, output, wantedblocks) {
     })
 }
 
-// decryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/4gb.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/ts')
+// decryption('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/1gb.c4gh', '/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/ts')
 
 async function c4ghWriting (input, output, wantedblocks) {
   const readStream = fs.createReadStream(input)
@@ -100,7 +101,7 @@ async function c4ghWriting (input, output, wantedblocks) {
      })
 }
 
-// c4ghWriting('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/4gb.c4gh')
+// c4ghWriting('/home/fabienne/Projects/Crypt4ghJSCode/crypt4ghJS/testData/1gb.c4gh')
 
 async function generateKeys (secFile, pubFile, password) {
    const keys = await crypt4GHJS.keygen.keygen(password)
