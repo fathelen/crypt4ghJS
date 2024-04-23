@@ -1,6 +1,6 @@
-const helperfunction = require('./helper functions')
-const ChaCha20Poly1305 = require('@stablelib/chacha20poly1305')
-const scrypt = require('scrypt-js')
+import * as helperfunction from './helper functions.js'
+import scrypt from 'scrypt-js'
+import sodium from 'libsodium-wrappers'
 
 const magicBytestring = helperfunction.string2byte('c4gh-v1')
 const kdfNoneBytestring = helperfunction.string2byte('none')
@@ -20,7 +20,7 @@ const pubkeyEnd = '-----END CRYPT4GH PUBLIC KEY-----'
  *                         secret keys
  * @returns => list of 32byte keys, starting with the seckret key, pubkeys second
  */
-exports.encryption_keyfiles = async (keys, password = '') => {
+export async function encryptionKeyfiles (keys, password = '') {
   const solvedKeys = []
   try {
     for (let i = 0; i < keys.length; i++) {
@@ -42,6 +42,7 @@ exports.encryption_keyfiles = async (keys, password = '') => {
         solvedKeys.push(pubkey)
       } else {
         console.trace('Not a crypt4gh keyfile!')
+        throw new Error('Wrong File Format')
       }
     }
     return solvedKeys
@@ -71,13 +72,15 @@ async function secret (keyContent, seckey, password) {
           const N = 16384; const r = 8; const p = 1
           const dklen = 32
           const keyPrmoise = scrypt.scrypt(helperfunction.string2byte(password), salt, N, r, p, dklen)
-          const key = keyPrmoise.then(function (result) {
+          const key = keyPrmoise.then(async function (result) {
             const sharedkey = result
             const nonce = keyContent.subarray(58, 70)
             const encData = keyContent.subarray(70)
-            const chacha20poly1305 = new ChaCha20Poly1305.ChaCha20Poly1305(sharedkey)
-            const plaintext = chacha20poly1305.open(nonce, encData)
-            return plaintext
+            const encKey = sodium.crypto_aead_chacha20poly1305_ietf_decrypt(null, encData, null, nonce, sharedkey)
+            if (encKey === undefined) {
+              throw new Error('wrong password')
+            }
+            return encKey
           })
           return await key
         }
@@ -86,6 +89,7 @@ async function secret (keyContent, seckey, password) {
       }
     }
   } catch (e) {
-    console.trace('Secret key data could not be decrypted!')
+    console.trace(e)
+    throw new Error('Problem while key decryption')
   }
 }

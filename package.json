@@ -2,9 +2,14 @@
   "name": "crypt4gh_js",
   "version": "1.0.0",
   "description": "Crypt4GH Version JavaScript",
-  "main": "./source/index.js",
+  "private": true,
+  "exports": "./src/index_node.js",
+  "type": "module",
+  "jest": {
+    "transform": {}
+  },
   "scripts": {
-    "test": "jest"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "repository": {
     "type": "git",
@@ -17,11 +22,16 @@
     "keygen"
   ],
   "author": "Fabienne Thelen",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
+    "@noble/ciphers": "^0.4.1",
     "@stablelib/blake2b": "^1.0.1",
     "@stablelib/chacha20poly1305": "^1.0.1",
     "@stablelib/x25519": "^1.0.3",
+    "buffer": "^6.0.3",
+    "crypto": "^1.0.1",
+    "libsodium": "^0.7.13",
+    "libsodium-wrappers": "^0.7.13",
     "scrypt-js": "^3.0.1"
   },
   "devDependencies": {
@@ -34,5 +44,8 @@
     "eslint-plugin-promise": "^6.1.1",
     "jest": "^29.7.0",
     "typescript": "^5.2.2"
+  },
+  "browser": {
+    "crypto": false
   }
 }

@@ -1,0 +1,3 @@
+[submodule "crypt4ghJS"]
+	path = crypt4ghJS
+	url = https://github.com/fathelen/crypt4ghJS

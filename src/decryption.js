@@ -1,68 +1,73 @@
-const helperfunction = require('./helper functions')
-const ChaCha20Poly1305 = require('@stablelib/chacha20poly1305')
-const x25519 = require('@stablelib/x25519')
-const Blake2b = require('@stablelib/blake2b')
-const dec = require('./decryption')
+import * as helperfunction from './helper functions.js'
+import * as x25519 from '@stablelib/x25519'
+import * as Blake2b from '@stablelib/blake2b'
+import _sodium from 'libsodium-wrappers'
 
-exports.SEGMENT_SIZE = 65536
-const fullSegment = 65564
+export const SEGMENT_SIZE = 65536
 const PacketTypeDataEnc = '0000'
 const PacketTypeEditList = '1000'
 const encryptionMethod = '0000' // only (xchacha20poly1305)
 const magicBytestring = helperfunction.string2byte('crypt4gh')
 
-/**
- * Main decryption function
- * @param {*} encryptedData => crypt4gh encrypted data in Uint8Array format
- * @param {*} seckey => Seckey as Uint8Array of 32bytes
- * @param {*} blocks => optional Parameter, if only defined blocks of size 64kb
- *                      should be ecrypted
- * @returns => decrypted data in an ArrayList, each value is a 64kb block of the
- *             data
- */
-exports.decryption = async function * (encryptedData, seckey, blocks = []) {
-  const header = await encryptedData.subarray(0, 1000)
-  const headerInformation = dec.header_deconstruction(header, seckey)
-  // const ArrayList = []
-  const chacha20poly1305 = new ChaCha20Poly1305.ChaCha20Poly1305(headerInformation[0])
-  try {
-    if (blocks && !headerInformation[3].length > 0) {
-      for await (const val of decryptionBlocks(encryptedData, blocks, headerInformation, chacha20poly1305)) {
-        yield await Promise.resolve(val[0])
-      }
-    } else if (headerInformation[3].length > 0 && blocks == null) {
-      console.log('aaa')
-      for await (const val of decryptEdit(headerInformation, encryptedData, chacha20poly1305)) {
-        yield await Promise.resolve(val)
-      }
-    } else if (headerInformation[3].length > 0 && blocks != null) {
-      console.trace('Combination of blocks and edit list is not possible')
-    } else {
-      for (let i = headerInformation[4]; i < encryptedData.length; i = i + 65564) {
-        const nonce = await encryptedData.subarray(i, i + 12)
-        const enc = await encryptedData.subarray(i + 12, i + 12 + dec.SEGMENT_SIZE + 16)
-        const plaintext = chacha20poly1305.open(nonce, enc)
-        yield await Promise.resolve(plaintext)
-      }
+export async function decrypption (headerInfo, text, counter, wantedblocks) {
+  if (headerInfo[5][0] && headerInfo[5][1] === false && Array.from(headerInfo[5][0].keys()).includes(counter)) {
+    const plaintext = await pureDecryption(Uint8Array.from(text), headerInfo[0])
+    const aplliedEdit = applyEditlist(headerInfo[5][0].get(counter), plaintext)
+    return aplliedEdit
+  } else if (headerInfo[5][0] && headerInfo[5][1] === true) {
+    if(Array.from(headerInfo[5][0].keys()).includes(counter)){
+      const plaintext = await pureDecryption(Uint8Array.from(text), headerInfo[0])
+    const aplliedEdit = applyEditlist(headerInfo[5][0].get(counter), plaintext)
+    return aplliedEdit
+    } else if(counter > Math.max(...headerInfo[5][0].keys())) { 
+      const plaintext = await pureDecryption(Uint8Array.from(text), headerInfo[0])
+      return plaintext
     }
-  } catch (e) {
-    console.trace('Decryption was not possible')
+
+  } else if (wantedblocks && !headerInfo[5][0]) {
+    if (wantedblocks.includes(counter)) {
+      const plaintext = await pureDecryption(Uint8Array.from(text), headerInfo[0])
+      return plaintext
+    }
+  } else if (!wantedblocks && !headerInfo[5][0]) {
+    const plaintext = await pureDecryption(Uint8Array.from(text), headerInfo[0])
+    return plaintext
   }
 }
 
+export async function pureDecryption (d, key) {
+  let encData = new Uint8Array()
+  await (async () => {
+    await _sodium.ready
+    const sodium = _sodium
+    const nonce = d.subarray(0, 12)
+    const enc = d.subarray(12)
+    encData = sodium.crypto_aead_chacha20poly1305_ietf_decrypt(null, enc, null, nonce, key)
+  })()
+  return encData
+}
+
+export function pureEdit (d) {
+  const edits = calculateEditlist(d)
+  return edits
+}
 /**
  * Function checks if a decryption is possible, by checking if the given seckey is able to decode a header packet.
  * @param {*} header => header part of the encrypted data
  * @param {*} seckeys => secret key to decrypt header packet
  * @returns => List containing the sessionkey, nonce, body, editlist and position bodystart
  */
-exports.header_deconstruction = function (header, seckeys) {
+export async function headerDeconstruction (header, seckeys) {
   try {
-    const headerPackets = dec.parse(header)
-    const decryptedPackets = dec.decrypt_header(headerPackets[0], seckeys)
+    let editlist = new Uint8Array()
+    const headerPackets = parse(header)
+    const decryptedPackets = await decryptHeader(headerPackets[0], seckeys)
     const partitionedPackages = partitionPackets(decryptedPackets[0])
     const sessionKey = parseEncPacket(partitionedPackages[0][0])
-    return [sessionKey, decryptedPackets[2], headerPackets[1], partitionedPackages[1], headerPackets[2]]
+    if (partitionedPackages[1].length > 0) {
+      editlist = pureEdit([sessionKey, decryptedPackets[2], headerPackets[1], partitionedPackages[1], headerPackets[2]])
+    }
+    return [sessionKey, decryptedPackets[2], headerPackets[1], partitionedPackages[1], headerPackets[2], editlist, partitionedPackages[1][0]]
   } catch (e) {
     console.trace('header deconstruction not possible.')
   }
@@ -73,20 +78,20 @@ exports.header_deconstruction = function (header, seckeys) {
  * @param {*} header => start of the file containing the header packages
  * @returns => List containing the list of header packages, body and position bodystart
  */
-exports.parse = function (header) {
+export function parse (header) {
   try {
     // checken magic number
     const magicHeaderDecryption = new TextDecoder().decode(header.subarray(0, 8))
     const magicHeaderOrignal = new TextDecoder().decode(magicBytestring)
-    if (magicHeaderDecryption !== magicHeaderOrignal) console.trace('Not a crypt4gh file')
+    if (magicHeaderDecryption !== magicHeaderOrignal) return undefined
     // check version number
     const version = new Uint8Array(header.subarray(8, 12))
-    if (version[0] !== 1) console.trace('Only version 1 is accepted')
+    if (version[0] !== 1) return undefined
     // check packet count
     const numPakets = new Uint32Array(new Uint8Array(header.subarray(12, 16)))
-    if (numPakets[0] === 0) console.trace('No packages!')
+    if (numPakets[0] === 0) return undefined
     // extract packets -- returns list of packets
-    const extracted = dec.extract_packets(numPakets[0], header)
+    const extracted = extractPackets(numPakets[0], header)
     return [extracted[0], extracted[1], extracted[2]]
   } catch (e) {
     console.trace('header parsing not possible.')
@@ -99,7 +104,7 @@ exports.parse = function (header) {
  * @param {*} header => start of the file containing the header packages
  * @returns  => List containing the list of header packages, body and position bodystart
  */
-exports.extract_packets = function (packetNum, header) {
+export function extractPackets (packetNum, header) {
   const listHeaderPackages = []
   let position = 0
   try {
@@ -135,40 +140,43 @@ exports.extract_packets = function (packetNum, header) {
  * @param {*} seckeys => seckey to decode a header package
  * @returns => List containing the decrypted package, the undecrypted packages and the nonce
  */
-exports.decrypt_header = function (headerPackets, seckeys) {
+export async function decryptHeader (headerPackets, seckeys) {
+  seckeys = [seckeys]
+  const decryptedPackets = []
+  const undecryptablePackets = []
+  let nonceUint8 = new Uint8Array(12)
   try {
-    seckeys = [seckeys]
-    const decryptedPackets = []
-    const undecryptablePackets = []
-    let nonceUint8
-    for (let i = 0; i < headerPackets.length; i++) {
-      const wKeyUint8 = new Uint8Array(headerPackets[i].slice(8, 40))
-      nonceUint8 = new Uint8Array(headerPackets[i].slice(40, 52))
-      const encryptedUint8 = new Uint8Array(headerPackets[i].slice(52))
-      for (let j = 0; j < seckeys.length; j++) {
-        const k = x25519.generateKeyPairFromSeed(seckeys[j])
-        const dh = x25519.sharedKey(seckeys[j], wKeyUint8)
-        const uint8Blake2b = new Uint8Array(dh.length + wKeyUint8.length + k.publicKey.length)
-        uint8Blake2b.set(dh)
-        uint8Blake2b.set(k.publicKey, dh.length)
-        uint8Blake2b.set(wKeyUint8, dh.length + wKeyUint8.length)
-        const blake2b = new Blake2b.BLAKE2b()
-        blake2b.update(uint8Blake2b)
-        const uint8FromBlake2b = blake2b.digest()
-        const sharedKey = uint8FromBlake2b.subarray(0, 32)
-        const chacha20poly1305 = new ChaCha20Poly1305.ChaCha20Poly1305(sharedKey)
-        const plaintext = chacha20poly1305.open(nonceUint8, encryptedUint8)
-        if (plaintext) {
-          decryptedPackets.push(plaintext)
-        } else {
-          undecryptablePackets.push(headerPackets[i])
+    await (async () => {
+      await _sodium.ready
+      const sodium = _sodium
+      for (let i = 0; i < headerPackets.length; i++) {
+        const wKeyUint8 = new Uint8Array(headerPackets[i].slice(8, 40))
+        nonceUint8 = new Uint8Array(headerPackets[i].slice(40, 52))
+        const encryptedUint8 = new Uint8Array(headerPackets[i].slice(52))
+        for (let j = 0; j < seckeys.length; j++) {
+          const k = x25519.generateKeyPairFromSeed(seckeys[j])
+          const dh = x25519.sharedKey(seckeys[j], wKeyUint8)
+          const uint8Blake2b = new Uint8Array(dh.length + wKeyUint8.length + k.publicKey.length)
+          uint8Blake2b.set(dh)
+          uint8Blake2b.set(k.publicKey, dh.length)
+          uint8Blake2b.set(wKeyUint8, dh.length + wKeyUint8.length)
+          const blake2b = new Blake2b.BLAKE2b()
+          blake2b.update(uint8Blake2b)
+          const uint8FromBlake2b = blake2b.digest()
+          const sharedKey = uint8FromBlake2b.subarray(0, 32)
+          try {
+            const encKey = sodium.crypto_aead_chacha20poly1305_ietf_decrypt(null, encryptedUint8, null, nonceUint8, sharedKey)
+            decryptedPackets.push(encKey)
+          } catch {
+            undecryptablePackets.push(headerPackets[i])
+          }
         }
       }
-    }
-    return [decryptedPackets, undecryptablePackets, nonceUint8]
+    })()
   } catch (e) {
     console.trace('Header could not be decrypted.')
   }
+  return [decryptedPackets, undecryptablePackets, nonceUint8]
 }
 
 /**
@@ -219,7 +227,7 @@ function parseEncPacket (packet) {
  * @param {*} decryptedText => already decrypted input data
  * @returns => decrypted data edited according to the editlist
  */
-function applyEditlist (edlist, decryptedText) {
+export function applyEditlist (edlist, decryptedText) {
   try {
     const editedData = []
     let pos = BigInt(0)
@@ -255,33 +263,11 @@ function applyEditlist (edlist, decryptedText) {
 }
 
 /**
- * Function to decrypt data with blocks parameter
- * @param {*} encryptedData => crypt4gh encrypted data in Uint8Array format
- * @param {*} blocks => List of 64k data blocks that should be decrypted
- * @param {*} headerInformation => Information contained in decrypted header package
- * @param {*} chacha20poly1305 => encryption method
- * @returns => decrypted data
- */
-async function * decryptionBlocks (encryptedData, blocks, headerInformation, chacha20poly1305) {
-  try {
-    for (let i = 0; i < blocks.length; i++) {
-      const nonce = await encryptedData.subarray((blocks[i] - 1) * fullSegment + headerInformation[4], (blocks[i] - 1) * fullSegment + headerInformation[4] + 12)
-      const enc = await encryptedData.subarray((blocks[i] - 1) * fullSegment + headerInformation[4] + 12, (blocks[i] - 1) * fullSegment + headerInformation[4] + 12 + dec.SEGMENT_SIZE + 16)
-      const plaintext = chacha20poly1305.open(nonce, enc)
-      yield await Promise.resolve([plaintext, i, blocks[i]])
-    }
-  } catch (e) {
-    console.trace('Decryption with blocks not possible.')
-  }
-}
-
-/**
  * blocks2encrypt is needed to prepare the edit informations to calculate new editlists for each block
  * @param {*} headerInformation 2 dim array containing the header Informations, needed to decrypt the data
  * @returns an Array containing the addeded editlist (summed values of editlist), the editlist and a boolean if the og editlist was even or odd.
  */
 function blocks2encrypt (headerInformation) {
-  console.log('drin')
   // 1.Step: Welche Blöcke müssen entschlüsselt werden
   const edit64 = new BigInt64Array(headerInformation[3][0].buffer)
   let editlist = edit64.subarray(1)
@@ -310,7 +296,6 @@ function blocks2encrypt (headerInformation) {
       addedEdit.push(j)
     }
   }
-  console.log(editlist)
   return [addedEdit, editlist, unEven]
 }
 
@@ -322,7 +307,6 @@ function blocks2encrypt (headerInformation) {
  * @returns Array containing a map with the edits for each block and a boolean if the og editlist was even or odd.
  */
 function calculateEditlist (headerInformation) {
-  console.log('hier')
   const preEdit = blocks2encrypt(headerInformation)
   let bEven = 0
   const blocks = new Map()
@@ -400,28 +384,4 @@ function calculateEditlist (headerInformation) {
     }
   }
   return [blocks, preEdit[2]]
-}
-
-/**
- * decryptEdit is used to decrypt the parts received from the edit lists
- * @param {*} headerInformation 2 dim array containing the header Informations, needed to decrypt the data
- * @param {*} encryptedData encrypted data whitch is about to be decrypted
- * @param {*} chacha20poly1305 decryption method
- */
-async function * decryptEdit (headerInformation, encryptedData, chacha20poly1305) {
-  // 3.Step entschlüssle nur die gebrauchten blöcke
-  const blocks = await calculateEditlist(headerInformation)
-  console.log('blocks: ', blocks)
-  for await (const val of decryptionBlocks(encryptedData, Array.from(blocks[0].keys()), headerInformation, chacha20poly1305)) {
-    const edit = applyEditlist(blocks[0].get(val[2]), val[0])
-    yield await Promise.resolve(edit)
-  }
-  if (blocks[1] === true) {
-    for (let i = headerInformation[4] + 65564 * Math.max(...blocks[0].keys()); i < encryptedData.length; i = i + 65564) {
-      const nonce = await encryptedData.subarray(i, i + 12)
-      const enc = await encryptedData.subarray(i + 12, i + 12 + dec.SEGMENT_SIZE + 16)
-      const plaintext = chacha20poly1305.open(nonce, enc)
-      yield await Promise.resolve(plaintext)
-    }
-  }
 }

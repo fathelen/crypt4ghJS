@@ -3,7 +3,7 @@
  * @param {*} str =>input string
  * @returns => string in byte representation
  */
-exports.string2byte = function (str) {
+export function string2byte (str) {
   try {
     const result = new Uint8Array(str.length)
     for (let i = 0; i < str.length; i++) {
@@ -21,7 +21,7 @@ exports.string2byte = function (str) {
    * @param {*} buf2 => second buffer to compare
    * @returns true if buf1 and buf2 are equal
    */
-exports.equal = function (buf1, buf2) {
+export function equal (buf1, buf2) {
   try {
     if (buf1.byteLength !== buf2.byteLength) return false
     const dv1 = new Int8Array(buf1)
@@ -40,7 +40,7 @@ exports.equal = function (buf1, buf2) {
  * @param {*} base64 => input string
  * @returns => Uint8array
  */
-exports.base64ToArrayBuffer = function (base64) {
+export function base64ToArrayBuffer (base64) {
   try {
     const binaryString = atob(base64)
     const bytes = new Uint8Array(binaryString.length)
@@ -53,22 +53,16 @@ exports.base64ToArrayBuffer = function (base64) {
   }
 }
 
-/**
- * Function to create a sequence of random bytes
- * @param {*} length => length of the resulting random bytes sequence
- * @returns => Uint8array of random bytes
- */
-exports.randomBytes = function (length) {
-  try {
-    function randomString (length, chars) {
-      let result = ''
-      for (let i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)]
-      return result
-    }
-    const rString = randomString(length, '0123456789abcdefghijklmnopqrstuvwxyz')
-    const buf1 = Uint8Array.from(rString.split('').map(x => x.charCodeAt()))
-    return buf1
-  } catch (e) {
-    console.trace('Need an integer')
+export function random (length) {
+  let result = ''
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  const charactersLength = characters.length
+  let counter = 0
+  while (counter < length) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength))
+    counter += 1
   }
+  return result
 }
+
+export default { random, base64ToArrayBuffer, equal, string2byte }

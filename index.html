@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+    <style > 
+        .header {
+            padding: 60px;
+            text-align: center;
+            background: #13056a;
+            color: white;
+            font-size: 30px;
+        }
+        .accordion {
+            background-color: #eee;
+            color: #444;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 25px;
+            transition: 0.4s;
+        }
+
+        .active, .accordion:hover {
+            background-color: #ccc; 
+        }
+
+        .panel {
+            padding: 0 18px;
+            display: none;
+            background-color: white;
+            overflow: hidden;
+        }
+        .tut {
+            padding: 60px;
+            background: #aca8c3;
+            color: black;
+        }
+        #filecontents {
+        border: double;
+        overflow-y: scroll;
+        height: 400px;
+        }
+        #enccontents {
+        border: double;
+        overflow-y: scroll;
+        height: 400px;
+        }
+        #deccontents {
+        border: double;
+        overflow-y: scroll;
+        height: 400px;
+        }
+      
+    </style>
+    <head>
+        <meta charset="utf-8" />
+        <title>Crypt4GH-JS Demo Website</title>
+      </head>
+      <body>
+        <div class="header">
+            <h1 style="font-family:Garamond">Crypt4GH-JS Demo Website</h1>
+          </div> 
+          <h2 style="font-family:Garamond" >This website was created to demonstrate the use of Crypt4GH-JS.</h2>
+          <h2 style="font-family:Garamond">The following three step tutorial shows you: How to create a keypair, how to encrypt your data and how to decrypt your encrypted data.</h2>
+          <button class="accordion">1. Step: create your key pair</button>
+        <div class="panel">
+            <div class='tut'> 
+                <span class="popuptext" id="myPopup"></span>
+                <p style="font-family:Garamond"> Keypair generation:  </p>
+                <p style="font-family:Garamond"> 1: Step (optional): to create a keypair a password can be chosen. </p>
+                <ul>
+                <li>If a password is chosen the secret key is encrypted. The password is needed for encryption and decryption. </li>
+                <li>If no password is chosen, the secret key is not encrypted. No password is needed for encryption and decryption.</li>
+                </ul>
+            <p style="font-family:Garamond"> 2: Step: After clicking the download button the secret and public key-files are downloaded. </p>
+            </div>
+            
+            <br />
+            <br />
+            <label for="psw">Password (optional)</label>
+            <input type="password" id="psw" name="psw" required> 
+            <br />
+            <br />
+            <label for="secname"> Enter name for seckey file (optional): </label>
+            <textarea id="secname" name="secname" rows="1" cols="25"></textarea>
+            <br />
+            <br />
+            <label for="pubname"> Enter name for pubkey file (optinal): </label>
+            <textarea id="pubname" name="pubname" rows="1" cols="25"></textarea>
+            <br />
+            <br />
+            <input type="button" id="btn" value="Download key files" onclick="confirm('Start generating keyfiles')" />
+            <br />
+            <br />
+            <div>Key Preview</div>
+            <div id="filecontents"></div>
+            <br />
+            <br />
+        </div>
+        <button class="accordion">2. Step: encrypt your data</button>
+        <div class="panel">
+            <div class='tut'> 
+                <p style="font-family:Garamond"> For data encryption: </p>
+                <p style="font-family:Garamond"> 1. Step: upload the secret and public key file. </p>
+                <p style="font-family:Garamond"> 2. Step: upload the file, that is going to be encrypted or enter text to encrypt into the textfield.</p>
+                <br>
+                <p style="font-family:Garamond"> 3. Step (optional):, enter blocks or  editlist (parameters to decide which parts of the file can be decrypted). </p>
+                <ul>
+                    <li>Blocks: 64kb blocks of the original file. If added a single number for example '1', the first 64kb of the original file can be decrypted. If added a list for example '1,5', the first 64kb and the fifth 64kb of the original file can be decrypted. </li>
+                    <li>Editlist: a list containing bytes that will be skipped or decrypted. Example: the editlist '0,5,10,3' used on 'abcdefghijklmnopqrstuvwxyz' -> 'abcdepqr'. Odd entries are skipped, even entries are decrypted. </li>
+                  </ul>
+                <p style="font-family:Garamond"> 4. Step (optional): enter password, if a password was used to generate the key files. </p>
+                <p style="font-family:Garamond"> 5. Step: After clicking the submit button the encrypted c4gh-file can be downloaded.</p>
+            </div>
+           
+            <br />
+            <br />
+            <label for="input"> Choose your secret keyfile: </label>
+            <input type="file" id="input" />
+            <br />
+            <br />
+            <label for="input2"> Choose your public keyfile: </label>
+            <input type="file" id="input2" />
+            <br />
+            <br />
+            <label for="input3"> Choose your data file: </label>
+            <input type="file" id="input3" />
+            <br />
+            <br />
+            <label for="w3review"> Or enter text to encrypt: </label>
+            <br />
+            <br />
+            <textarea id="w3review" name="w3review" rows="4" cols="50"></textarea>
+            <br />
+            <br />
+            <label for="block2">Blocks (optional)</label>
+            <input type="text" id="block2" />
+            <label for="editlist"> OR!    Editlist (optional)</label>
+            <input type="text" id="editlist" />
+            <br />
+            <br />
+            <label for="psw2">Password (optional)</label>
+            <input type="password" id="psw2" name="psw2">
+            <br />
+            <br />
+            <label for="c4ghname"> Enter name for c4gh file (optinal): </label>
+            <textarea id="c4ghname" name="c4ghname" rows="1" cols="25"></textarea>
+            <br />
+            <br />
+            <input type="button" id="but" value="Download c4gh file" onclick="confirm('Start generating c4gh file')" />
+            <br />
+            <br />
+            <div>Encryption Preview</div>
+            <div id="enccontents"></div>
+            <br />
+            <br />
+        </div>
+        <button class="accordion">3. Step: decrypt your data </button>
+        <div class="panel">
+            <div class='tut'> 
+                <p style="font-family:Garamond"> For data decryption: </p>
+                <p style="font-family:Garamond"> 1. Step: upload the secret key file. </p>
+                <p style="font-family:Garamond"> 2. Step: choose the c4gh file for decryption </p>
+                <p style="font-family:Garamond"> 3. Step (optional): enter password, if a password was used to generate the key files. </p>
+                <p style="font-family:Garamond"> 4. Step: After clicking the submit button the decrypted file can be downloaded. </p>
+            </div>
+            <br />
+            <br />
+            <label for="input4"> Choose your secret keyfile: </label>
+            <input type="file" id="input4" />
+            <br />
+            <br />
+            <label for="input5"> Choose your c4gh file: </label>
+            <input type="file" id="input5" />
+            <br />
+            <br />
+            <label for="psw3">Password (optional)</label>
+            <input type="password" id="psw3" name="psw3" required>
+            <br />
+            <br />
+            <label for="decname"> Enter name for decrypted file (optinal): </label>
+            <textarea id="decname" name="decname" rows="1" cols="25"></textarea>
+            <br />
+            <br />
+            <input type="button" id="but2" value="Download decrypted file" onclick="confirm('Start generating decryption')"/>
+            <div>Decryption Preview</div>
+            <div id="deccontents"></div>
+            <br />
+            <br />
+        </div>
+        <script src="./dist/main.js"> </script>
+      </body>
+</html>
