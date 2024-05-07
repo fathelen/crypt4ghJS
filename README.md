@@ -7,7 +7,7 @@ Crypt4GH-JS has been implemented in JavaScript and is therefore applicable to al
 
 ## Installation 
 ### Installation with npm: 
- [crypt4GH-JS](*https://www.npmjs.com/package/crypt4gh_js*)
+ [crypt4GH-JS](https://www.npmjs.com/package/crypt4gh_js)
 
 
 
