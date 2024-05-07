@@ -90,7 +90,7 @@ test('wrong pubkey file', async () => {
   const decryptedKeys = await crypt4GHJS.keyfiles.encryptionKeyfiles([seckey, pubkey])
   expect(decryptedKeys).toBe(undefined)
 })
-/*
+
 // encryption
 // Test Case 9: encryption without additional parameters, single header packet
 test(' encryption without additional parameters, single header packet', async () => {
@@ -2793,4 +2793,4 @@ test('decryption: rearrangement, with editlist before, multiple header packets, 
         })
       readStream.destroy()
     })
-})*/ 
+})
