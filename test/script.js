@@ -2,6 +2,7 @@ const index = require('crypt4gh_js')
 const fs = require('fs')
 const testDataUnencrypted = fs.readFileSync('../testData/abcd.txt', 'utf8')
 
+
 // Keyfiles
 // keyfiles without password
 const pubkey = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nGER04WfJXzPHiCWe94CHlMY6sp6zwWpAehA0MMHjdVQ=\n-----END CRYPT4GH PUBLIC KEY-----\n'
