@@ -200,12 +200,6 @@ undefined.encrypted
 vscode-profile-2024-01-30-15-04-53.cpuprofile
 vscode-profile-2024-01-30-15-15-25.cpuprofile
 vscode-profile-2024-01-30-15-26-43.cpuprofile
-Data4Tests/testcase1_public
-Data4Tests/testcase1_secret
-Data4Tests/testcase2_public
-Data4Tests/testcase2_secret
-Data4Tests/testcase7_wrongPubkeyFile
-Data4Tests/testcase8_wrongSeckeyFile
 testData/abcd_dec.txt
 testData/abcd_RE.c4gh
 testData/abcd_RE.txt
@@ -213,7 +207,6 @@ testData/abcdREA.c4gh
 testData/abcdREA.txt
 testData/pubkey
 testData/seckey
-Data4Tests/abcd.txt
 Data4Tests/testcase9.c4gh
 Data4Tests/testcase67.txt
 Data4Tests/testcase66.txt
