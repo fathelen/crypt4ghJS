@@ -1,6 +1,6 @@
 const index = require('crypt4gh_js')
 const fs = require('fs')
-const testDataUnencrypted = fs.readFileSync('C:\\Users\\fabie\\crypt4gh_js\\testData\\abcd.txt', 'utf8')
+const testDataUnencrypted = fs.readFileSync('../testData/abcd.txt', 'utf8')
 
 // Keyfiles
 // keyfiles without password
