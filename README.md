@@ -18,6 +18,13 @@ npm i crypt4gh_js
 
  
  ### Installation from git: 
+ To use the latest GitHub source install the package via: 
+ ```sh
+
+git clone https:https://github.com/fathelen/crypt4ghJS
+npm i ./crypt4ghJS
+
+```
  
 
 
