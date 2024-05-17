@@ -165,13 +165,75 @@ For web use:
 
 ### Decrypt data
 
-### Reencrypt data
+For node: 
+ ```javascript
+async function decryption (input, seckeyPath, output, wantedblocks) {
+  const seckey = fs.readFileSync(seckeyPath, {encoding: 'utf8'})
+  const keys = await crypt4GHJS.keyfiles.encryptionKeyfiles([seckey])
+  const readStream = fs.createReadStream(input, { end: 10000 })
+  readStream
+    .on('data', async function (d) {
+      fs.writeFile(output, '', (err) => {
+        if (err) {
+          console.log(err)
+        }
+      })
+      let counter = 0
+      const val = await crypt4GHJS.decryption.headerDeconstruction(Uint8Array.from(d), keys[0])
+      const readStream2 = fs.createReadStream(input, { start: val[4], highWaterMark: 65564 })
+      readStream2
+        .on('data', async function (d2) {
+          counter++
+          const text = await crypt4GHJS.decryption.decrypption(val, d2, counter, wantedblocks)
+          if (text) {
+            fs.appendFile(output, text, (err) => {
+              if (err) {
+                console.log(err)
+              }
+            })
+          } 
+        })
 
-### Rearrange data 
+      readStream.destroy()
+    })
+}
 
-### Check fileformat
+// decryption('c4gh_file', 'secret_key_file')
 
-## Examples
+```
+For web use: 
+ ```javascript
+
+async function * decr () {
+  let decText = ''
+  const file = document.getElementById('input4')
+  const file2 = document.getElementById('input5')
+  let password = document.getElementById('psw3').value
+  const seckeyFile = await file.files[0].text()
+  const keys = await crypt4GHJS.keyfiles.encryptionKeyfiles([seckeyFile], password)
+  const headerChunk = await file2.files[0].slice(0, 1000)
+  const chunkHeader = await headerChunk.arrayBuffer()
+  const header = await crypt4GHJS.decryption.headerDeconstruction(new Uint8Array(chunkHeader), keys[0])
+  const chunksize = 65564
+  let counter = 0
+  let offset = header[4]
+  while (offset < file2.files[0].size) {
+    counter++
+    const chunkfile = await file2.files[0].slice(offset, offset + chunksize)
+    const chunk = await chunkfile.arrayBuffer()
+    const plaintext = await crypt4GHJS.decryption.decrypption(header, new Uint8Array(chunk), counter)
+    const decoder = new TextDecoder()
+    if (plaintext) {
+      decText += decoder.decode(plaintext)
+      yield decText
+    }
+    offset += chunksize
+  }
+}
+
+```
+
+
 
 ## Crypt4GH Specification 
 
