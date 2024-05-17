@@ -29,9 +29,30 @@ npm i ./crypt4ghJS
 
 
 ## Usage 
-The usage of the diffrent task, that can be handled via crypt4GH_JS, are shown in  our [example file](https://github.com/fathelen/crypt4ghJS/blob/master/test/bench.js)
+The usage of the diffrent task, that can be handled via crypt4GH_JS, are shown in  the [example file](https://github.com/fathelen/crypt4ghJS/blob/master/test/bench.js) <br>
+The single tasks will be explained in the following: <br>
 
 ### Generate keys 
+For node:
+ ```javascript
+
+async function generateKeys (secFile, pubFile, password) {
+   const keys = await crypt4GHJS.keygen.keygen(password)
+   fs.writeFile(secFile, keys[0], (err) => {
+    if (err) {
+      console.log(err)
+    }
+  })
+  fs.writeFile(pubFile, keys[1], (err) => {
+    if (err) {
+      console.log(err)
+    }
+  })
+}
+
+// generateKeys('../testData/abcd_editRE.c4gh', '../testData/pubkey', 'aaa')
+
+```
 
 ### Encrypt data 
 
