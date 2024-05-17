@@ -80,6 +80,74 @@ async function keyfile () {
 ```
 
 ### Encrypt data 
+For the crypt4GH encryption of data, 2 functions are needed. The first function 'encHead' is used to encrypt the header, the second function 'encryption' is used to encrypt the data. 
+For node: 
+ ```javascript
+async function encryption (input, seckeyPath, pubkeyPath, output, edit, blocks) {
+  const seckey = fs.readFileSync(seckeyPath, {encoding: 'utf8'})
+  const pubkey = fs.readFileSync(pubkeyPath, {encoding: 'utf-8'})
+  const keys = await crypt4GHJS.keyfiles.encryptionKeyfiles([seckey, pubkey])
+  const header = await crypt4GHJS.encryption.encHead(keys[0], [keys[1]], edit, blocks)
+  const writeStream = fs.createWriteStream(output)
+   writeStream.write(header[0])
+   if (header[1]) {
+    let counter = 0
+    const readStream = fs.createReadStream(input)
+      readStream
+        .on('data', async function (d) {
+          counter++
+          const text = await crypt4GHJS.encryption.encryption(header, d, counter, blocks)
+          if (text) {
+            riteStream.write(text)
+            }
+          })
+          .on('end', (d) => {
+            writeStream.end()
+          })
+  }
+}
+
+encryption('../testData/2mb', '../testData/ts', '../testData/tp' )
+
+```
+For web use: 
+ ```javascript
+
+ const seckeyFile = await file.files[0].text()
+  const pubkeyFile = await file2.files[0].text()
+  const keys = await crypt4GHJS.keyfiles.encryptionKeyfiles([seckeyFile, pubkeyFile], password)
+  const header = await crypt4GHJS.encryption.encHead(keys[0], [keys[1]], ed, block)
+  c4ghtext.push(header[0])
+  const chunksize = 65536
+  let counter = 0
+  let offset = 0
+  if (enteredText !== '') {
+    while (offset < enteredText.length) {
+      counter++
+      const chunkfile = await enteredText.slice(offset, offset + chunksize)
+      const encryptedtext = await crypt4GHJS.encryption.encryption(header, Uint8Array.from(chunkfile.split('').map(x => x.charCodeAt())), counter, block)
+      if (encryptedtext) {
+        c4ghtext.push(encryptedtext)
+      }
+
+      offset += chunksize
+    }
+  } else {
+    while (offset < file3.files[0].size) {
+      counter++
+      const chunkfile = await file3.files[0].slice(offset, offset + chunksize)
+      const chunk = await chunkfile.arrayBuffer()
+      const encryptedtext = await crypt4GHJS.encryption.encryption(header, new Uint8Array(chunk), counter, block)
+      if (encryptedtext) {
+      // yield encryptedtext
+        c4ghtext.push(encryptedtext)
+      }
+
+      offset += chunksize
+    }
+  }
+
+```
 
 ### Decrypt data
 
