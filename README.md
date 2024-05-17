@@ -236,7 +236,7 @@ async function * decr () {
 
 
 ## Demonstration
-For demonstration we biuld a  [Demo Website](https://fathelen.github.io/crypt4ghJS/)
+For demonstration we build a  [Demo Website](https://fathelen.github.io/crypt4ghJS/)
 
 ## Crypt4GH Specification 
 
