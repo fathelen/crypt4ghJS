@@ -50,7 +50,7 @@ async function generateKeys (secFile, pubFile, password) {
   })
 }
 
-// generateKeys('../testData/abcd_editRE.c4gh', '../testData/pubkey', 'aaa')
+// generateKeys('secret_key_file', 'public_key_file', 'passwort')
 
 ```
 
