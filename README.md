@@ -78,9 +78,23 @@ async function keyfile () {
 }
 
 ```
+### Check keyfiles 
+The function check keyfiles, is used to first check if the given keys are crypt4GH keys and second to decrypt the keys, to use them in the next step e.g. encryption or decryption. <br>
+For node: 
+ ```javascript
+const keys = await crypt4GHJS.keyfiles.encryptionKeyfiles([seckeyFile, pubkeyFile], password)
 
+
+
+```
+As for web use: 
+ ```javascript
+
+const keys = await crypt4GHJS.keyfiles.encryptionKeyfiles([seckeyFile, pubkeyFile], password)
+
+```
 ### Encrypt data 
-For the crypt4GH encryption of data, 2 functions are needed. The first function 'encHead' is used to encrypt the header, the second function 'encryption' is used to encrypt the data. 
+For the crypt4GH encryption of data, 2 functions are needed. The first function 'encHead' is used to encrypt the header, the second function 'encryption' is used to encrypt the data.  <br>
 For node: 
  ```javascript
 async function encryption (input, seckeyPath, pubkeyPath, output, edit, blocks) {
@@ -107,7 +121,7 @@ async function encryption (input, seckeyPath, pubkeyPath, output, edit, blocks) 
   }
 }
 
-encryption('../testData/2mb', '../testData/ts', '../testData/tp' )
+encryption('data', 'secret_key_file', 'public_key_file' )
 
 ```
 For web use: 
@@ -154,8 +168,6 @@ For web use:
 ### Reencrypt data
 
 ### Rearrange data 
-
-### Check keyfiles 
 
 ### Check fileformat
 
