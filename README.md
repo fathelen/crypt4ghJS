@@ -46,7 +46,7 @@ Sw8o+Bpejno2FkDq23D2Q6GAOzq7Zy5a+brAqEgavEE=
 YzRnaC12MQAGc2NyeXB0ABQAAAAAxr0v09Ec5NDcYKA7Ez4R5AARY2hhY2hhMjBfcG9seTEzMDUAPEfrI78aV6HMW78I51HwqMcPXyoqUACg0PQ4pijMGmlHMwjLdj5s8c3mjSR4MKjMQ6tkP5wT3KiOdKgxsQ==
 -----END CRYPT4GH PRIVATE KEY-----
 ```
-
+The function 'keygen' computes keyfiles in the given format.
 
 For node:
  ```javascript
