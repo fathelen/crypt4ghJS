@@ -51,10 +51,19 @@ async function generateKeys (secFile, pubFile, password) {
   })
 }
 
-// generateKeys('secret_key_file', 'public_key_file', 'passwort')
+generateKeys('secret_key_file', 'public_key_file', 'passwort')
 
 ```
 For web use: 
+ ```javascript
+
+async function keyfile () {
+  const password = await document.getElementById('psw').value
+  const result = await crypt4GHJS.keygen.keygen(password)
+  return result
+}
+
+```
 
 ### Encrypt data 
 
