@@ -164,6 +164,7 @@ For web use:
 ```
 
 ### Decrypt data
+For the crypt4GH decryption again 2 functions are needed. The first function 'headerDeconstruction' is used to decrypt the header, the second function 'decryption' is used to decrypt the data.  <br>
 
 For node: 
  ```javascript
