@@ -29,7 +29,7 @@ npm i ./crypt4ghJS
 
 
 ## Usage 
-crypt4GH-JS can be used to generate keypairs, encrypt data, decrypt data, reencrypt data, rearrange data and to check if a file is on crypt4GH format. 
+The usage of the diffrent task, that can be handled via crypt4GH_JS, are shown in  our [example file](https://github.com/fathelen/crypt4ghJS/blob/master/test/bench.js)
 
 ### Generate keys 
 
