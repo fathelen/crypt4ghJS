@@ -10,9 +10,12 @@ crypt4GH-JS can be installated via the crypt4gh_js npm package and the crypt4ghJ
 ### Installation with npm: 
 The npm package can be found here: [crypt4GH-JS](https://www.npmjs.com/package/crypt4gh_js) <br>
 To install crypt4GH_JS via npm use:
-<shell>
-/npm i crypt4gh_js
-<\shell>
+```sh
+
+npm i crypt4gh_js
+
+```
+
  
  ### Installation from git: 
  
