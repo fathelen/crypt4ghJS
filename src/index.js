@@ -69,18 +69,17 @@ async function encr () {
     }
   }
   const seckeyFile = await file.files[0].text()
-  const pubkeyFile = await file2.files[0].text()
+  // const pubkeyFile = await file2.files[0].text()
   const pubkeyFiles = await file2.files
   let pubs = []
-  console.log(pubkeyFiles)
   for(let i=0; i<pubkeyFiles.length; i++){
    let pub = await pubkeyFiles[i].text()
    pubs.push(pub)
   }
   pubs.unshift(seckeyFile)
   const keys = await crypt4GHJS.keyfiles.encryptionKeyfiles(pubs, password)
-  console.log(keys)
-  const header = await crypt4GHJS.encryption.encHead(keys[0], [keys[1]], ed, block)
+  console.log('Keys: ',keys)
+  const header = await crypt4GHJS.encryption.encHead(keys[0], keys.shift(), ed, block)
   c4ghtext.push(header[0])
   const chunksize = 65536
   let counter = 0
