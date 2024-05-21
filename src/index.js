@@ -78,13 +78,9 @@ async function encr () {
   }
   pubs.unshift(seckeyFile)
   const keys = await crypt4GHJS.keyfiles.encryptionKeyfiles(pubs, password)
-  console.log('Keys: ',keys)
   let sec = keys.shift()
   let pub = keys
-  console.log('seckey: ', sec)
-  console.log('pubkeys: ',pub)
   const header = await crypt4GHJS.encryption.encHead(sec, pub, ed, block)
-  console.log('header: ', header)
   c4ghtext.push(header[0])
   const chunksize = 65536
   let counter = 0
