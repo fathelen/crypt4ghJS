@@ -584,3 +584,7 @@ benchmbits/pW256kb20mbits
 benchmbits/pW256kb40mbits
 benchmbits/pW256kb50mbits
 benchmbits/pW256kb100mbits
+test/abcd_pub
+test/abcd_sec
+test/passwort_pub
+test/passwort_sec

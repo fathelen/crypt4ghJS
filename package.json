@@ -29,7 +29,6 @@
     "@stablelib/chacha20poly1305": "^1.0.1",
     "@stablelib/x25519": "^1.0.3",
     "buffer": "^6.0.3",
-    "libsodium": "^0.7.13",
     "libsodium-wrappers": "^0.7.13",
     "scrypt-js": "^3.0.1"
   },
