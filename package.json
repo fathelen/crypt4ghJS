@@ -1,6 +1,6 @@
 {
   "name": "crypt4gh_js",
-  "version": "1.0.1",
+  "version": "1.0.12",
   "description": "Crypt4GH Version JavaScript",
   "private": false,
   "exports": "./src/index_node.js",
