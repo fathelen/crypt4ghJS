@@ -16,7 +16,8 @@ encrypted text is due to the nonce and message authentication
 code (MAC) used for chacha20-ietf-poly1305.
 
 ## Transformation of edit lists
-```javascript
+Since the streamed chunks
+```
 
 export function applyEditlist (edlist, decryptedText) {
   try {
@@ -53,4 +54,4 @@ export function applyEditlist (edlist, decryptedText) {
   }
 }
 
-```javascript
+```
