@@ -20,81 +20,50 @@ Since the streamed chunks are decrypted individually, the editlist has to be rec
 We implemented this process in two steps.
 <br> 
 <br> 
-First step is to differentiate, if a chunk has to be decrypted and if so, if the chunk has to be fully or partly decrypted : 
+First step is to recalculate the editlist fitted to the stream based approach : 
 ```
 
-export function applyEditlist (edlist, decryptedText) {
-  try {
-    const editedData = []
-    let pos = BigInt(0)
-    const len = BigInt(decryptedText.length)
-    for (let i = 0; i < edlist.length; i = i + 2) {
-      const discard = edlist[i]
-      pos = pos + discard
-      if (i === edlist.length - 1) {
-        const part = decryptedText.subarray(Number(pos), Number(len))
-        editedData.push(part)
-      } else {
-        const keep = edlist[i + 1]
-        const part = decryptedText.subarray(Number(pos), Number(pos) + Number(keep))
-        editedData.push(part)
-        pos = pos + keep
-      }
-    }
-    let length = 0
-    editedData.forEach(item => {
-      length += item.length
-    })
-    // Create a new array with total length and merge all source arrays.
-    const mergedArray = new Uint8Array(length)
-    let offset = 0
-    editedData.forEach(item => {
-      mergedArray.set(item, offset)
-      offset += item.length
-    })
-    return mergedArray
-  } catch (e) {
-    console.trace('edit list could not be applied.')
-  }
-}
+chunkList = Map of chunks that need to be decrypted, key = chunk Number, value = edits for chunk
+booleanEven = true if editlist is even, false if editlist is odd
+chunk = current chunk
+counter = counter of streamed chunks
+
+function diffrentiateDecryption(chunkList, booleanEven,chunk, counter)
+  if(chunkList & booleanEven == false & chunkList.contains(counter) then
+    decryptedText <- decrypt(chunk)
+    editedText <- streamEditlist(chunkList(counter), decrypted)
+    return editedText
+ else if(chunkList & booleanEven == true & chunkList.contains(counter) then
+    decryptedText <- decrypt(chunk)
+    editedText <- streamEditlist(chunkList(counter), decrypted)
+    return editedText
+else
+    decryptedText <- decrypt(chunk)
+    return <- decryptedText
+    
+    
+
 
 ```
-Second step is two recalculate the needed part of the chunk, if the chunk has to be partly decrypted:
+Second step is to differentiate, if a chunk has to be decrypted and if so, if the chunk has to be fully or partly decrypted : 
 ```
 
-export function applyEditlist (edlist, decryptedText) {
-  try {
-    const editedData = []
-    let pos = BigInt(0)
-    const len = BigInt(decryptedText.length)
-    for (let i = 0; i < edlist.length; i = i + 2) {
-      const discard = edlist[i]
-      pos = pos + discard
-      if (i === edlist.length - 1) {
-        const part = decryptedText.subarray(Number(pos), Number(len))
-        editedData.push(part)
-      } else {
-        const keep = edlist[i + 1]
-        const part = decryptedText.subarray(Number(pos), Number(pos) + Number(keep))
-        editedData.push(part)
-        pos = pos + keep
-      }
-    }
-    let length = 0
-    editedData.forEach(item => {
-      length += item.length
-    })
-    // Create a new array with total length and merge all source arrays.
-    const mergedArray = new Uint8Array(length)
-    let offset = 0
-    editedData.forEach(item => {
-      mergedArray.set(item, offset)
-      offset += item.length
-    })
-    return mergedArray
-  } catch (e) {
-    console.trace('edit list could not be applied.')
-  }
-}
+chunkList = Map of chunks that need to be decrypted, key = chunk Number, value = edits for chunk
+booleanEven = true if editlist is even, false if editlist is odd
+chunk = current chunk
+counter = counter of streamed chunks
+
+function diffrentiateDecryption(chunkList, booleanEven,chunk, counter)
+  if(chunkList & booleanEven == false & chunkList.contains(counter) then
+    decryptedText <- decrypt(chunk)
+    editedText <- streamEditlist(chunkList(counter), decrypted)
+    return editedText
+ else if(chunkList & booleanEven == true & chunkList.contains(counter) then
+    decryptedText <- decrypt(chunk)
+    editedText <- streamEditlist(chunkList(counter), decrypted)
+    return editedText
+else
+    decryptedText <- decrypt(chunk)
+    return <- decryptedText
 
 ```
