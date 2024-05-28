@@ -48,23 +48,117 @@ function diffrentiateDecryption(chunkList, booleanEven,chunk, counter)
 Second step is to differentiate, if a chunk has to be decrypted and if so, if the chunk has to be fully or partly decrypted : 
 ```
 
-chunkList = Map of chunks that need to be decrypted, key = chunk Number, value = edits for chunk
-booleanEven = true if editlist is even, false if editlist is odd
-chunk = current chunk
-counter = counter of streamed chunks
+function calculateEditlist (headerInformation) {
+  const preEdit = blocks2encrypt(headerInformation)
+  let bEven = 0
+  const blocks = new Map()
+  for (let i = 0; i < preEdit[0].length; i++) {
+    if (i % 2 === 0) {
+      bEven = Number(((preEdit[0][i] - 1n) / 65536n) + 1n)
+    } else {
+      const bOdd = Number(((preEdit[0][i] - 1n) / 65536n) + 1n)
+      if (bEven === bOdd && i >= 2) {
+        if (Number(((preEdit[0][i - 2] - 1n) / 65536n) + 1n) === bOdd) {
+          blocks.set(bEven, [...blocks.get(bEven), preEdit[1][i - 1]])
+          blocks.set(bEven, [...blocks.get(bEven), preEdit[1][i]])
+        } else {
+          const lastKey = [...blocks.keys()].pop()
+          const sum = 65536n - ((blocks.get(lastKey).reduce((partialSum, a) => partialSum + a, 0n))) + BigInt((65536 * (bOdd - 2)))
+          blocks.set(bEven, [preEdit[1][i - 1] - sum])
+          blocks.set(bEven, [...blocks.get(bEven), preEdit[1][i]])
+        }
+      } else if (bEven === bOdd && i < 2) {
+        if (blocks.has(bEven)) {
+          if (preEdit[1][i - 1] > 65536n) {
+            blocks.set(bEven, [...blocks.get(bEven), preEdit[1][i - 1] - (BigInt(bEven - 1) * 65536n)])
+          } else {
+            blocks.set(bEven, [...blocks.get(bEven), preEdit[1][i - 1]])
+          }
+        } else {
+          if (preEdit[1][i - 1] > 65536n) {
+            blocks.set(bEven, [preEdit[1][i - 1] - (BigInt(bEven - 1) * 65536n)])
+          } else {
+            blocks.set(bEven, [preEdit[1][i - 1]])
+          }
+        }
+        blocks.set(bEven, [...blocks.get(bEven), preEdit[1][i]])
+      } else if (bEven !== bOdd) {
+        if (blocks.has(bEven)) {
+          if (preEdit[1][i - 1] > 65536n) {
+            blocks.set(bEven, [...blocks.get(bEven), preEdit[1][i - 1] - (BigInt(bEven - 1) * 65536n)])
+          } else {
+            blocks.set(bEven, [...blocks.get(bEven), preEdit[1][i - 1]])
+          }
+        } else {
+          if (preEdit[1][i - 1] > 65536n) {
+            blocks.set(bEven, [preEdit[1][i - 1] - (BigInt(bEven - 1) * 65536n)])
+          } else {
+            blocks.set(bEven, [preEdit[1][i - 1]])
+          }
+        }
+        if (preEdit[1][i - 1] > 65536) {
+          blocks.set(bEven, [...blocks.get(bEven), 65536n * BigInt(bEven) - preEdit[1][i - 1]])
+        } else {
+          blocks.set(bEven, [...blocks.get(bEven), 65536n - preEdit[1][i - 1]])
+        }
+        const lastKey = [...blocks.keys()].pop()
+        const x = (preEdit[1][i] / 65536n)
+        if (preEdit[1][i] > 65536n) {
+          for (let j = lastKey + 1; j < Number(x + 1n); j++) {
+            blocks.set(j, [0n, 65536n])
+          }
+        }
+        blocks.set(bOdd, [0n])
+        if (Number(x) > 0) {
+          if (preEdit[1][i - 1] > 65536) {
+            blocks.set(bOdd, [...blocks.get(bOdd), preEdit[1][i] - (65536n * BigInt(bEven) - preEdit[1][i - 1])])
+          } else {
+            blocks.set(bOdd, [...blocks.get(bOdd), preEdit[1][i] - (65536n * x - preEdit[1][i - 1])])
+          }
+        } else {
+          if (preEdit[1][i - 1] > 65536) {
+            blocks.set(bOdd, [...blocks.get(bOdd), preEdit[1][i] - (65536n * BigInt(bEven) - preEdit[1][i - 1])])
+          } else {
+            blocks.set(bOdd, [...blocks.get(bOdd), preEdit[1][i] - (65536n * (x + 1n) - preEdit[1][i - 1])])
+          }
+        }
+      }
+    }
+  }
+  return [blocks, preEdit[2]]
+}
 
-function diffrentiateDecryption(chunkList, booleanEven,chunk, counter)
-  if(chunkList & booleanEven == false & chunkList.contains(counter) then
-    decryptedText <- decrypt(chunk)
-    editedText <- streamEditlist(chunkList(counter), decrypted)
-    return editedText
- else if(chunkList & booleanEven == true & chunkList.contains(counter) then
-    decryptedText <- decrypt(chunk)
-    editedText <- streamEditlist(chunkList(counter), decrypted)
-    return editedText
- else
-    decryptedText <- decrypt(chunk)
-    return <- decryptedText
+function blocks2encrypt (headerInformation) {
+  // 1.Step: Welche Blöcke müssen entschlüsselt werden
+  const edit64 = new BigInt64Array(headerInformation[3][0].buffer)
+  let editlist = edit64.subarray(1)
+  let addedEdit = []
+  let j = 0n
+  for (let i = 0; i < editlist.length; i++) {
+    j = j + editlist[i]
+    addedEdit.push(j)
+  }
+  // ungerade editlist anpassen
+  let unEven = false
+  const editOdd = new BigInt64Array(editlist.length + 1)
+  if (editlist.length % 2 !== 0) {
+    unEven = true
+    const sum = (editlist.reduce((partialSum, a) => partialSum + a, 0n))
+    editOdd.set(editlist)
+    editOdd[editOdd.length - 1] = 65536n * ((sum / 65536n) + 1n) - sum
+  }
+  // 2.Map erstellen
+  if (editlist.length % 2 !== 0) {
+    addedEdit = []
+    editlist = editOdd
+    let j = 0n
+    for (let i = 0; i < editlist.length; i++) {
+      j = j + editlist[i]
+      addedEdit.push(j)
+    }
+  }
+  return [addedEdit, editlist, unEven]
+}
 
 ```
 After this recalculation the function ApplyEditList (page 15) from the [GA4GH File Encryption Standard](http://samtools.github.io/hts-specs/crypt4gh.pdf) can be used to edit the decrypted text.
