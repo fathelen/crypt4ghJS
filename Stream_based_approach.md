@@ -19,6 +19,7 @@ code (MAC) used for chacha20-ietf-poly1305.
 Since the streamed chunks are decrypted individually, the editlist has to be recalculated to know, which chunks have to be fully or partly decrypted. 
 We implemented this process in two steps.
 <br> 
+<br> 
 First step is to differentiate, if a chunk has to be decrypted and if so, if the chunk has to be fully or partly decrypted : 
 ```
 
