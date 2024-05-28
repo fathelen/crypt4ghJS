@@ -16,3 +16,41 @@ encrypted text is due to the nonce and message authentication
 code (MAC) used for chacha20-ietf-poly1305.
 
 ## Transformation of edit lists
+'''javascript
+
+export function applyEditlist (edlist, decryptedText) {
+  try {
+    const editedData = []
+    let pos = BigInt(0)
+    const len = BigInt(decryptedText.length)
+    for (let i = 0; i < edlist.length; i = i + 2) {
+      const discard = edlist[i]
+      pos = pos + discard
+      if (i === edlist.length - 1) {
+        const part = decryptedText.subarray(Number(pos), Number(len))
+        editedData.push(part)
+      } else {
+        const keep = edlist[i + 1]
+        const part = decryptedText.subarray(Number(pos), Number(pos) + Number(keep))
+        editedData.push(part)
+        pos = pos + keep
+      }
+    }
+    let length = 0
+    editedData.forEach(item => {
+      length += item.length
+    })
+    // Create a new array with total length and merge all source arrays.
+    const mergedArray = new Uint8Array(length)
+    let offset = 0
+    editedData.forEach(item => {
+      mergedArray.set(item, offset)
+      offset += item.length
+    })
+    return mergedArray
+  } catch (e) {
+    console.trace('edit list could not be applied.')
+  }
+}
+
+'''javascript
