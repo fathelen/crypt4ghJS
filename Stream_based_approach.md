@@ -22,86 +22,28 @@ We implemented this process in two steps.
 <br> 
 First step is to recalculate the editlist fitted to the stream based approach : 
 ```
-function calculateEditlist (headerInformation) {
-  const preEdit = blocks2encrypt(headerInformation)
-  let bEven = 0
-  const blocks = new Map()
-  for (let i = 0; i < preEdit[0].length; i++) {
-    if (i % 2 === 0) {
-      bEven = Number(((preEdit[0][i] - 1n) / 65536n) + 1n)
-    } else {
-      const bOdd = Number(((preEdit[0][i] - 1n) / 65536n) + 1n)
-      if (bEven === bOdd && i >= 2) {
-        if (Number(((preEdit[0][i - 2] - 1n) / 65536n) + 1n) === bOdd) {
-          blocks.set(bEven, [...blocks.get(bEven), preEdit[1][i - 1]])
-          blocks.set(bEven, [...blocks.get(bEven), preEdit[1][i]])
+function streamEditlist(editlist)
+  Blocks2decrypt = blocks2decrypt(editlist)
+  ChunkMap = Map()
+  repeat:
+    if (i % 2 === 0) then
+      bEven = (Blocks2decrypt[0][i] - 1) / 65536 + 1
+    else
+      bOdd = (Blocks2decrypt[0][i] - 1) / 65536 + 1
+      if (bEven === bOdd) then
+       if (((Blocks2decrypt[0][i - 2] - 1) / 65536 + 1) === bOdd) {
+          ChunkMap[bEven].push(preEdit[1][i - 1]])
+          ChunkMap[bEven].push(preEdit[1][i]])
         } else {
-          const lastKey = [...blocks.keys()].pop()
-          const sum = 65536n - ((blocks.get(lastKey).reduce((partialSum, a) => partialSum + a, 0n))) + BigInt((65536 * (bOdd - 2)))
-          blocks.set(bEven, [preEdit[1][i - 1] - sum])
-          blocks.set(bEven, [...blocks.get(bEven), preEdit[1][i]])
+          const sum = 65536 - ( sum(ChunkMap[bEven - 1]) + 65536 * (bOdd - 2)
+          ChunkMap[bEven].push(preEdit[1][i - 1] - sum])
+          ChunkMap[bEven].push(preEdit[1][i]])
         }
-      } else if (bEven === bOdd && i < 2) {
-        if (blocks.has(bEven)) {
-          if (preEdit[1][i - 1] > 65536n) {
-            blocks.set(bEven, [...blocks.get(bEven), preEdit[1][i - 1] - (BigInt(bEven - 1) * 65536n)])
-          } else {
-            blocks.set(bEven, [...blocks.get(bEven), preEdit[1][i - 1]])
-          }
-        } else {
-          if (preEdit[1][i - 1] > 65536n) {
-            blocks.set(bEven, [preEdit[1][i - 1] - (BigInt(bEven - 1) * 65536n)])
-          } else {
-            blocks.set(bEven, [preEdit[1][i - 1]])
-          }
-        }
-        blocks.set(bEven, [...blocks.get(bEven), preEdit[1][i]])
-      } else if (bEven !== bOdd) {
-        if (blocks.has(bEven)) {
-          if (preEdit[1][i - 1] > 65536n) {
-            blocks.set(bEven, [...blocks.get(bEven), preEdit[1][i - 1] - (BigInt(bEven - 1) * 65536n)])
-          } else {
-            blocks.set(bEven, [...blocks.get(bEven), preEdit[1][i - 1]])
-          }
-        } else {
-          if (preEdit[1][i - 1] > 65536n) {
-            blocks.set(bEven, [preEdit[1][i - 1] - (BigInt(bEven - 1) * 65536n)])
-          } else {
-            blocks.set(bEven, [preEdit[1][i - 1]])
-          }
-        }
-        if (preEdit[1][i - 1] > 65536) {
-          blocks.set(bEven, [...blocks.get(bEven), 65536n * BigInt(bEven) - preEdit[1][i - 1]])
-        } else {
-          blocks.set(bEven, [...blocks.get(bEven), 65536n - preEdit[1][i - 1]])
-        }
-        const lastKey = [...blocks.keys()].pop()
-        const x = (preEdit[1][i] / 65536n)
-        if (preEdit[1][i] > 65536n) {
-          for (let j = lastKey + 1; j < Number(x + 1n); j++) {
-            blocks.set(j, [0n, 65536n])
-          }
-        }
-        blocks.set(bOdd, [0n])
-        if (Number(x) > 0) {
-          if (preEdit[1][i - 1] > 65536) {
-            blocks.set(bOdd, [...blocks.get(bOdd), preEdit[1][i] - (65536n * BigInt(bEven) - preEdit[1][i - 1])])
-          } else {
-            blocks.set(bOdd, [...blocks.get(bOdd), preEdit[1][i] - (65536n * x - preEdit[1][i - 1])])
-          }
-        } else {
-          if (preEdit[1][i - 1] > 65536) {
-            blocks.set(bOdd, [...blocks.get(bOdd), preEdit[1][i] - (65536n * BigInt(bEven) - preEdit[1][i - 1])])
-          } else {
-            blocks.set(bOdd, [...blocks.get(bOdd), preEdit[1][i] - (65536n * (x + 1n) - preEdit[1][i - 1])])
-          }
-        }
-      }
-    }
-  }
-  return [blocks, preEdit[2]]
-}
+      else
+        
 
+
+  until len(Blocks2decrypt[0])
 
 function blocks2decrypt(editlist)
 
@@ -121,15 +63,6 @@ function blocks2decrypt(editlist)
     unitil i = len(editOdd)
     editlist = editOdd
  return [sumEditlist, editlist, unEven]
-
- 
-
-  
-
-    
-    
-
-
 ```
 Second step is to differentiate, if a chunk has to be decrypted and if so, if the chunk has to be fully or partly decrypted : 
 ```
