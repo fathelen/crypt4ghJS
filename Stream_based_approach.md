@@ -22,32 +22,6 @@ We implemented this process in two steps.
 <br> 
 First step is to recalculate the editlist fitted to the stream based approach : 
 ```
-
-chunkList = Map of chunks that need to be decrypted, key = chunk Number, value = edits for chunk
-booleanEven = true if editlist is even, false if editlist is odd
-chunk = current chunk
-counter = counter of streamed chunks
-
-function diffrentiateDecryption(chunkList, booleanEven,chunk, counter)
-  if(chunkList & booleanEven == false & chunkList.contains(counter) then
-    decryptedText <- decrypt(chunk)
-    editedText <- streamEditlist(chunkList(counter), decrypted)
-    return editedText
- else if(chunkList & booleanEven == true & chunkList.contains(counter) then
-    decryptedText <- decrypt(chunk)
-    editedText <- streamEditlist(chunkList(counter), decrypted)
-    return editedText
- else
-    decryptedText <- decrypt(chunk)
-    return <- decryptedText
-    
-    
-
-
-```
-Second step is to differentiate, if a chunk has to be decrypted and if so, if the chunk has to be fully or partly decrypted : 
-```
-
 function calculateEditlist (headerInformation) {
   const preEdit = blocks2encrypt(headerInformation)
   let bEven = 0
@@ -128,37 +102,54 @@ function calculateEditlist (headerInformation) {
   return [blocks, preEdit[2]]
 }
 
-function blocks2encrypt (headerInformation) {
-  // 1.Step: Welche Blöcke müssen entschlüsselt werden
-  const edit64 = new BigInt64Array(headerInformation[3][0].buffer)
-  let editlist = edit64.subarray(1)
-  let addedEdit = []
-  let j = 0n
-  for (let i = 0; i < editlist.length; i++) {
-    j = j + editlist[i]
-    addedEdit.push(j)
-  }
-  // ungerade editlist anpassen
-  let unEven = false
-  const editOdd = new BigInt64Array(editlist.length + 1)
-  if (editlist.length % 2 !== 0) {
+
+function blocks2decrypt(editlist)
+
+  if (len(editlist) % 2 === 0) then
+   unEnven = false
+   repeat:
+    sumEditlist = sumEditlist.push(sum(editlist[i]))
+    unitil i = len(editlist)
+  else:
     unEven = true
-    const sum = (editlist.reduce((partialSum, a) => partialSum + a, 0n))
+    sum = (editlist.reduce((partialSum, a) => partialSum + a, 0n))
     editOdd.set(editlist)
     editOdd[editOdd.length - 1] = 65536n * ((sum / 65536n) + 1n) - sum
-  }
-  // 2.Map erstellen
-  if (editlist.length % 2 !== 0) {
-    addedEdit = []
+    repeat:
+      j = j + editOdd[i]
+      sumEditlist = sumEditlist.push(sum(editOdd[i]))
+    unitil i = len(editOdd)
     editlist = editOdd
-    let j = 0n
-    for (let i = 0; i < editlist.length; i++) {
-      j = j + editlist[i]
-      addedEdit.push(j)
-    }
-  }
-  return [addedEdit, editlist, unEven]
-}
+ return [sumEditlist, editlist, unEven]
+
+ 
+
+  
+
+    
+    
+
+
+```
+Second step is to differentiate, if a chunk has to be decrypted and if so, if the chunk has to be fully or partly decrypted : 
+```
+chunkList = Map of chunks that need to be decrypted, key = chunk Number, value = edits for chunk
+booleanEven = true if editlist is even, false if editlist is odd
+chunk = current chunk
+counter = counter of streamed chunks
+
+function diffrentiateDecryption(chunkList, booleanEven,chunk, counter)
+  if(chunkList & booleanEven == false & chunkList.contains(counter) then
+    decryptedText <- decrypt(chunk)
+    editedText <- streamEditlist(chunkList(counter), decrypted)
+    return editedText
+ else if(chunkList & booleanEven == true & chunkList.contains(counter) then
+    decryptedText <- decrypt(chunk)
+    editedText <- streamEditlist(chunkList(counter), decrypted)
+    return editedText
+ else
+    decryptedText <- decrypt(chunk)
+    return <- decryptedText
 
 ```
 After this recalculation the function ApplyEditList (page 15) from the [GA4GH File Encryption Standard](http://samtools.github.io/hts-specs/crypt4gh.pdf) can be used to edit the decrypted text.
