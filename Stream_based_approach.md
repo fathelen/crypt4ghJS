@@ -40,7 +40,12 @@ function streamEditlist(editlist)
           ChunkMap[bEven].push(preEdit[1][i]])
         }
       else
-        
+        if (ChunkMap.contains(bEven))
+          if (ChunkMap[1][i - 1] > 65536) 
+            CunkMap[bEven].push(preEdit[1][i - 1] - (bEven - 1) * 65536])
+          else 
+            CunkMap[bEven].push(preEdit[1][i - 1]])
+
 
 
   until len(Blocks2decrypt[0])
