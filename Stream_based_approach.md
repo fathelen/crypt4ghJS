@@ -37,7 +37,7 @@ function diffrentiateDecryption(chunkList, booleanEven,chunk, counter)
     decryptedText <- decrypt(chunk)
     editedText <- streamEditlist(chunkList(counter), decrypted)
     return editedText
-else
+ else
     decryptedText <- decrypt(chunk)
     return <- decryptedText
     
@@ -62,8 +62,9 @@ function diffrentiateDecryption(chunkList, booleanEven,chunk, counter)
     decryptedText <- decrypt(chunk)
     editedText <- streamEditlist(chunkList(counter), decrypted)
     return editedText
-else
+ else
     decryptedText <- decrypt(chunk)
     return <- decryptedText
 
 ```
+After this recalculation the function ApplyEditList (page 15) from the [GA4GH File Encryption Standard](http://samtools.github.io/hts-specs/crypt4gh.pdf) can be used to edit the decrypted text.
