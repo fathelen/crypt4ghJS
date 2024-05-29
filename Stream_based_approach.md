@@ -13,7 +13,7 @@ For the decryption we used the same concept, encrypted chunks
 of 65 564byte byte are streamed and decrypted separately on
 the client-site. The expand of 28byte byte from plaintext to
 encrypted text is due to the nonce and message authentication
-code (MAC) used for chacha20-ietf-poly1305.
+code (MAC) used for the chacha20-ietf-poly1305 encryption.
 
 ## Transformation of edit lists
 Since the streamed chunks are decrypted individually, the editlist has to be recalculated to know, which chunks have to be fully or partly decrypted. 
