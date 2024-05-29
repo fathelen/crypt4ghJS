@@ -28,27 +28,43 @@ function streamEditlist(editlist)
   repeat:
     if (i % 2 === 0) then
       bEven = (Blocks2decrypt[0][i] - 1) / 65536 + 1
-    else
+    else then
       bOdd = (Blocks2decrypt[0][i] - 1) / 65536 + 1
       if (bEven === bOdd) then
-       if (((Blocks2decrypt[0][i - 2] - 1) / 65536 + 1) === bOdd) {
-          ChunkMap[bEven].push(preEdit[1][i - 1]])
-          ChunkMap[bEven].push(preEdit[1][i]])
-        } else {
-          const sum = 65536 - ( sum(ChunkMap[bEven - 1]) + 65536 * (bOdd - 2)
-          ChunkMap[bEven].push(preEdit[1][i - 1] - sum])
-          ChunkMap[bEven].push(preEdit[1][i]])
-        }
-      else
-        if (ChunkMap.contains(bEven))
-          if (ChunkMap[1][i - 1] > 65536) 
-            CunkMap[bEven].push(preEdit[1][i - 1] - (bEven - 1) * 65536])
-          else 
-            CunkMap[bEven].push(preEdit[1][i - 1]])
-
-
-
-  until len(Blocks2decrypt[0])
+         if (((Blocks2decrypt[0][i - 2] - 1) / 65536 + 1) === bOdd) 
+            ChunkMap[bEven].push(Blocks2decrypt[1][i - 1]])
+            ChunkMap[bEven].push(Blocks2decrypt[1][i]])
+         else then 
+            const sum = 65536 - ( sum(ChunkMap[bEven - 1]) + 65536 * (bOdd - 2)
+            ChunkMap[bEven].push(Blocks2decrypt[1][i - 1] - sum])
+            ChunkMap[bEven].push(Blocks2decrypt[1][i]])
+      else then 
+          if (ChunkMap.contains(bEven)) then
+            if (ChunkMap[1][i - 1] > 65536) then
+              CunkMap[bEven].push(Blocks2decrypt[1][i - 1] - (bEven - 1) * 65536])
+         else then
+            CunkMap[bEven].push(Blocks2decrypt[1][i - 1]])
+         if (Blocks2decrypt[1][i-1] > 65536) then
+            ChunkMap[bEven].push(65536 * bEven - Blocks2decrypt[1][i - 1])
+         else then
+            ChunkMap[bEven].push( 65536n- Blocks2decrypt[1][i - 1])
+         if (Blocks2decrypt[1][i] > 65536) then
+            repeat:
+              ChunkMap[i].push([0,65536])
+            until len(Blocks2decrypt[1][i]/65536 +1)
+        ChunkMap[bOdd].push([0])
+        if (Blocks2decrypt[1][i]/65536 > 0) then
+            if (Blocks2decrypt[1][i - 1] > 65536) then
+              ChunkMap[bOdd].push(Blocks2decrypt[1][i] - (65536 * bEven - Blocks2decrypt[1][i - 1])])
+            else then
+              CunkMap[bOdd].push(Blocks2decrypt[1][i] - (65536 * (Blocks2decrypt[1][i]/65536) - Blocks2decrypt[1][i - 1])])
+        else then
+            if (Blocks2decrypt[1][i - 1] > 65536) then
+              ChunkMap[bOdd].push(Blocks2decrypt[1][i] - (65536 * bEven - Blocks2decrypt[1][i - 1])])
+            else  then
+              ChunkMap[bOdd].push(preEdit[1][i] - (65536 * (Blocks2decrypt[1][i]/65536 + 1) - Blocks2decrypt[1][i - 1])])
+ until len(Blocks2decrypt[0])
+ return [ChunkMap, Blocks2decrypt[2]]
 
 function blocks2decrypt(editlist)
 
