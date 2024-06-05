@@ -22,68 +22,48 @@ We implemented this process in two steps.
 <br> 
 First step is to recalculate the editlist fitted to the stream based approach : 
 ```
-function streamEditlist(editlist)
-  Blocks2decrypt = blocks2decrypt(editlist)
-  ChunkMap = Map()
-  repeat:
-    if (i % 2 === 0) then
-      bEven = (Blocks2decrypt[0][i] - 1) / 65536 + 1
-    else then
-      bOdd = (Blocks2decrypt[0][i] - 1) / 65536 + 1
-      if (bEven === bOdd) then
-         if (((Blocks2decrypt[0][i - 2] - 1) / 65536 + 1) === bOdd) 
-            ChunkMap[bEven].push(Blocks2decrypt[1][i - 1]])
-            ChunkMap[bEven].push(Blocks2decrypt[1][i]])
-         else then 
-            const sum = 65536 - ( sum(ChunkMap[bEven - 1]) + 65536 * (bOdd - 2)
-            ChunkMap[bEven].push(Blocks2decrypt[1][i - 1] - sum])
-            ChunkMap[bEven].push(Blocks2decrypt[1][i]])
-      else then 
-          if (ChunkMap.contains(bEven)) then
-            if (ChunkMap[1][i - 1] > 65536) then
-              CunkMap[bEven].push(Blocks2decrypt[1][i - 1] - (bEven - 1) * 65536])
-         else then
-            CunkMap[bEven].push(Blocks2decrypt[1][i - 1]])
-         if (Blocks2decrypt[1][i-1] > 65536) then
-            ChunkMap[bEven].push(65536 * bEven - Blocks2decrypt[1][i - 1])
-         else then
-            ChunkMap[bEven].push( 65536n- Blocks2decrypt[1][i - 1])
-         if (Blocks2decrypt[1][i] > 65536) then
-            repeat:
-              ChunkMap[i].push([0,65536])
-            until len(Blocks2decrypt[1][i]/65536 +1)
-        ChunkMap[bOdd].push([0])
-        if (Blocks2decrypt[1][i]/65536 > 0) then
-            if (Blocks2decrypt[1][i - 1] > 65536) then
-              ChunkMap[bOdd].push(Blocks2decrypt[1][i] - (65536 * bEven - Blocks2decrypt[1][i - 1])])
-            else then
-              CunkMap[bOdd].push(Blocks2decrypt[1][i] - (65536 * (Blocks2decrypt[1][i]/65536) - Blocks2decrypt[1][i - 1])])
-        else then
-            if (Blocks2decrypt[1][i - 1] > 65536) then
-              ChunkMap[bOdd].push(Blocks2decrypt[1][i] - (65536 * bEven - Blocks2decrypt[1][i - 1])])
-            else  then
-              ChunkMap[bOdd].push(preEdit[1][i] - (65536 * (Blocks2decrypt[1][i]/65536 + 1) - Blocks2decrypt[1][i - 1])])
- until len(Blocks2decrypt[0])
- return [ChunkMap, Blocks2decrypt[2]]
+function RecalculateEditlist(headerInformation){
+  summedupEditlisst <- blocks2decrypt(HeaderInformation)[0]
+  editlist <- blocks2decrypt(HeaderInformation)[1]
+  blocksize <- 65536
+  blockEven <- 0
+  blocks <- new Map()
+  FOR each index of editlist
+     IF index modulo 2 equals 0 THEN
+        blockEven <- ((summedupEditlist[index] minus 1) divided by blocksize) minus 1
+     END IF
+     ELSE THEN
+        blockOdd <- ((summedupEditlist[index] minus 1) divided by blocksize) minus 1
+        IF blockEven equals blockOdd THEN
+          blocks <- editpairSameblock(editlist,blocksize,blocks, blockEven, blockOdd, i)
+        END IF
+        ELSE THEN
+          blocks <- editpairDiffrentblock(editlist,blocksize,blocks, blockEven, blockOdd, i)
+        END ELSE
+     END ELSE
+  END FOR
+  RETURN [blocks, blocks2decrypt(HeaderInformation)[2]]
+}
 
 function blocks2decrypt(editlist)
-
-  if (len(editlist) % 2 === 0) then
-   unEnven = false
-   repeat:
-    sumEditlist = sumEditlist.push(sum(editlist[i]))
-    unitil i = len(editlist)
-  else:
-    unEven = true
-    sum = (editlist.reduce((partialSum, a) => partialSum + a, 0n))
-    editOdd.set(editlist)
-    editOdd[editOdd.length - 1] = 65536n * ((sum / 65536n) + 1n) - sum
-    repeat:
-      j = j + editOdd[i]
-      sumEditlist = sumEditlist.push(sum(editOdd[i]))
-    unitil i = len(editOdd)
-    editlist = editOdd
- return [sumEditlist, editlist, unEven]
+  addedEdit <- []
+  editOdd <- []
+  j <- 0
+  IF length of editlist modulo 2 equals 0 THEN
+    unEven <- false
+    FOR each index of editlist
+      j <- j plus editlist[index]
+      addedEdit <- addedEdit append j
+    END FOR
+  END IF
+  ELSE THEN
+    unEven <- true
+    const sum <- sum of editlist
+    const restvalue <- blocksize multiplied by ((sum divided by blocksize) plus 1n) minus sum
+    editlist <- editlist append restvalue
+    addedEdit <- append sum plus restvalue
+  END ELSE
+  RETURN [addedEdit, editlist, uneven]
 ```
 Second step is to differentiate, if a chunk has to be decrypted and if so, if the chunk has to be fully or partly decrypted : 
 ```
@@ -93,17 +73,20 @@ chunk = current chunk
 counter = counter of streamed chunks
 
 function diffrentiateDecryption(chunkList, booleanEven,chunk, counter)
-  if(chunkList & booleanEven == false & chunkList.contains(counter) then
+  IF chunkList and booleanEven equal false and chunkList contains counter THEN
     decryptedText <- decrypt(chunk)
     editedText <- streamEditlist(chunkList(counter), decrypted)
-    return editedText
- else if(chunkList & booleanEven == true & chunkList.contains(counter) then
+    RETURN editedText
+ END IF
+ ELSE IF chunkList and booleanEven equal true and  chunkList contains counter THEN
     decryptedText <- decrypt(chunk)
     editedText <- streamEditlist(chunkList(counter), decrypted)
-    return editedText
- else
+    RERURN editedText
+ END ELSE IF
+ ELSE
     decryptedText <- decrypt(chunk)
-    return <- decryptedText
+    RETURN decryptedText
+ END ELSE
 
 ```
 After this recalculation the function ApplyEditList (page 15) from the [GA4GH File Encryption Standard](http://samtools.github.io/hts-specs/crypt4gh.pdf) can be used to edit the decrypted text.
