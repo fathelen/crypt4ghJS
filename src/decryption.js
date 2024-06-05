@@ -465,6 +465,7 @@ function editpairDiffrentblock(editlist, blocksize, blocks, bEven, bOdd, i){
     blocks.set(bOdd, [...blocks.get(bOdd), editlist[i] - sum - x*blocksize])
 
   } else {
+      let value
       // Fallunterscheidung erste iteration oder schon weiter
       if(i<2){
         // Fallunterscheidung wird mind der erste block übersprungen oder nicht 
@@ -476,7 +477,16 @@ function editpairDiffrentblock(editlist, blocksize, blocks, bEven, bOdd, i){
       blocks.set(bEven, [...blocks.get(bEven), blocksize - editlist[i - 1]])
       const lastKey = [...blocks.keys()].pop()
       const sum = blocksize - ((blocks.get(lastKey).reduce((partialSum, a) => partialSum + a, 0n)))
-      const value = editlist[i-1] - sum - (blocksize * BigInt((bEven - 1 -lastKey)))
+      value = editlist[i-1] - sum - (blocksize * BigInt((bEven - 1 -lastKey)))
+
+      }else{
+        // funnktioniert wie der erste Fall nul mit dem unterschied, das berechnet werden muss wie viele bytes von editlist[i-1](überspringen), schon im letzten block genutzt wurden und wie viel für bEven noch über bleibt.
+        const lastKey = [...blocks.keys()].pop()
+        const sum = blocksize - ((blocks.get(lastKey).reduce((partialSum, a) => partialSum + a, 0n)))
+        value = editlist[i-1] - sum - (blocksize * BigInt((bEven - 1 -lastKey)))
+        blocks.set(bEven, [value])
+        blocks.set(bEven, [...blocks.get(bEven), blocksize - value])
+      }
       const x = ((editlist[i] - (blocksize - value)) / blocksize)
         if (editlist[i] > blocksize) {
           for (let j = bEven + 1; j < bOdd; j++) {
@@ -485,24 +495,6 @@ function editpairDiffrentblock(editlist, blocksize, blocks, bEven, bOdd, i){
         }
         blocks.set(bOdd, [0n])
         blocks.set(bOdd, [...blocks.get(bOdd), editlist[i] - x*blocksize - (blocksize - value)])
-
-      }else{
-        // funnktioniert wie der erste Fall nul mit dem unterschied, das berechnet werden muss wie viele bytes von editlist[i-1](überspringen), schon im letzten block genutzt wurden und wie viel für bEven noch über bleibt.
-        const lastKey = [...blocks.keys()].pop()
-        const sum = blocksize - ((blocks.get(lastKey).reduce((partialSum, a) => partialSum + a, 0n)))
-        const value = editlist[i-1] - sum - (blocksize * BigInt((bEven - 1 -lastKey)))
-        blocks.set(bEven, [value])
-        blocks.set(bEven, [...blocks.get(bEven), blocksize - value])
-
-        const x = ((editlist[i] - (blocksize - value)) / blocksize)
-        if (editlist[i] > blocksize) {
-          for (let j = bEven + 1; j < bOdd; j++) {
-            blocks.set(j, [0n, blocksize])
-          }
-        }
-        blocks.set(bOdd, [0n])
-        blocks.set(bOdd, [...blocks.get(bOdd), editlist[i] - x*blocksize - (blocksize - value)])
-      }
     } 
   return blocks
 }

@@ -93,7 +93,7 @@ async function decryption (input, seckeyPath, output, wantedblocks) {
     })
 }
 
-decryption('../test/edit8', '../test/passwort_sec','../test/edit8_decryption')
+decryption('../test/edit5', '../test/passwort_sec','../test/edit7_decryption')
 
 async function c4ghWriting (input, output, wantedblocks) {
   const readStream = fs.createReadStream(input)
