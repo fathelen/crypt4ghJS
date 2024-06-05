@@ -487,6 +487,7 @@ function editpairDiffrentblock(editlist, blocksize, blocks, bEven, bOdd, i){
         blocks.set(bEven, [value])
         blocks.set(bEven, [...blocks.get(bEven), blocksize - value])
       }
+      
       const x = ((editlist[i] - (blocksize - value)) / blocksize)
         if (editlist[i] > blocksize) {
           for (let j = bEven + 1; j < bOdd; j++) {
