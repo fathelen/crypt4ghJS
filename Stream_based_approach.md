@@ -45,6 +45,7 @@ function RecalculateEditlist(headerInformation){
   RETURN [blocks, blocks2decrypt(HeaderInformation)[2]]
 }
 
+
 function blocks2decrypt(editlist)
   addedEdit <- []
   editOdd <- []
@@ -64,6 +65,31 @@ function blocks2decrypt(editlist)
     addedEdit <- append sum plus restvalue
   END ELSE
   RETURN [addedEdit, editlist, uneven]
+
+
+function editpairSameblock(editlist, blocksize, blocks, bEven, bOdd, i)
+  IF i smaller then 2 THEN
+    IF editlist[i-1] greater then blocksize THEN
+      blocks[bEven] <- [editlist[i - 1] minus  (bEven minus 1) multplied by blocksize]
+    END IF
+    ELSE THEN
+      blocks[bEven] <- [editlist[i - 1]])
+    END ELSE
+  blocks[bEven] append editlist[i]
+  END IF
+  ELSE THEN
+    IF blocks includes bOdd THEN
+      blocks[bEven] append editlist[i - 1]
+       blocks[bEven] append editlist[i]
+    END IF
+    ELSE THEN
+      lastKey <- greates key in map blocks
+      sum <- blocksize minus (sum of values for last key) plus (blocksize mulitplied by (bOdd minus lastKey minus 1))
+      blocks[bEven] <-  editlist[i - 1] minus sum 
+      blocks[bEven] append editlist[i]
+    END ELSE
+  END ELSE
+  RETURN blocks 
 ```
 Second step is to differentiate, if a chunk has to be decrypted and if so, if the chunk has to be fully or partly decrypted : 
 ```
