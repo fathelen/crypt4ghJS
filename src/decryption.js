@@ -48,7 +48,8 @@ export async function pureDecryption (d, key) {
 }
 
 export function pureEdit (d) {
-  const edits = calculateEditlist(d)
+  // const edits = calculateEditlist(d)
+  const edits = RecalculateEditlist(d)
   return edits
 }
 /**
@@ -395,27 +396,28 @@ function RecalculateEditlist(headerInformation){
   const editlist = preEdit[1]
   const blocksize = 65536n
   let blockEven = 0
-  const blocks = new Map()
+  let blocks = new Map()
   for (let i = 0; i < editlist.length; i++) {
     if (i % 2 === 0) {
-      bEven = Number(((summedupEditllist[i] - 1n) / blocksize) + 1n)
+      blockEven = Number(((summedupEditllist[i] - 1n) / blocksize) + 1n)
     } else {
       const blockOdd = Number(((summedupEditllist[i] - 1n) / blocksize) + 1n)
-      if(bEven === bOdd){
-        blocks = editpairSameblock(editlist,blocksize,blocks)
-      } else if (bEven !== bOdd) {
-        blocks = editpairDiffrentblock(editlist,blocksize,blocks)
+      if(blockEven === blockOdd){
+        blocks = editpairSameblock(editlist,blocksize,blocks, blockEven, blockOdd, i)
+      } else if (blockEven !== blockOdd) {
+        blocks = editpairDiffrentblock(editlist,blocksize,blocks, blockEven, blockOdd, i)
       }
     }
   }
-  return [block, preEdit[2]]
+  console.log(blocks)
+  return [blocks, preEdit[2]]
 }
 
 
 // Fuktion deckt den Fall ab, dass ein editpaar, was immer ein paar aus bytes überspringen und bytes behalten abdeckt zB position 0 und 1 oder 2 und 3 im Array, sich im selben block befindet 
-function editpairSameblock(editlist, blocksize, blocks){
+function editpairSameblock(editlist, blocksize, blocks, bEven, bOdd, i){
   // Fallunterscheidung: Im ersten iterationsdurchlauf wird die Map mit dem ersten Key-Value paar gefüllt, damit in den nächsten Iterationsschritten auf die bereits hinzugefügten Key-Value Paare zugegriffen werden kann.
-  if (bEven === bOdd && i < 2) {
+  if (i < 2) {
       // Fallunterscheidung: Im Fall, dass an der ersten Position in der editlist ein Wert größer als die Blocksize steht, wird mindestens der ersten Block nicht benötigt, dafür muss der editlist eintrag an der ersten stelle minus die anzahl der zu überspringenden Blöck mal der Blocksize gerechnet werden. 
       // Falls dies nicht der Fall ist kann der erste Wert der editlist in der Map gespeichert werden.
       if (editlist[i - 1] > blocksize) {
@@ -425,7 +427,7 @@ function editpairSameblock(editlist, blocksize, blocks){
       }
     // Da sich beide Werte im gleichen block befinden, kann der zweite Wert der editlist der Value-Liste einfach angehängt werden.
     blocks.set(bEven, [...blocks.get(bEven), editlist[i]])
-  } else if (bEven === bOdd && i >= 2) {
+  } else if (i >= 2) {
     // Fallunterscheidung: Falls der block schon der Map hinzugefügt wurde, können die Werte des aktuellen editpaars einfach angehängt werden.
     // Falls das nicht der Fall, muss berechnet werden, welcher anteil des überspringenden editlist eintrags noch von dem vorherigen block abgezogen werden muss und wie viel noch von dem neu hinzuzufügenden block. Dafür berechnet man zunächste die Summe der values des zuletzthinzugefügten keys. (Funktioniert da editlists aufsummiert werden können und daher die blöck nummer im laufe der iteration immer größer wird).
     // Diese summe wird der blocksize abgezogen -> damit weiß man wie viele byte schon im vorherigen block übersprungen werden. Nun muss man diesem Wert noch erweitern um die  blocksize multipliziert mit der aktuellen Blockzahl-2, da der überspringende Bereich mehr als ein gesamter block sein kann.
@@ -442,7 +444,7 @@ function editpairSameblock(editlist, blocksize, blocks){
   return blocks
 }
 
-function editpairDiffrentblock(editlist, blocksize, blocks){
+function editpairDiffrentblock(editlist, blocksize, blocks, bEven, bOdd, i){
   // Fallunterscheidung: Block wurde der Map schon als key hinzugefügt oder nicht, wenn der key schon vorhanden ist und das überspringen in diesem endet, kann der wert einfach angehangen werden. 
   // Ist der key noch nicht vorhanden muss berechnet werden wie viel aus dem letzten block und eventuell komplett übersprungenden blöcken von dem überspringenden Wert abgezogen werden muss bevor es der map, für den key bEven, hinzugefügt werden kann. 
   if (blocks.has(bEven)) {
@@ -454,7 +456,7 @@ function editpairDiffrentblock(editlist, blocksize, blocks){
     // Dann muss berechnet werden, ob editlist[i] also die zu behaltenen bytes mehr als eine blocksize sind und daher der map komplette blöcke hinzugefügt werden müssen
     const x = ((editlist[i] -sum) / blocksize)
     if (editlist[i] > blocksize) {
-      for (let j = bEven + 1; j < bOdd -1 ; j++) {
+      for (let j = bEven + 1; j < bOdd; j++) {
         blocks.set(j, [0n, blocksize])
       }
     }
@@ -463,20 +465,44 @@ function editpairDiffrentblock(editlist, blocksize, blocks){
     blocks.set(bOdd, [...blocks.get(bOdd), editlist[i] - sum - x*blocksize])
 
   } else {
-      // funnktioniert wie der erste Fall nul mit dem unterschied, das berechnet werden muss wie viele bytes von editlist[i-1](überspringen), schon im letzten block genutzt wurden und wie viel für bEven noch über bleibt.
+      // Fallunterscheidung erste iteration oder schon weiter
+      if(i<2){
+        // Fallunterscheidung wird mind der erste block übersprungen oder nicht 
+        if (editlist[i - 1] > blocksize) {
+          blocks.set(bEven, [editlist[i - 1] - (BigInt(bEven - 1) * blocksize)])
+        } else {
+          blocks.set(bEven, [editlist[i - 1]])
+        }
+      blocks.set(bEven, [...blocks.get(bEven), blocksize - editlist[i - 1]])
       const lastKey = [...blocks.keys()].pop()
       const sum = blocksize - ((blocks.get(lastKey).reduce((partialSum, a) => partialSum + a, 0n)))
       const value = editlist[i-1] - sum - (blocksize * BigInt((bEven - 1 -lastKey)))
-      blocks.set(bEven, [value])
-      blocks.set(bEven, [...blocks.get(bEven), blocksize - value])
-      const x = ((editlist[i] -sum) / blocksize)
-      if (editlist[i] > blocksize) {
-        for (let j = bEven + 1; j < bOdd -1 ; j++) {
-          blocks.set(j, [0n, blocksize])
+      const x = ((editlist[i] - (blocksize - value)) / blocksize)
+        if (editlist[i] > blocksize) {
+          for (let j = bEven + 1; j < bOdd; j++) {
+            blocks.set(j, [0n, blocksize])
+          }
         }
-      }
-      blocks.set(bOdd, [0n])
-      blocks.set(bOdd, [...blocks.get(bOdd), editlist[i] - sum - x*blocksize])
+        blocks.set(bOdd, [0n])
+        blocks.set(bOdd, [...blocks.get(bOdd), editlist[i] - x*blocksize - (blocksize - value)])
 
-  } 
+      }else{
+        // funnktioniert wie der erste Fall nul mit dem unterschied, das berechnet werden muss wie viele bytes von editlist[i-1](überspringen), schon im letzten block genutzt wurden und wie viel für bEven noch über bleibt.
+        const lastKey = [...blocks.keys()].pop()
+        const sum = blocksize - ((blocks.get(lastKey).reduce((partialSum, a) => partialSum + a, 0n)))
+        const value = editlist[i-1] - sum - (blocksize * BigInt((bEven - 1 -lastKey)))
+        blocks.set(bEven, [value])
+        blocks.set(bEven, [...blocks.get(bEven), blocksize - value])
+
+        const x = ((editlist[i] - (blocksize - value)) / blocksize)
+        if (editlist[i] > blocksize) {
+          for (let j = bEven + 1; j < bOdd; j++) {
+            blocks.set(j, [0n, blocksize])
+          }
+        }
+        blocks.set(bOdd, [0n])
+        blocks.set(bOdd, [...blocks.get(bOdd), editlist[i] - x*blocksize - (blocksize - value)])
+      }
+    } 
+  return blocks
 }

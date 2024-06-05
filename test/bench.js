@@ -7,6 +7,7 @@ import _sodium from 'libsodium-wrappers'
 import * as Blake2b from '@stablelib/blake2b'
 import * as x25519 from '@stablelib/x25519'
 
+
 const ts = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAEbm9uZQAEbm9uZQAgrpd+v2ZGymbextTp5nMt298h1yEFBigB+bS+1WJT/lM=\n-----END CRYPT4GH PRIVATE KEY-----\n'
 const tp = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nfQCgFp/dPaDOELnzrgEEQUeOmOlMj9M/dTP7bIiuxyw=\n-----END CRYPT4GH PUBLIC KEY-----\n'
 const ts2 = '-----BEGIN CRYPT4GH PRIVATE KEY-----\nYzRnaC12MQAGc2NyeXB0ABQAAAAAErnfoX48n1p21KYPJF39qwARY2hhY2hhMjBfcG9seTEzMDUAPB2VckJsR/5iz35Zg5VO2VRkdIStoFIL0681lrdKlpn80dA7bH+vRcQc1+LVT4vptEt7EC5eXltE07uNhA==\n-----END CRYPT4GH PRIVATE KEY-----\n'
@@ -15,15 +16,11 @@ const tp2 = '-----BEGIN CRYPT4GH PUBLIC KEY-----\nKK2of4G9P49mpUE1PVDia+hTSQ8VWJ
 async function encryption (input, seckeyPath, pubkeyPath, output, edit, blocks) {
   const seckey = fs.readFileSync(seckeyPath, {encoding: 'utf8'})
   const pubkey = fs.readFileSync(pubkeyPath, {encoding: 'utf-8'})
-  console.log(seckey)
-  console.log(pubkey)
   const keys = await crypt4GHJS.keyfiles.encryptionKeyfiles([seckey, pubkey], "passwort")
-  console.log(keys)
-  /*
   const header = await crypt4GHJS.encryption.encHead(keys[0], [keys[1]], edit, blocks)
-  process.stdout.write(header[0])
-  // const writeStream = fs.createWriteStream(output)
-  // writeStream.write(header[0])
+  // process.stdout.write(header[0])
+  const writeStream = fs.createWriteStream(output)
+  writeStream.write(header[0])
    if (header[1]) {
     let counter = 0
     const readStream = fs.createReadStream(input)
@@ -32,18 +29,18 @@ async function encryption (input, seckeyPath, pubkeyPath, output, edit, blocks) 
           counter++
           const text = await crypt4GHJS.encryption.encryption(header, d, counter, blocks)
           if (text) {
-            process.stdout.write(text)
-            // writeStream.write(text)
+            //process.stdout.write(text)
+            writeStream.write(text)
             }
           })
           .on('end', (d) => {
-            // writeStream.end()
+            writeStream.end()
             readStream.destroy()
           })
-  } */
+  }
 }
 
-// encryption('../testData/2mb', '../test/passwort_sec', '../test/passwort_pub' )
+// encryption('../testData/32kb', '../test/passwort_sec', '../test/passwort_pub', '../test/edit8',[70000,5,60000,2000])
 
 async function pureWriting (input, output, edit, blocks) {
     const readStream = fs.createReadStream(input)
@@ -62,40 +59,41 @@ const seckeyPass = new Uint8Array([ 239,  53, 227, 105, 157, 144,  90, 226, 118,
 
 async function decryption (input, seckeyPath, output, wantedblocks) {
   const seckey = fs.readFileSync(seckeyPath, {encoding: 'utf8'})
-  const keys = await crypt4GHJS.keyfiles.encryptionKeyfiles([seckey])
+  const keys = await crypt4GHJS.keyfiles.encryptionKeyfiles([seckey], 'passwort')
   const readStream = fs.createReadStream(input, { end: 10000 })
   readStream
     .on('data', async function (d) {
-      process.stdout.write('')
-      /*
+      // process.stdout.write('')
       fs.writeFile(output, '', (err) => {
         if (err) {
           console.log(err)
         }
-      })*/ 
+      })
       let counter = 0
       const val = await crypt4GHJS.decryption.headerDeconstruction(Uint8Array.from(d), keys[0])
+      /*
+      console.log('header: ', val)
       const readStream2 = fs.createReadStream(input, { start: val[4], highWaterMark: 65564 })
       readStream2
         .on('data', async function (d2) {
           counter++
           const text = await crypt4GHJS.decryption.decrypption(val, d2, counter, wantedblocks)
+          console.log('text: ',text)
           if (text) {
-            process.stdout.write(text)
-            /*
+            // process.stdout.write(text)
             fs.appendFile(output, text, (err) => {
               if (err) {
                 console.log(err)
               }
-            }) */
+            })
           } 
-        })
+        }) */
 
       readStream.destroy()
     })
 }
 
-// decryption('../testData/1gb.c4gh', '../testData/ts')
+decryption('../test/edit8', '../test/passwort_sec','../test/edit8_decryption')
 
 async function c4ghWriting (input, output, wantedblocks) {
   const readStream = fs.createReadStream(input)
@@ -220,5 +218,7 @@ async function Enc_Frank (key, fix_sec) {
   return x
 }
 
-const de = await Enc_Frank(tp_pass, fixkey_sec)
-console.log(de)
+// const de = await Enc_Frank(tp_pass, fixkey_sec)
+// console.log(de)
+
+
