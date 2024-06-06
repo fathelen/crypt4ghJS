@@ -89,7 +89,54 @@ function editpairSameblock(editlist, blocksize, blocks, bEven, bOdd, i)
       blocks[bEven] append editlist[i]
     END ELSE
   END ELSE
-  RETURN blocks 
+  RETURN blocks
+
+function editpairDiffrentblock(editlist, blocksize, blocks, bEven, bOdd, i)
+  IF blocks include bEven THEN
+    blocks[bEven] append editlist[i-1]
+    sum <- blocksize minus (sum of values for bEven)
+    blocks[bEven append sum
+
+    const fullblock <- (editlist[i] minus sum) divided by  blocksize
+    IF editlist[i] greater then blocksize THEN
+      FOR j greater bEven to smaller then bOdd
+         blocks[j] <-  [0, blocksize]
+      END FOR
+    blocks[bOdd] <- [0]
+    blocks[bOdd] append  editlist[i] minus  sum minus (fullblock multiplied by blocksize)
+  END IF
+  ELSE THEN
+    IF i smaller then 2 THEN
+      IF editlist[i-1] greater then blocksize THEN
+        blocks[bEven] <- editlist[i - 1] minus (bEven minus 1) multiplied by  blocksize
+      END IF
+      ELSE THEN
+        blocks[bEven] <- editlist[i - 1]
+      END ELSE
+      blocks[bEven] append blocksize minus editlist[i - 1]
+      lastKey <- greatest key in map blocks
+      sum <- blocksize mius sum of blocks[lastkey]
+      value <- editlist[i-1] mins sum minus (blocksize multiplied by (bEven mius 1 minus lastKey)
+   END IF
+   ELSE THEN
+    lastKey <- greatest key in map blocks
+    sum <- blocksize mius sum of blocks[lastkey]
+    value <- editlist[i-1] mins sum minus (blocksize multiplied by (bEven mius 1 minus lastKey)
+    blocks[bEven] <- value
+    blocks[bEven] append blocksize minus value
+   END ELSE
+    
+    const fullblock <- editlist[i] minus (blocksize minus value) divided by blocksize
+        IF editlist[i] greater then blocksize THEN
+          FOR j greater then bEven to smaller bOdd
+            blocks[j] <-[0, blocksize])
+          }
+        }
+        blocks[bOdd] <-  [0]
+        blocks[bOdd] append editlist[i] minus  (fullblock multiplied by blocksize) minus (blocksize minus value)
+    
+  END ELSE
+  RETURN blocks
 ```
 Second step is to differentiate, if a chunk has to be decrypted and if so, if the chunk has to be fully or partly decrypted : 
 ```
