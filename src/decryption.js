@@ -22,15 +22,20 @@ export async function decrypption (headerInfo, text, counter, wantedblocks) {
     } else if(counter > Math.max(...headerInfo[5][0].keys())) { 
       const plaintext = await pureDecryption(Uint8Array.from(text), headerInfo[0])
       return plaintext
+    } else {
+      const plaintext = Uint8Array.from('');
+      return plaintext
     }
 
   } else if (wantedblocks && !headerInfo[5][0]) {
     if (wantedblocks.includes(counter)) {
       const plaintext = await pureDecryption(Uint8Array.from(text), headerInfo[0])
+      console.log('fertig')
       return plaintext
     }
   } else if (!wantedblocks && !headerInfo[5][0]) {
     const plaintext = await pureDecryption(Uint8Array.from(text), headerInfo[0])
+    console.log('fertig')
     return plaintext
   }
 }
@@ -300,6 +305,30 @@ function blocks2encrypt (headerInformation) {
   return [addedEdit, editlist, unEven]
 }
 
+function blocks2encrypt2 (headerInformation) {
+  // 1.Step: Welche Blöcke müssen entschlüsselt werden
+  const edit64 = new BigInt64Array(headerInformation[3][0].buffer)
+  let editlist = edit64.subarray(1)
+  let addedEdit = []
+  let j = 0n
+  let unEven = false
+  for (let i = 0; i < editlist.length; i++) {
+    j = j + editlist[i]
+    addedEdit.push(j)
+  }
+  if(editlist.length % 2 !== 0){
+    unEven = true
+    const editOdd = new BigInt64Array(editlist.length + 1)
+    editOdd.set(editlist)
+    const sum = (editlist.reduce((partialSum, a) => partialSum + a, 0n))
+    const restvalue = 65536n * ((sum / 65536n) + 1n) - sum
+    addedEdit.push( sum + restvalue)
+    editOdd[editOdd.length - 1] = restvalue
+    editlist = editOdd
+  }
+  return [addedEdit, editlist, unEven]
+}
+
 /**
  * calculateEditlist is a function to calculate edit lists for each block from the original editlist.
  * @param {*} headerInformation 2 dim array containing the header Informations, needed to decrypt the data
@@ -391,7 +420,7 @@ function calculateEditlist (headerInformation) {
 
 // Vereinfachte Form
 function RecalculateEditlist(headerInformation){
-  const preEdit = blocks2encrypt(headerInformation)
+  const preEdit = blocks2encrypt2(headerInformation)
   const summedupEditllist = preEdit[0]
   const editlist = preEdit[1]
   const blocksize = 65536n
@@ -409,7 +438,6 @@ function RecalculateEditlist(headerInformation){
       }
     }
   }
-  console.log(blocks)
   return [blocks, preEdit[2]]
 }
 
@@ -427,7 +455,7 @@ function editpairSameblock(editlist, blocksize, blocks, bEven, bOdd, i){
       }
     // Da sich beide Werte im gleichen block befinden, kann der zweite Wert der editlist der Value-Liste einfach angehängt werden.
     blocks.set(bEven, [...blocks.get(bEven), editlist[i]])
-  } else if (i >= 2) {
+  } else {
     // Fallunterscheidung: Falls der block schon der Map hinzugefügt wurde, können die Werte des aktuellen editpaars einfach angehängt werden.
     // Falls das nicht der Fall, muss berechnet werden, welcher anteil des überspringenden editlist eintrags noch von dem vorherigen block abgezogen werden muss und wie viel noch von dem neu hinzuzufügenden block. Dafür berechnet man zunächste die Summe der values des zuletzthinzugefügten keys. (Funktioniert da editlists aufsummiert werden können und daher die blöck nummer im laufe der iteration immer größer wird).
     // Diese summe wird der blocksize abgezogen -> damit weiß man wie viele byte schon im vorherigen block übersprungen werden. Nun muss man diesem Wert noch erweitern um die  blocksize multipliziert mit der aktuellen Blockzahl-2, da der überspringende Bereich mehr als ein gesamter block sein kann.
@@ -487,7 +515,7 @@ function editpairDiffrentblock(editlist, blocksize, blocks, bEven, bOdd, i){
         blocks.set(bEven, [value])
         blocks.set(bEven, [...blocks.get(bEven), blocksize - value])
       }
-      
+
       const x = ((editlist[i] - (blocksize - value)) / blocksize)
         if (editlist[i] > blocksize) {
           for (let j = bEven + 1; j < bOdd; j++) {

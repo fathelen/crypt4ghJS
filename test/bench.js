@@ -40,7 +40,7 @@ async function encryption (input, seckeyPath, pubkeyPath, output, edit, blocks) 
   }
 }
 
-// encryption('../testData/32kb', '../test/passwort_sec', '../test/passwort_pub', '../test/edit8',[70000,5,60000,2000])
+// encryption('../testData/2mb', '../test/passwort_sec', '../test/passwort_pub', '../test/edit9',[70000,5,60000])
 
 async function pureWriting (input, output, edit, blocks) {
     const readStream = fs.createReadStream(input)
@@ -71,14 +71,11 @@ async function decryption (input, seckeyPath, output, wantedblocks) {
       })
       let counter = 0
       const val = await crypt4GHJS.decryption.headerDeconstruction(Uint8Array.from(d), keys[0])
-      /*
-      console.log('header: ', val)
       const readStream2 = fs.createReadStream(input, { start: val[4], highWaterMark: 65564 })
       readStream2
         .on('data', async function (d2) {
           counter++
           const text = await crypt4GHJS.decryption.decrypption(val, d2, counter, wantedblocks)
-          console.log('text: ',text)
           if (text) {
             // process.stdout.write(text)
             fs.appendFile(output, text, (err) => {
@@ -87,13 +84,15 @@ async function decryption (input, seckeyPath, output, wantedblocks) {
               }
             })
           } 
-        }) */
-
-      readStream.destroy()
+        }) 
+        .on('end', (d2) => {
+          readStream2.destroy()
+          readStream.destroy()
+         })
     })
 }
 
-decryption('../test/edit5', '../test/passwort_sec','../test/edit7_decryption')
+decryption('../test/edit9', '../test/passwort_sec','../test/edit9_decryption')
 
 async function c4ghWriting (input, output, wantedblocks) {
   const readStream = fs.createReadStream(input)
