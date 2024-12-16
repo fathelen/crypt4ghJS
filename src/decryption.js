@@ -305,28 +305,11 @@ function blocks2encrypt (headerInformation) {
   return [addedEdit, editlist, unEven]
 }
 
-function blocks2encrypt2 (headerInformation) {
-  // 1.Step: Welche Blöcke müssen entschlüsselt werden
-  const edit64 = new BigInt64Array(headerInformation[3][0].buffer)
-  let editlist = edit64.subarray(1)
-  let addedEdit = []
-  let j = 0n
-  let unEven = false
-  for (let i = 0; i < editlist.length; i++) {
-    j = j + editlist[i]
-    addedEdit.push(j)
-  }
-  if(editlist.length % 2 !== 0){
-    unEven = true
-    const editOdd = new BigInt64Array(editlist.length + 1)
-    editOdd.set(editlist)
-    const sum = (editlist.reduce((partialSum, a) => partialSum + a, 0n))
-    const restvalue = 65536n * ((sum / 65536n) + 1n) - sum
-    addedEdit.push( sum + restvalue)
-    editOdd[editOdd.length - 1] = restvalue
-    editlist = editOdd
-  }
-  return [addedEdit, editlist, unEven]
+
+  const calculateSum = (arr) => {
+    return arr.reduce((total, current) => {
+        return total + current;
+    }, 0n);
 }
 
 /**
@@ -342,188 +325,57 @@ function calculateEditlist (headerInformation) {
   const blocks = new Map()
   for (let i = 0; i < preEdit[0].length; i++) {
     if (i % 2 === 0) {
-      bEven = Number(((preEdit[0][i] - 1n) / 65536n) + 1n)
+      bEven = Number((preEdit[0][i]/ 65536n) + 1n)
     } else {
-      const bOdd = Number(((preEdit[0][i] - 1n) / 65536n) + 1n)
+      const bOdd = Number((preEdit[0][i]/ 65536n) + 1n)
+      //even edit list entry (keeping bytes) and odd edit list entry(non-keeping bytes) are in the same block
       if (bEven === bOdd && i >= 2) {
-        if (Number(((preEdit[0][i - 2] - 1n) / 65536n) + 1n) === bOdd) {
+        if (Number((preEdit[0][i - 2] / 65536n) + 1n) === bOdd) {
+          // previous bEven is also in the same block (bEven is already in the map)
           blocks.set(bEven, [...blocks.get(bEven), preEdit[1][i - 1]])
           blocks.set(bEven, [...blocks.get(bEven), preEdit[1][i]])
         } else {
+          //previous bEven is not in the same block
           const lastKey = [...blocks.keys()].pop()
-          const sum = 65536n - ((blocks.get(lastKey).reduce((partialSum, a) => partialSum + a, 0n))) + BigInt((65536 * (bOdd - 2)))
-          blocks.set(bEven, [preEdit[1][i - 1] - sum])
+          const inlast = 65536n - calculateSum(blocks.get(lastKey))
+          blocks.set(bEven, [preEdit[1][i - 1] - inlast])
           blocks.set(bEven, [...blocks.get(bEven), preEdit[1][i]])
         }
       } else if (bEven === bOdd && i < 2) {
-        /*
-        if (blocks.has(bEven)) {
-          if (preEdit[1][i - 1] > 65536n) {
-            blocks.set(bEven, [...blocks.get(bEven), preEdit[1][i - 1] - (BigInt(bEven - 1) * 65536n)])
-          } else {
-            blocks.set(bEven, [...blocks.get(bEven), preEdit[1][i - 1]])
-          }
-        } else {*/
-          if (preEdit[1][i - 1] > 65536n) {
-            blocks.set(bEven, [preEdit[1][i - 1] - (BigInt(bEven - 1) * 65536n)])
-          } else {
-            blocks.set(bEven, [preEdit[1][i - 1]])
-          }
-        // }
+        //odd entry is bigger than blocksize
+        if (preEdit[1][i - 1] > 65536n) {
+           blocks.set(bEven, [preEdit[1][i - 1] - (BigInt(bEven - 1) * 65536n)])
+        } else {
+          // odd entry is smaller than blocksize
+          blocks.set(bEven, [preEdit[1][i - 1]])
+        }
+
         blocks.set(bEven, [...blocks.get(bEven), preEdit[1][i]])
+        //even and odd editlist entries are in different blocks
       } else if (bEven !== bOdd) {
-        if (blocks.has(bEven)) {
           if (preEdit[1][i - 1] > 65536n) {
-            blocks.set(bEven, [...blocks.get(bEven), preEdit[1][i - 1] - (BigInt(bEven - 1) * 65536n)])
+            //odd editlist entry ist bigger than blocksize
+            const lastKey = [...blocks.keys()].pop()
+            blocks.set(bEven, [preEdit[1][i - 1] - (65536n*BigInt(bEven-lastKey) - calculateSum(blocks.get(lastKey)))])
           } else {
-            blocks.set(bEven, [...blocks.get(bEven), preEdit[1][i - 1]])
-          }
-        } else {
-          if (preEdit[1][i - 1] > 65536n) {
-            blocks.set(bEven, [preEdit[1][i - 1] - (BigInt(bEven - 1) * 65536n)])
-          } else {
+            // odd edit list entry is smaller than blocksize
             blocks.set(bEven, [preEdit[1][i - 1]])
           }
-        }
-        if (preEdit[1][i - 1] > 65536) {
-    !!!      blocks.set(bEven, [...blocks.get(bEven), 65536n * BigInt(bEven) - preEdit[1][i - 1]])
-        } else {
-          // blocks.set(bEven, [...blocks.get(bEven), 65536n - preEdit[1][i - 1]])
-          blocks.set(bEven, [...blocks.get(bEven), 65536n - ((blocks.get(bEven).reduce((partialSum, a) => partialSum + a, 0n)))]) 
-        }
+        
         const lastKey = [...blocks.keys()].pop()
-        const x = (preEdit[1][i] / 65536n)
+        const left = preEdit[1][i] - (65536n- calculateSum(blocks.get(lastKey)))
+        const take = left/65536n
+        const rest = left - 65536n*take
         if (preEdit[1][i] > 65536n) {
-          for (let j = lastKey + 1; j < Number(x + 1n); j++) {
+          blocks.set(bEven, [...blocks.get(bEven), 65536n- calculateSum(blocks.get(lastKey))])
+          for (let j = lastKey+1; j <=bOdd-1; j++) {
             blocks.set(j, [0n, 65536n])
           }
         }
-        blocks.set(bOdd, [0n])
-        if (Number(x) > 0) {
-          if (preEdit[1][i - 1] > 65536) {
-            blocks.set(bOdd, [...blocks.get(bOdd), preEdit[1][i] - (65536n * BigInt(bEven) - preEdit[1][i - 1])])
-          } else {
-            blocks.set(bOdd, [...blocks.get(bOdd), preEdit[1][i] - (65536n * x - preEdit[1][i - 1])])
-          }
-        } else {
-          if (preEdit[1][i - 1] > 65536) {
-            blocks.set(bOdd, [...blocks.get(bOdd), preEdit[1][i] - (65536n * BigInt(bEven) - preEdit[1][i - 1])])
-          } else {
-            blocks.set(bOdd, [...blocks.get(bOdd), preEdit[1][i] - (65536n * (x + 1n) - preEdit[1][i - 1])])
-          }
-        }
+        blocks.set(bOdd, [0n, rest])
       }
     }
   }
   return [blocks, preEdit[2]]
 }
 
-// Vereinfachte Form
-function RecalculateEditlist(headerInformation){
-  const preEdit = blocks2encrypt2(headerInformation)
-  const summedupEditllist = preEdit[0]
-  const editlist = preEdit[1]
-  const blocksize = 65536n
-  let blockEven = 0
-  let blocks = new Map()
-  for (let i = 0; i < editlist.length; i++) {
-    if (i % 2 === 0) {
-      blockEven = Number(((summedupEditllist[i] - 1n) / blocksize) + 1n)
-    } else {
-      const blockOdd = Number(((summedupEditllist[i] - 1n) / blocksize) + 1n)
-      if(blockEven === blockOdd){
-        blocks = editpairSameblock(editlist,blocksize,blocks, blockEven, blockOdd, i)
-      } else if (blockEven !== blockOdd) {
-        blocks = editpairDiffrentblock(editlist,blocksize,blocks, blockEven, blockOdd, i)
-      }
-    }
-  }
-  return [blocks, preEdit[2]]
-}
-
-
-// Fuktion deckt den Fall ab, dass ein editpaar, was immer ein paar aus bytes überspringen und bytes behalten abdeckt zB position 0 und 1 oder 2 und 3 im Array, sich im selben block befindet 
-function editpairSameblock(editlist, blocksize, blocks, bEven, bOdd, i){
-  // Fallunterscheidung: Im ersten iterationsdurchlauf wird die Map mit dem ersten Key-Value paar gefüllt, damit in den nächsten Iterationsschritten auf die bereits hinzugefügten Key-Value Paare zugegriffen werden kann.
-  if (i < 2) {
-      // Fallunterscheidung: Im Fall, dass an der ersten Position in der editlist ein Wert größer als die Blocksize steht, wird mindestens der ersten Block nicht benötigt, dafür muss der editlist eintrag an der ersten stelle minus die anzahl der zu überspringenden Blöck mal der Blocksize gerechnet werden. 
-      // Falls dies nicht der Fall ist kann der erste Wert der editlist in der Map gespeichert werden.
-      if (editlist[i - 1] > blocksize) {
-        blocks.set(bEven, [editlist[i - 1] - (BigInt(bEven - 1) * blocksize)])
-      } else {
-        blocks.set(bEven, [editlist[i - 1]])
-      }
-    // Da sich beide Werte im gleichen block befinden, kann der zweite Wert der editlist der Value-Liste einfach angehängt werden.
-    blocks.set(bEven, [...blocks.get(bEven), editlist[i]])
-  } else {
-    // Fallunterscheidung: Falls der block schon der Map hinzugefügt wurde, können die Werte des aktuellen editpaars einfach angehängt werden.
-    // Falls das nicht der Fall, muss berechnet werden, welcher anteil des überspringenden editlist eintrags noch von dem vorherigen block abgezogen werden muss und wie viel noch von dem neu hinzuzufügenden block. Dafür berechnet man zunächste die Summe der values des zuletzthinzugefügten keys. (Funktioniert da editlists aufsummiert werden können und daher die blöck nummer im laufe der iteration immer größer wird).
-    // Diese summe wird der blocksize abgezogen -> damit weiß man wie viele byte schon im vorherigen block übersprungen werden. Nun muss man diesem Wert noch erweitern um die  blocksize multipliziert mit der aktuellen Blockzahl-2, da der überspringende Bereich mehr als ein gesamter block sein kann.
-    if (blocks.has(bOdd)) {
-      blocks.set(bEven, [...blocks.get(bEven), editlist[i - 1]])
-      blocks.set(bEven, [...blocks.get(bEven), editlist[i]])
-    } else {
-      const lastKey = [...blocks.keys()].pop()
-      const sum = blocksize - ((blocks.get(lastKey).reduce((partialSum, a) => partialSum + a, 0n))) + (blocksize * BigInt((bOdd - lastKey -1)))
-      blocks.set(bEven, [editlist[i - 1] - sum])
-      blocks.set(bEven, [...blocks.get(bEven), editlist[i]])
-    }
-  } 
-  return blocks
-}
-
-function editpairDiffrentblock(editlist, blocksize, blocks, bEven, bOdd, i){
-  // Fallunterscheidung: Block wurde der Map schon als key hinzugefügt oder nicht, wenn der key schon vorhanden ist und das überspringen in diesem endet, kann der wert einfach angehangen werden. 
-  // Ist der key noch nicht vorhanden muss berechnet werden wie viel aus dem letzten block und eventuell komplett übersprungenden blöcken von dem überspringenden Wert abgezogen werden muss bevor es der map, für den key bEven, hinzugefügt werden kann. 
-  if (blocks.has(bEven)) {
-    // wenn der key schon vorhanden ist kann editlist[i-1], als der bereich der übersprungen werden soll einfach hinzugefügt werden, da der ja in bEven endet 
-    blocks.set(bEven, [...blocks.get(bEven), editlist[i-1]])
-    // dann muss berechnet werden wie viele bytes in dem block noch frei sind, diese werden von editlist[i] abgezogen und bEven angehangen.
-    const sum = blocksize - ((blocks.get(bEven).reduce((partialSum, a) => partialSum + a, 0n)))
-    blocks.set(bEven, [...blocks.get(bEven), sum])
-    // Dann muss berechnet werden, ob editlist[i] also die zu behaltenen bytes mehr als eine blocksize sind und daher der map komplette blöcke hinzugefügt werden müssen
-    const x = ((editlist[i] -sum) / blocksize)
-    if (editlist[i] > blocksize) {
-      for (let j = bEven + 1; j < bOdd; j++) {
-        blocks.set(j, [0n, blocksize])
-      }
-    }
-    // wenn man dann bei bOdd angekommen ist muss noch berechnet werden wie viele bytes aus diesem block noch behalten werden müssen
-    blocks.set(bOdd, [0n])
-    blocks.set(bOdd, [...blocks.get(bOdd), editlist[i] - sum - x*blocksize])
-
-  } else {
-      let value
-      // Fallunterscheidung erste iteration oder schon weiter
-      if(i<2){
-        // Fallunterscheidung wird mind der erste block übersprungen oder nicht 
-        if (editlist[i - 1] > blocksize) {
-          blocks.set(bEven, [editlist[i - 1] - (BigInt(bEven - 1) * blocksize)])
-        } else {
-          blocks.set(bEven, [editlist[i - 1]])
-        }
-      blocks.set(bEven, [...blocks.get(bEven), blocksize - editlist[i - 1]])
-      const lastKey = [...blocks.keys()].pop()
-      const sum = blocksize - ((blocks.get(lastKey).reduce((partialSum, a) => partialSum + a, 0n)))
-      value = editlist[i-1] - sum - (blocksize * BigInt((bEven - 1 -lastKey)))
-
-      }else{
-        // funnktioniert wie der erste Fall nul mit dem unterschied, das berechnet werden muss wie viele bytes von editlist[i-1](überspringen), schon im letzten block genutzt wurden und wie viel für bEven noch über bleibt.
-        const lastKey = [...blocks.keys()].pop()
-        const sum = blocksize - ((blocks.get(lastKey).reduce((partialSum, a) => partialSum + a, 0n)))
-        value = editlist[i-1] - sum - (blocksize * BigInt((bEven - 1 -lastKey)))
-        blocks.set(bEven, [value])
-        blocks.set(bEven, [...blocks.get(bEven), blocksize - value])
-      }
-
-      const x = ((editlist[i] - (blocksize - value)) / blocksize)
-        if (editlist[i] > blocksize) {
-          for (let j = bEven + 1; j < bOdd; j++) {
-            blocks.set(j, [0n, blocksize])
-          }
-        }
-        blocks.set(bOdd, [0n])
-        blocks.set(bOdd, [...blocks.get(bOdd), editlist[i] - x*blocksize - (blocksize - value)])
-    } 
-  return blocks
-}
