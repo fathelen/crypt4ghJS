@@ -30,12 +30,10 @@ export async function decrypption (headerInfo, text, counter, wantedblocks) {
   } else if (wantedblocks && !headerInfo[5][0]) {
     if (wantedblocks.includes(counter)) {
       const plaintext = await pureDecryption(Uint8Array.from(text), headerInfo[0])
-      console.log('fertig')
       return plaintext
     }
   } else if (!wantedblocks && !headerInfo[5][0]) {
     const plaintext = await pureDecryption(Uint8Array.from(text), headerInfo[0])
-    console.log('fertig')
     return plaintext
   }
 }
@@ -53,8 +51,8 @@ export async function pureDecryption (d, key) {
 }
 
 export function pureEdit (d) {
-  // const edits = calculateEditlist(d)
-  const edits = RecalculateEditlist(d)
+  const edits = calculateEditlist(d)
+  //const edits = RecalculateEditlist(d)
   return edits
 }
 /**
@@ -75,7 +73,7 @@ export async function headerDeconstruction (header, seckeys) {
     }
     return [sessionKey, decryptedPackets[2], headerPackets[1], partitionedPackages[1], headerPackets[2], editlist, partitionedPackages[1][0]]
   } catch (e) {
-    console.trace('header deconstruction not possible.')
+    console.trace('header deconstruction not possible.',e)
   }
 }
 
@@ -353,15 +351,21 @@ function calculateEditlist (headerInformation) {
         blocks.set(bEven, [...blocks.get(bEven), preEdit[1][i]])
         //even and odd editlist entries are in different blocks
       } else if (bEven !== bOdd) {
+        //odd editlist entry ist bigger than blocksize
           if (preEdit[1][i - 1] > 65536n) {
-            //odd editlist entry ist bigger than blocksize
-            const lastKey = [...blocks.keys()].pop()
-            blocks.set(bEven, [preEdit[1][i - 1] - (65536n*BigInt(bEven-lastKey) - calculateSum(blocks.get(lastKey)))])
-          } else {
+            // if blocks is empty
+            if (blocks.size === 0){
+              const overjump = preEdit[1][i - 1]/65536n
+              const rest = preEdit[1][i - 1] - overjump*65536n
+              blocks.set(Number(overjump)+1, [rest])
+            }else{
+              const lastKey = [...blocks.keys()].pop()
+              blocks.set(bEven, [preEdit[1][i - 1] - (65536n*BigInt(bEven-lastKey) - calculateSum(blocks.get(lastKey)))])
+          }} else {
             // odd edit list entry is smaller than blocksize
             blocks.set(bEven, [preEdit[1][i - 1]])
           }
-        
+
         const lastKey = [...blocks.keys()].pop()
         const left = preEdit[1][i] - (65536n- calculateSum(blocks.get(lastKey)))
         const take = left/65536n
