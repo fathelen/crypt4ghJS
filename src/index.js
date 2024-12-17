@@ -141,6 +141,7 @@ async function * decr () {
     const decoder = new TextDecoder()
     if (plaintext) {
       resulttext.push(plaintext)
+      console.log(plaintext)
       /** 
       decText += decoder.decode(plaintext)
       console.log('Länge plain: ', plaintext.length)
@@ -149,8 +150,11 @@ async function * decr () {
     }
     offset += chunksize
   }
+  console.log(resulttext)
   const buffered = Buffer.concat(resulttext)
+  console.log(buffered)
   const text = new Uint8Array(buffered)
+  console.log(text)
   return text
   console.log('all done')
 }
