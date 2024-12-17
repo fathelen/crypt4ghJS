@@ -204,7 +204,7 @@ async function encryptionEditlist (input, seckeyPath, pubkeyPath, output, edit, 
   }
 }
 
-//encryptionEditlist('../testData/21541_1#4.cram', '../testData/ts', '../testData/tp', '../testData/cramblock.c4gh', [140000,70000])
+//encryptionEditlist('../testData/21541_1#4.cram', '../testData/ts', '../testData/tp', '../testData/cramblock.c4gh', [0, 7853, 71721, 307929, 51299, 38])
 
 async function decryptionEditlist (input, seckeyPath, output, wantedblocks) {
   const seckey = fs.readFileSync(seckeyPath, {encoding: 'utf8'})

@@ -70,6 +70,7 @@ export async function headerDeconstruction (header, seckeys) {
     const sessionKey = parseEncPacket(partitionedPackages[0][0])
     if (partitionedPackages[1].length > 0) {
       editlist = pureEdit([sessionKey, decryptedPackets[2], headerPackets[1], partitionedPackages[1], headerPackets[2]])
+      console.log(editlist)
     }
     return [sessionKey, decryptedPackets[2], headerPackets[1], partitionedPackages[1], headerPackets[2], editlist, partitionedPackages[1][0]]
   } catch (e) {
