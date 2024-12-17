@@ -116,7 +116,7 @@ async function encr () {
   return text
 }
 
-async function * decr () {
+async function decr () {
   const resulttext = []
   let decText = ''
   const file = document.getElementById('input4')
@@ -192,14 +192,17 @@ document.getElementById('but').addEventListener('click', async function () {
 
 // Download decrypted file
 document.getElementById('but2').addEventListener('click', async function () {
-  const dec = decr()
+  const dec = await decr()
   let filename = 'decrypted_file'
   const decName = await document.getElementById('decname').value
   if (decName !== '') {
     filename = decName
   }
-  const element = document.createElement('a')
+
+  //const element = document.createElement('a')
   saveByteArray([dec], filename)
+  const keyPreview = document.getElementById('deccontents')
+  keyPreview.innerText += dec.subarray(0, 500)
   /*
   let next
   let index = 0
