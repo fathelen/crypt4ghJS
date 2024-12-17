@@ -140,6 +140,8 @@ async function * decr () {
     const decoder = new TextDecoder()
     if (plaintext) {
       decText += decoder.decode(plaintext)
+      console.log('Länge plain: ', plaintext.length)
+      console.log('längedec: ', decText.length)
       yield decText
     }
     offset += chunksize

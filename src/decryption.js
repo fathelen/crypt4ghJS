@@ -14,17 +14,21 @@ export async function decrypption (headerInfo, text, counter, wantedblocks) {
     console.log('1')
     const plaintext = await pureDecryption(Uint8Array.from(text), headerInfo[0])
     const aplliedEdit = applyEditlist(headerInfo[5][0].get(counter), plaintext)
-    console.log(aplliedEdit.length)
+    //console.log(aplliedEdit.length)
     return aplliedEdit
   } else if (headerInfo[5][0] && headerInfo[5][1] === true) {
+    console.log('2')
     if(Array.from(headerInfo[5][0].keys()).includes(counter)){
+      console.log('3')
       const plaintext = await pureDecryption(Uint8Array.from(text), headerInfo[0])
     const aplliedEdit = applyEditlist(headerInfo[5][0].get(counter), plaintext)
     return aplliedEdit
     } else if(counter > Math.max(...headerInfo[5][0].keys())) { 
+      console.log('4')
       const plaintext = await pureDecryption(Uint8Array.from(text), headerInfo[0])
       return plaintext
     } else {
+      console.log('5')
       const plaintext = Uint8Array.from('');
       return plaintext
     }
