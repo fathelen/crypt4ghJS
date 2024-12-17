@@ -139,9 +139,11 @@ async function * decr () {
     const plaintext = await crypt4GHJS.decryption.decrypption(header, new Uint8Array(chunk), counter)
     const decoder = new TextDecoder()
     if (plaintext) {
+      decText += plaintext
+      /** 
       decText += decoder.decode(plaintext)
       console.log('Länge plain: ', plaintext.length)
-      console.log('längedec: ', decText.length)
+      console.log('längedec: ', decText.length) */
       yield decText
     }
     offset += chunksize
