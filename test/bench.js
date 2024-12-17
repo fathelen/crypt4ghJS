@@ -226,6 +226,7 @@ async function decryptionEditlist (input, seckeyPath, output, wantedblocks) {
           counter++
           const text = await crypt4GHJS.decryption.decrypption(val, d2, counter, wantedblocks)
           if (text) {
+            console.log(text)
             //process.stdout.write(text)
             fs.appendFile(output, text, (err) => {
               if (err) {

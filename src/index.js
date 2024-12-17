@@ -150,12 +150,9 @@ async function * decr () {
     }
     offset += chunksize
   }
-  console.log(resulttext)
   const buffered = Buffer.concat(resulttext)
-  console.log(buffered)
-  const text = new Uint8Array(buffered)
-  console.log(text)
-  return text
+
+  return buffered
   console.log('all done')
 }
 // Download keyfiles
@@ -202,6 +199,8 @@ document.getElementById('but2').addEventListener('click', async function () {
     filename = decName
   }
   const element = document.createElement('a')
+  saveByteArray([dec], filename)
+  /*
   let next
   let index = 0
   while (!(next = await dec.next()).done) {
@@ -214,7 +213,8 @@ document.getElementById('but2').addEventListener('click', async function () {
     element.setAttribute('href',
       'data:text/plain;charset=utf-8,' +
         encodeURIComponent(chunk))
-  }
+  }*/
+
   element.setAttribute('download', filename)
   document.body.appendChild(element)
   element.click()
