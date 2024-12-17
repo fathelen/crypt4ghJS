@@ -11,24 +11,18 @@ const magicBytestring = helperfunction.string2byte('crypt4gh')
 
 export async function decrypption (headerInfo, text, counter, wantedblocks) {
   if (headerInfo[5][0] && headerInfo[5][1] === false && Array.from(headerInfo[5][0].keys()).includes(counter)) {
-    console.log('1')
     const plaintext = await pureDecryption(Uint8Array.from(text), headerInfo[0])
     const aplliedEdit = applyEditlist(headerInfo[5][0].get(counter), plaintext)
-    //console.log(aplliedEdit.length)
     return aplliedEdit
   } else if (headerInfo[5][0] && headerInfo[5][1] === true) {
-    console.log('2')
     if(Array.from(headerInfo[5][0].keys()).includes(counter)){
-      console.log('3')
       const plaintext = await pureDecryption(Uint8Array.from(text), headerInfo[0])
     const aplliedEdit = applyEditlist(headerInfo[5][0].get(counter), plaintext)
     return aplliedEdit
     } else if(counter > Math.max(...headerInfo[5][0].keys())) { 
-      console.log('4')
       const plaintext = await pureDecryption(Uint8Array.from(text), headerInfo[0])
       return plaintext
     } else {
-      console.log('5')
       const plaintext = Uint8Array.from('');
       return plaintext
     }
@@ -76,7 +70,6 @@ export async function headerDeconstruction (header, seckeys) {
     const sessionKey = parseEncPacket(partitionedPackages[0][0])
     if (partitionedPackages[1].length > 0) {
       editlist = pureEdit([sessionKey, decryptedPackets[2], headerPackets[1], partitionedPackages[1], headerPackets[2]])
-      console.log(editlist)
     }
     return [sessionKey, decryptedPackets[2], headerPackets[1], partitionedPackages[1], headerPackets[2], editlist, partitionedPackages[1][0]]
   } catch (e) {

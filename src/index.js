@@ -141,12 +141,6 @@ async function decr () {
     const decoder = new TextDecoder()
     if (plaintext) {
       resulttext.push(plaintext)
-      console.log(plaintext)
-      /** 
-      decText += decoder.decode(plaintext)
-      console.log('Länge plain: ', plaintext.length)
-      console.log('längedec: ', decText.length) */
-      //yield decText
     }
     offset += chunksize
   }
@@ -198,31 +192,16 @@ document.getElementById('but2').addEventListener('click', async function () {
   if (decName !== '') {
     filename = decName
   }
-
-  //const element = document.createElement('a')
   saveByteArray([dec], filename)
   const keyPreview = document.getElementById('deccontents')
   keyPreview.innerText += dec.subarray(0, 500)
+ 
   /*
-  let next
-  let index = 0
-  while (!(next = await dec.next()).done) {
-    const chunk = next.value
-    if (index === 0) {
-      const keyPreview = document.getElementById('deccontents')
-      keyPreview.innerText += chunk.substring(0, 500)
-    }
-    index++
-    element.setAttribute('href',
-      'data:text/plain;charset=utf-8,' +
-        encodeURIComponent(chunk))
-  }*/
-
   element.setAttribute('download', filename)
   document.body.appendChild(element)
   element.click()
 
-  document.body.removeChild(element)
+  document.body.removeChild(element) */
 
 }, false)
 
