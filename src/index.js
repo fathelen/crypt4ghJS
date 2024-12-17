@@ -117,6 +117,7 @@ async function encr () {
 }
 
 async function * decr () {
+  const resulttext = []
   let decText = ''
   const file = document.getElementById('input4')
   const file2 = document.getElementById('input5')
@@ -139,15 +140,18 @@ async function * decr () {
     const plaintext = await crypt4GHJS.decryption.decrypption(header, new Uint8Array(chunk), counter)
     const decoder = new TextDecoder()
     if (plaintext) {
-      decText = plaintext
+      resulttext.push(plaintext)
       /** 
       decText += decoder.decode(plaintext)
       console.log('Länge plain: ', plaintext.length)
       console.log('längedec: ', decText.length) */
-      yield decText
+      //yield decText
     }
     offset += chunksize
   }
+  const buffered = Buffer.concat(resulttext)
+  const text = new Uint8Array(buffered)
+  return text
   console.log('all done')
 }
 // Download keyfiles
